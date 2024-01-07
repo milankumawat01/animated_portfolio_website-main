@@ -4,7 +4,6 @@ import SkillBox from "../../chip/SkillBox";
 
 import { IoLogoHtml5, IoLogoCss3 } from "react-icons/io";
 
-
 import {
   SiJavascript,
   SiTailwindcss,
@@ -49,11 +48,20 @@ const Skills = ({ darkMode }) => {
                   name={"Javascript"}
                   value={80}
                 />
-                <ProgressBar logo={<FaReact />} name={"React Js"} value={80} />
+                <ProgressBar logo={<FaReact />} name={"React Js"} value={75} />
+                <ProgressBar logo={<FaReact />} name={"Node Js"} value={65} />
+                <ProgressBar logo={<FaReact />} name={"Wordpress"} value={72} />
+                <ProgressBar logo={<FaReact />} name={"UI/UX"} value={90} />
+                <ProgressBar logo={<FaReact />} name={"Python"} value={60} />
+                <ProgressBar
+                  logo={<FaReact />}
+                  name={"Artificial Intelligence"}
+                  value={51}
+                />
                 <ProgressBar
                   logo={<SiTailwindcss />}
-                  name={"Tailwind CSS"}
-                  value={80}
+                  name={"Flutter (Dart)"}
+                  value={60}
                 />
               </div>
             </div>
@@ -83,9 +91,7 @@ const Skills = ({ darkMode }) => {
               />
               <SkillBox
                 className=""
-                logo={
-                  <GrCode/>
-                }
+                logo={<GrCode />}
                 black={"black"}
                 white={"white"}
                 skill={"C++"}
