@@ -45,11 +45,10 @@ const Resume = () => {
                 </span>
                 <p className=" text-[.9rem] text-justify break-words text-gray-500">
                   <ul>•Worked on various projects in AI-ML domain.</ul>
-                  <ul>•Hands-on experience with Deep Learning </ul>
+                  <ul>•Hands-on experience with Deep Learning. </ul>
                 </p>
               </div>
-              <br></br>
-
+              <br />
               <div className=" flex flex-col gap-1 sm:gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
                   Front End Developer/ Designer{" "}
@@ -82,7 +81,7 @@ const Resume = () => {
                     • Conducted user research, created wireframes and
                     prototypes, and developed high-fidelity designs.
                   </ul>
-                  <ul>• Worked on Figma and Adobe Creative Suite</ul>
+                  <ul>• Worked on Figma and Adobe Creative Suite.</ul>
                 </p>
               </div>
             </div>
@@ -120,7 +119,6 @@ const Resume = () => {
                 </p>
               </div>
               <br />
-
               <br />
               <div className=" flex flex-col gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
@@ -135,7 +133,6 @@ const Resume = () => {
               </div>
               <br />
               <br />
-
               <div className=" flex flex-col gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
                   Matriculation
