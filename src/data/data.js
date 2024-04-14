@@ -1,6 +1,6 @@
 export const data = [
   {
-    id: 1,
+    id: 7,
     img: "https://i.postimg.cc/vHFR2F63/Frame-1.png",
     title: "Restraunt Website",
     desc: "",
@@ -8,7 +8,7 @@ export const data = [
     git: "https://www.figma.com/file/NQXQAhOgpHqo3vwpVEvR7x/Mehek-E-Punjab?type=design&node-id=0%3A1&mode=design&t=AwTZXz0xnMfVf8qL-1",
   },
   {
-    id: 2,
+    id: 4,
     img: "https://i.postimg.cc/76FRR0bf/1-Home-Page-Tenant-Side.png",
     title: "Rent A Room",
     link: "https://rentaroom-coderift.vercel.app/",
@@ -23,7 +23,7 @@ export const data = [
     git: "Not found",
   },
   {
-    id: 4,
+    id: 6,
     img: "https://i.postimg.cc/1tBt56m1/Screenshot-2024-04-14-191904.png",
     title: "Multiphase Digital",
     desc: "",
@@ -31,7 +31,7 @@ export const data = [
     git: "Not found",
   },
   {
-    id: 5,
+    id: 2,
     img: "https://i.postimg.cc/0jm9KwxN/Screenshot-2024-04-15-004149.png",
     title: "Watermark Detection Tool",
     desc: "",
@@ -39,7 +39,7 @@ export const data = [
     git: "https://github.com/milankumawat1/Watermark-Detection-Tool",
   },
   {
-    id: 6,
+    id: 5,
     img: "https://i.postimg.cc/T1kJmpcZ/Screenshot-2024-04-15-004429.png  ",
     title: "Yolo Trips Website",
     desc: "",
@@ -47,7 +47,7 @@ export const data = [
     git: "https://github.com/milankumawat1/Trails",
   },
   {
-    id: 6,
+    id: 1,
     img: "",
     title: "Salary Prediction App",
     desc: "",
