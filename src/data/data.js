@@ -22,4 +22,12 @@ export const data = [
     link: "https://www.figma.com/community/file/1249076333094763377/miuzik",
     git: "Not found",
   },
+  {
+    id: 4,
+    img: "https://ibb.co/Kmy70bG",
+    title: "Multiphase Digital",
+    desc: "",
+    link: "http://multiphasedigital.com/credits",
+    git: "Not found",
+  },
 ];
