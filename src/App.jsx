@@ -1,35 +1,52 @@
-import React, { useState, useEffect } from "react";
-import { Suspense } from "react";
-import { BarLoader } from "react-spinners";
-import Home from "./pages/Home";
+import { useEffect } from 'react'
+import Layout from './components/Layout'
+import Home from './sections/Home'
+import About from './sections/About'
+import Services from './sections/Services'
+import Works from './sections/Works'
+import Blogs from './sections/Blogs'
+import Contact from './sections/Contact'
 
-const App = () => {
-  const [loading, setLoading] = useState(true);
-
+function App() {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const goFullscreen = () => {
+      const el = document.documentElement
+      if (!document.fullscreenElement) {
+        el.requestFullscreen?.() ||
+          el.webkitRequestFullscreen?.() ||
+          el.msRequestFullscreen?.()
+      }
+    }
+
+    // Browsers require a user gesture to enter fullscreen
+    const events = ['click', 'keydown', 'touchstart', 'scroll']
+    events.forEach((e) => window.addEventListener(e, goFullscreen, { once: true }))
+
+    // Re-enter fullscreen if user exits it
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        // Re-attach listeners so next interaction goes fullscreen again
+        events.forEach((e) => window.addEventListener(e, goFullscreen, { once: true }))
+      }
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, goFullscreen))
+      document.removeEventListener('fullscreenchange', onFullscreenChange)
+    }
+  }, [])
 
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen w-full flex items-center justify-center">
-          <BarLoader color="#f6c400" height={4} />
-        </div>
-      }
-    >
-      {loading ? (
-        <div className="h-screen w-full flex items-center justify-center">
-          <BarLoader color="#f6c400" height={4} />
-        </div>
-      ) : (
-        <Home />
-      )}
-    </Suspense>
-  );
-};
+    <Layout>
+      <Home />
+      <About />
+      <Services />
+      <Works />
+      <Blogs />
+      <Contact />
+    </Layout>
+  )
+}
 
-export default App;
+export default App
