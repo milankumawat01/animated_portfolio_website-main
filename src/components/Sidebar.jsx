@@ -1,14 +1,22 @@
-import { FaLinkedin, FaGithub, FaInstagram, FaBars, FaTimes } from 'react-icons/fa'
 import { useState, useEffect } from 'react'
+import { FaLinkedin, FaGithub, FaInstagram, FaBars, FaTimes } from 'react-icons/fa'
 import { personalInfo, socialLinks } from '../data/content'
 
 const navItems = [
   { id: 'home', label: 'HOME' },
   { id: 'about', label: 'ABOUT' },
+  { id: 'ai', label: 'AI WORKFLOW' },
+  { id: 'stack', label: 'STACK' },
   { id: 'services', label: 'SERVICES' },
-  { id: 'works', label: 'WORKS' },
-  { id: 'blogs', label: 'BLOGS' },
+  { id: 'works', label: 'WORK' },
+  { id: 'freelance', label: 'FREELANCE' },
   { id: 'contact', label: 'CONTACT' },
+]
+
+const socials = [
+  { key: 'linkedin', Icon: FaLinkedin, hover: 'hover:text-accent-orange' },
+  { key: 'github', Icon: FaGithub, hover: 'hover:text-accent-pink' },
+  { key: 'instagram', Icon: FaInstagram, hover: 'hover:text-accent-purple' },
 ]
 
 export default function Sidebar() {
@@ -19,23 +27,15 @@ export default function Sidebar() {
     const container = document.getElementById('main-scroll')
     if (!container) return
 
+    // Whichever nav section's top has most recently passed the 1/3 mark is "current".
     const handleScroll = () => {
-      const scrollTop = container.scrollTop
-      const containerHeight = container.clientHeight
+      const threshold = container.scrollTop + container.clientHeight / 3
+      let current = navItems[0].id
 
-      // Find which section is most visible
-      const allSections = container.querySelectorAll('[id]')
-      let current = 'home'
-
-      allSections.forEach((section) => {
-        const sectionTop = section.offsetTop
-        if (scrollTop >= sectionTop - containerHeight / 3) {
-          current = section.id
-        }
-      })
-
-      // Map experience back to about for nav highlight
-      if (current === 'experience') current = 'about'
+      for (const item of navItems) {
+        const el = document.getElementById(item.id)
+        if (el && el.offsetTop <= threshold) current = item.id
+      }
       setActiveSection(current)
     }
 
@@ -45,90 +45,90 @@ export default function Sidebar() {
   }, [])
 
   const scrollTo = (id) => {
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     setMobileOpen(false)
   }
 
   return (
     <>
-      {/* Mobile hamburger */}
       <button
-        className="fixed top-4 left-4 z-50 lg:hidden bg-dark text-white p-2 rounded"
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        className="fixed left-4 top-4 z-50 rounded-full border border-white/15 bg-dark-deep/80 p-3 text-white backdrop-blur lg:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
-        {mobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        {mobileOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
       </button>
 
-      {/* Overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-sidebar bg-dark-deep z-40 flex flex-col justify-between py-10 px-6 transition-transform duration-300 ${
+        className={`fixed left-0 top-0 z-40 flex h-full w-sidebar flex-col justify-between border-r border-line bg-dark-deep px-6 py-10 transition-transform duration-300 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
-        {/* Logo */}
         <div>
-          <h1
-            className="text-white text-3xl font-black mb-12 cursor-pointer"
+          <button
             onClick={() => scrollTo('home')}
+            className="mb-10 block text-left text-3xl font-black text-white"
           >
-            {personalInfo.logo}
-          </h1>
+            Milan<span className="gradient-text-anim">.</span>
+          </button>
 
-          {/* Navigation */}
-          <nav className="flex flex-col gap-4">
+          <nav className="flex flex-col gap-1">
             {navItems.map((item) => {
               const isActive = activeSection === item.id
               return (
                 <button
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
-                  className={`text-sm font-medium tracking-wider transition-colors text-left ${
-                    isActive
-                      ? 'text-white line-through decoration-2'
-                      : 'text-gray-400 hover:text-white'
+                  aria-current={isActive ? 'true' : undefined}
+                  className={`group flex items-center gap-2.5 py-1.5 text-left text-[13px] font-medium tracking-wide transition-colors ${
+                    isActive ? 'text-white' : 'text-white/40 hover:text-white/85'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    {item.label}
-                    {isActive && (
-                      <span className="w-2 h-2 rounded-full gradient-bg inline-block" />
-                    )}
-                  </span>
+                  <span
+                    className={`h-px transition-all duration-300 ${
+                      isActive ? 'w-5 gradient-bg' : 'w-2 bg-white/25 group-hover:w-4'
+                    }`}
+                  />
+                  {item.label}
                 </button>
               )
             })}
           </nav>
         </div>
 
-        {/* Bottom section */}
         <div>
-          {/* Social Icons */}
-          <div className="flex flex-col gap-4 mb-6">
-            <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-white hover:text-accent-orange transition-colors w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center">
-              <FaLinkedin size={16} />
-            </a>
-            <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-white hover:text-accent-pink transition-colors w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center">
-              <FaGithub size={16} />
-            </a>
-            <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-white hover:text-accent-purple transition-colors w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center">
-              <FaInstagram size={16} />
-            </a>
+          <a
+            href={personalInfo.resume}
+            download
+            className="mb-6 block rounded-full border border-white/15 py-2.5 text-center text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
+          >
+            Resume &#8595;
+          </a>
+
+          <div className="mb-5 flex gap-2.5">
+            {socials.map(({ key, Icon, hover }) => (
+              <a
+                key={key}
+                href={socialLinks[key]}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={key}
+                className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/12 text-white/70 transition-colors ${hover}`}
+              >
+                <Icon size={14} />
+              </a>
+            ))}
           </div>
 
-          {/* Copyright */}
-          <p className="text-gray-500 text-xs leading-relaxed">
-            Copyright &copy;2026 {personalInfo.name}. All rights reserved.
+          <p className="text-[10px] leading-relaxed text-white/25">
+            &copy; 2026 {personalInfo.name}
           </p>
         </div>
       </aside>

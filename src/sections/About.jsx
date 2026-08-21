@@ -1,147 +1,127 @@
-import { motion } from 'framer-motion'
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaUser, FaDownload } from 'react-icons/fa'
-import { personalInfo, stats, aboutDescription, aboutStatsDescription, quote, experience, education } from '../data/content'
+import { FaGraduationCap, FaBriefcase } from 'react-icons/fa'
+import {
+  personalInfo, stats, aboutIntro, aboutApproach, quote, experience, education,
+} from '../data/content'
+import Reveal from '../components/Reveal'
+import SectionHeading from '../components/SectionHeading'
+import Counter from '../components/Counter'
+import Aurora from '../components/Aurora'
 
 export default function About() {
   return (
-    <>
-      {/* Top Section - White */}
-      <section id="about" className="h-screen snap-start bg-white overflow-y-auto">
-        <div className="min-h-full px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 py-10 sm:py-14 flex flex-col justify-center max-w-[1600px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <p className="text-accent-orange italic text-sm 2xl:text-base mb-2">Nice to meet you!</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl font-black text-black mb-6 sm:mb-10">WELCOME TO...</h1>
-          </motion.div>
+    <section id="about" className="relative bg-dark py-24 sm:py-28">
+      <Aurora variant="soft" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left - Profile */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex flex-col items-center lg:items-start"
-            >
-              <div className="relative w-32 h-32 sm:w-44 sm:h-44 md:w-52 md:h-52 2xl:w-64 2xl:h-64 rounded-full overflow-hidden border-4 border-gray-100 mb-4 sm:mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                  alt={personalInfo.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white italic text-sm sm:text-lg font-light opacity-80 drop-shadow-lg whitespace-nowrap">
-                  Milan Kumawat
-                </div>
-              </div>
+      <div className="relative mx-auto max-w-[1500px] px-6 sm:px-10 md:px-14 lg:px-20 xl:px-24">
+        <SectionHeading kicker="About" title="WHO I" accent="AM" />
 
-              <h2 className="text-xl sm:text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">{personalInfo.name.toUpperCase()}</h2>
-              <p className="text-gray-600 text-sm sm:text-base 2xl:text-lg mb-3 sm:mb-4 text-center lg:text-left">
-                <span className="font-semibold">{personalInfo.title}</span> based in{' '}
-                <span className="font-bold text-black">{personalInfo.location}</span>
-              </p>
-              <a href="#" className="inline-flex items-center gap-2 text-black text-sm sm:text-base font-semibold underline underline-offset-4 decoration-2 hover:text-accent-orange transition-colors">
-                Download CV <FaDownload size={12} />
-              </a>
-            </motion.div>
+        <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+          <div>
+            <Reveal delay={0.05}>
+              <p className="text-base sm:text-lg leading-relaxed text-white/60">{aboutIntro}</p>
+            </Reveal>
+            <Reveal delay={0.12}>
+              <p className="mt-5 text-base sm:text-lg leading-relaxed text-white/60">{aboutApproach}</p>
+            </Reveal>
 
-            {/* Right - Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <FaPhone className="text-gray-400 flex-shrink-0" size={14} />
-                  <span className="text-xs sm:text-sm 2xl:text-base text-gray-700">{personalInfo.phone}</span>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <FaUser className="text-gray-400 flex-shrink-0" size={14} />
-                  <span className="text-xs sm:text-sm 2xl:text-base text-gray-700">{personalInfo.age}</span>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <FaEnvelope className="text-gray-400 flex-shrink-0" size={14} />
-                  <span className="text-xs sm:text-sm 2xl:text-base text-gray-700 break-all">{personalInfo.email}</span>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <FaMapMarkerAlt className="text-gray-400 flex-shrink-0" size={14} />
-                  <span className="text-xs sm:text-sm 2xl:text-base text-gray-700">{personalInfo.country}, {personalInfo.location}</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 sm:gap-8 mb-5 sm:mb-6">
-                <div>
-                  <span className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black gradient-text">{stats.yearsExperience}</span>
-                  <p className="text-xs sm:text-sm 2xl:text-base text-gray-500 mt-1">
-                    <span className="font-semibold text-black">Years</span><br />experience...
-                  </p>
-                  <p className="text-[10px] sm:text-xs 2xl:text-sm text-gray-500 mt-2 leading-relaxed hidden sm:block">{aboutDescription}</p>
-                </div>
-                <div>
-                  <span className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-black gradient-text">{stats.projectsCompleted}</span>
-                  <p className="text-xs sm:text-sm 2xl:text-base text-gray-500 mt-1">
-                    <span className="font-semibold text-black">Projects</span><br />Completed...
-                  </p>
-                  <p className="text-[10px] sm:text-xs 2xl:text-sm text-gray-500 mt-2 leading-relaxed hidden sm:block">{aboutStatsDescription}</p>
-                </div>
-              </div>
-
-              <div className="gradient-bg rounded-xl p-4 sm:p-6 text-white">
-                <span className="text-2xl sm:text-4xl font-serif leading-none">&ldquo;&ldquo;</span>
-                <p className="italic text-xs sm:text-sm 2xl:text-base leading-relaxed mt-1 sm:mt-2">{quote}</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Experience Section */}
-      <section id="experience" className="h-screen snap-start gradient-bg overflow-y-auto">
-        <div className="min-h-full px-6 sm:px-10 md:px-14 lg:px-20 xl:px-28 2xl:px-36 py-10 sm:py-14 flex flex-col justify-center max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <p className="text-yellow-200 italic text-sm 2xl:text-base mb-2">Experience</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-black text-white mb-4 sm:mb-6">MY EXPERIENCE</h2>
-              <p className="text-white/80 text-xs sm:text-sm 2xl:text-base leading-relaxed mb-6 sm:mb-8">
-                Hello there! I'm Milan Kumawat.<br />
-                An AI Engineer & Full-Stack Developer, passionate about building intelligent systems and scalable applications.
-              </p>
-              <button className="bg-dark-deep text-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm 2xl:text-base font-semibold hover:bg-black transition-colors flex items-center gap-2 rounded">
-                Download my resume <FaDownload size={12} />
-              </button>
-            </motion.div>
-
-            <div className="flex flex-col gap-5 sm:gap-8">
-              {experience.map((exp, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.15 }}
-                  className="border-t border-white/30 pt-3 sm:pt-4"
-                >
-                  <div className="flex justify-between items-start mb-1 sm:mb-2">
-                    <span className="text-yellow-200 text-xs sm:text-sm 2xl:text-base italic">-{exp.period}</span>
-                    <span className="text-white/70 text-xs sm:text-sm 2xl:text-base italic">-{exp.company}</span>
+            <Reveal delay={0.18}>
+              <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {stats.map((s) => (
+                  <div key={s.label} className="rounded-xl glass glass-hover p-4">
+                    <p className="text-3xl font-black gradient-text sm:text-4xl">
+                      <Counter value={s.value} suffix={s.suffix} />
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">{s.label}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-white/40">{s.sub}</p>
                   </div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl 2xl:text-3xl font-black text-white">{exp.role}</h3>
-                </motion.div>
-              ))}
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.24}>
+              <blockquote className="relative mt-8 overflow-hidden rounded-2xl gradient-bg p-6 sm:p-7">
+                <span className="absolute -top-2 left-4 font-serif text-7xl leading-none text-white/25">&ldquo;</span>
+                <p className="relative text-sm italic leading-relaxed text-white sm:text-base">{quote}</p>
+              </blockquote>
+            </Reveal>
+          </div>
+
+          {/* Right rail — quick facts */}
+          <Reveal dir="right" delay={0.1}>
+            <div className="rounded-2xl glass p-6 sm:p-7">
+              <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.25em] text-accent-orange">
+                Quick facts
+              </p>
+              <dl className="space-y-4 text-sm">
+                {[
+                  ['Name', personalInfo.name],
+                  ['Role', personalInfo.title],
+                  ['Based in', personalInfo.address],
+                  ['Email', personalInfo.email],
+                  ['Phone', personalInfo.phone],
+                  ['Studying', 'M.Tech AI/ML — BITS Pilani'],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-4 border-b border-line pb-3 last:border-0">
+                    <dt className="shrink-0 text-white/40">{k}</dt>
+                    <dd className="text-right font-medium text-white/90 break-all">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-7">
+                <p className="mb-4 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-accent-purple">
+                  <FaGraduationCap size={12} /> Education
+                </p>
+                {education.map((e) => (
+                  <div key={e.degree} className="mb-4 border-l-2 border-accent-purple/40 pl-4 last:mb-0">
+                    <p className="font-mono text-[11px] text-white/40">{e.period}</p>
+                    <p className="text-sm font-semibold text-white">{e.degree}</p>
+                    <p className="text-xs text-white/55">{e.institution}</p>
+                    {e.details && <p className="mt-0.5 text-[11px] text-white/35">{e.details}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
+          </Reveal>
+        </div>
+
+        {/* Experience timeline */}
+        <div className="mt-20">
+          <Reveal>
+            <p className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.25em] text-accent-orange">
+              <FaBriefcase size={12} /> Experience
+            </p>
+          </Reveal>
+
+          <div className="relative border-l border-line pl-6 sm:pl-10">
+            {experience.map((exp, i) => (
+              <Reveal key={exp.role + exp.period} delay={i * 0.06} className="group relative pb-10 last:pb-0">
+                <span className="absolute -left-[31px] top-1.5 h-3 w-3 rounded-full gradient-bg ring-4 ring-dark sm:-left-[47px]" />
+
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                  <h3 className="text-lg font-black tracking-tight text-white sm:text-xl md:text-2xl">
+                    {exp.role}
+                  </h3>
+                  <span className="font-mono text-xs text-accent-orange">{exp.period}</span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-white/70">{exp.company}</p>
+                <p className="text-xs italic text-white/35">{exp.description}</p>
+
+                {exp.points && (
+                  <ul className="mt-3 space-y-1.5">
+                    {exp.points.map((p) => (
+                      <li key={p} className="flex gap-2.5 text-sm leading-relaxed text-white/50">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent-pink" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Reveal>
+            ))}
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }
