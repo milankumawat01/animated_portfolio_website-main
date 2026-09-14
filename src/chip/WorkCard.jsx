@@ -6,11 +6,11 @@ import { AiOutlineGithub } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const WorkCard = () => {
-  const reversedData = [...data].reverse();
+  const projects = [...data];
 
   return (
     <>
-      {reversedData.map((data) => {
+      {projects.map((data) => {
         return (
           <div
             data-aos="zoom-in"
@@ -19,11 +19,22 @@ const WorkCard = () => {
           >
             <POPUP className="img-content relative">
               <div className="h-[280px] w-[380px] hover:scale-125 transition duration-500 cursor-pointer shadow-xl rounded-md overflow-hidden sm:h-[260px] sm:w-[92%] sm:bg-cover mx-auto ">
-                <img
-                  src={data.img}
-                  alt={data.title}
-                  className=" object-fit w-full h-full hover:scale-125 transition duration-500 cursor-pointer"
-                />
+                {data.img ? (
+                  <img
+                    src={data.img}
+                    alt={data.title}
+                    className=" object-fit w-full h-full hover:scale-125 transition duration-500 cursor-pointer"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col gap-2 items-center justify-center bg-gradient-to-br from-yellow-300 to-yellow-500 p-5 text-center">
+                    <span className=" text-xl font-bold text-black">
+                      {data.title}
+                    </span>
+                    <span className=" text-sm font-medium text-black/70">
+                      {data.tech}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div
@@ -33,23 +44,26 @@ const WorkCard = () => {
                   {data.desc}
                 </p>
                 <div className=" flex items-center justify-center gap-4">
-                  <Link
-                    to={data.link}
-                    target="_blank"
-                    className="  mt-3 rounded-md shadow-md p-1 px-2 flex gap-2 items-center justify-center font-medium"
-                  >
-                    <RxExternalLink className=" text-black bg-white rounded-full border  w-[35px] h-[35px] p-2" />
-                    <p className=" text-black">Demo</p>
-                  </Link>
-                  <br className="w-[2px] bg-white" />
-                  <Link
-                    to={data.git}
-                    target="_blank"
-                    className="  mt-3 rounded-md shadow-md p-1 px-2 flex gap-2 items-center justify-center font-medium"
-                  >
-                    <AiOutlineGithub className="  text-black bg-white rounded-full border  w-[35px] h-[35px] p-2" />
-                    <p className=" text-black">Code</p>
-                  </Link>
+                  {data.link && (
+                    <Link
+                      to={data.link}
+                      target="_blank"
+                      className="  mt-3 rounded-md shadow-md p-1 px-2 flex gap-2 items-center justify-center font-medium"
+                    >
+                      <RxExternalLink className=" text-black bg-white rounded-full border  w-[35px] h-[35px] p-2" />
+                      <p className=" text-black">Demo</p>
+                    </Link>
+                  )}
+                  {data.git && (
+                    <Link
+                      to={data.git}
+                      target="_blank"
+                      className="  mt-3 rounded-md shadow-md p-1 px-2 flex gap-2 items-center justify-center font-medium"
+                    >
+                      <AiOutlineGithub className="  text-black bg-white rounded-full border  w-[35px] h-[35px] p-2" />
+                      <p className=" text-black">Code</p>
+                    </Link>
+                  )}
                 </div>
               </div>
             </POPUP>

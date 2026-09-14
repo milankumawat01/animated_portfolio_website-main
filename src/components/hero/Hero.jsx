@@ -26,15 +26,15 @@ const Hero = () => {
             <TypeAnimation
               data-aos="fade-up"
               sequence={[
-                "Web Developer",
+                "AI Engineer",
                 2000,
-                "UI Designer",
+                "Backend Developer",
                 2000,
-                "Flutter Developer",
+                "Python & FastAPI Developer",
                 2000,
-                "Wordpress Developer",
+                "Full Stack Developer",
                 2000,
-                "Data Analyst",
+                "SaaS Builder",
                 2000,
                 "",
               ]}
@@ -46,7 +46,11 @@ const Hero = () => {
             <p
               // data-aos="fade-up"
               className=" text-[1.1rem] font-medium w-3/4 md:w-full text-gray-600 sm:text-[.95rem]"
-            ></p>
+            >
+              AI Engineer and Backend Developer building production SaaS
+              products, AI-powered applications and REST APIs with Python,
+              FastAPI, React and cloud-deployed infrastructure.
+            </p>
           </div>
           <div data-aos="fade-up" className="buttons flex gap-5">
             <a
@@ -58,7 +62,7 @@ const Hero = () => {
             <a
               href={resumePDF}
               className="flex items-center gap-2 border- text-[1rem] bg-white border-black px-7 py-2 sm:px-6 rounded-lg font-bold  hover:text-yellow-500"
-              download="Milan_Kumawat_Resume.pdf"
+              download="Milan Kumawat Resume.pdf"
             >
               <div className="flex items-center gap-1">
                 Resume <FiDownload />
@@ -72,7 +76,7 @@ const Hero = () => {
               className=" flex gap-5"
             >
               <li>
-                <a href="https://github.com/milankumawat1">
+                <a href="https://github.com/milankumawat01">
                   {" "}
                   <AiFillGithub className=" h-[1.8rem] w-[1.8rem] text-xl hover:scale-125" />{" "}
                 </a>

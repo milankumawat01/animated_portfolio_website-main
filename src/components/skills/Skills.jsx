@@ -2,18 +2,18 @@ import React from "react";
 import ProgressBar from "../../chip/ProgressBar";
 import SkillBox from "../../chip/SkillBox";
 
-import { IoLogoHtml5, IoLogoCss3 } from "react-icons/io";
-
 import {
-  SiJavascript,
-  SiTailwindcss,
+  SiPython,
+  SiFastapi,
   SiMongodb,
-  SiExpress,
+  SiPostgresql,
+  SiDocker,
+  SiRedis,
+  SiTypescript,
+  SiNextdotjs,
+  SiOpenai,
 } from "react-icons/si";
-import { GrCode } from "react-icons/gr";
-import { SiNextdotjs } from "react-icons/si";
 import { FaReact } from "react-icons/fa";
-import { IoLogoNodejs } from "react-icons/io";
 
 const Skills = ({ darkMode }) => {
   return (
@@ -41,27 +41,41 @@ const Skills = ({ darkMode }) => {
               className="progress flex items-center h-[100%] justify-end md:justify-center"
             >
               <div className=" flex flex-col gap-6  w-3/4  my-5 md:w-[90%]">
-                <ProgressBar logo={<IoLogoHtml5 />} name={"HTML"} value={95} />
-                <ProgressBar logo={<IoLogoCss3 />} name={"CSS"} value={88} />
+                <ProgressBar logo={<SiPython />} name={"Python"} value={92} />
                 <ProgressBar
-                  logo={<SiJavascript />}
-                  name={"Javascript"}
-                  value={40}
+                  logo={<SiFastapi />}
+                  name={"FastAPI / REST APIs"}
+                  value={90}
                 />
-                <ProgressBar logo={<FaReact />} name={"React Js"} value={60} />
-                
-                <ProgressBar logo={<FaReact />} name={"Wordpress"} value={72} />
-                <ProgressBar logo={<FaReact />} name={"UI/UX"} value={90} />
-                <ProgressBar logo={<FaReact />} name={"Python"} value={60} />
+                <ProgressBar
+                  logo={<SiOpenai />}
+                  name={"AI / LLM Integration"}
+                  value={88}
+                />
+                <ProgressBar
+                  logo={<SiMongodb />}
+                  name={"MongoDB / PostgreSQL"}
+                  value={85}
+                />
                 <ProgressBar
                   logo={<FaReact />}
-                  name={"Artificial Intelligence"}
-                  value={51}
+                  name={"React / Next.js"}
+                  value={80}
                 />
                 <ProgressBar
-                  logo={<SiTailwindcss />}
-                  name={"Flutter (Dart)"}
-                  value={60}
+                  logo={<SiTypescript />}
+                  name={"JavaScript / TypeScript"}
+                  value={78}
+                />
+                <ProgressBar
+                  logo={<SiDocker />}
+                  name={"Docker / Linux / Deployment"}
+                  value={75}
+                />
+                <ProgressBar
+                  logo={<SiRedis />}
+                  name={"Redis / Caching / Queues"}
+                  value={70}
                 />
               </div>
             </div>
@@ -70,10 +84,10 @@ const Skills = ({ darkMode }) => {
           <div className="right relative flex-1 flex flex-wrap p-5 gap-10 items-center justify-center sm:w-full">
             <div className="first2 flex flex-col gap-10">
               <SkillBox
-                logo={<IoLogoNodejs />}
+                logo={<SiPython />}
                 black={"white"}
                 white={"black"}
-                skill={"Node Js"}
+                skill={"Python"}
               />
               <SkillBox
                 logo={<SiMongodb />}
@@ -84,75 +98,20 @@ const Skills = ({ darkMode }) => {
             </div>
             <div className="last2 flex flex-col gap-10">
               <SkillBox
-                logo={<SiExpress />}
+                logo={<SiFastapi />}
                 black={"black"}
                 white={"white"}
-                skill={"Express Js"}
+                skill={"FastAPI"}
               />
               <SkillBox
-                className=""
-                logo={<GrCode />}
+                logo={<SiDocker />}
                 black={"black"}
                 white={"white"}
-                skill={"C++"}
+                skill={"Docker"}
               />
-              {/* <SkillBox
-                className=""
-                logo={
-                  <SiNextdotjs className=" text-white bg-black rounded-full h-fit border-white overflow-hidden" />
-                }
-                black={"black"}
-                white={"white"}
-                skill={"Next Js"}
-              /> */}
             </div>
           </div>
         </div>
-
-        {/* icons */}
-        {/* <div
-          data-aos="fade-up"
-          data-aos-duration="1200"
-          className=" container m-auto flex items-center justify-center mt-8 gap-8 md:gap-5"
-        >
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/ios-filled/50/null/c-plus-plus-logo.png"
-          />
-
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/color/48/null/python--v1.png"
-          />
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/ios/50/null/react-native--v1.png"
-          />
-
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/color/48/null/sass.png"
-            />
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/ios-filled/50/null/git.png"
-            />
-            <img
-              className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-              src="https://img.icons8.com/windows/50/null/sass--v1.png"
-            />
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/color/48/null/c-plus-plus-logo.png"
-          />
-          <img
-            className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]"
-            src="https://img.icons8.com/ios-filled/50/null/python.png"
-          />
-          <img className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]" src="https://img.icons8.com/color/48/null/javascript--v1.png"/>
-          <img className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]" src="https://img.icons8.com/color/48/null/nodejs.png"/>
-          <img className="w-[40px] h-[40px] md:w-[35px] md:h-[35px]" src="https://img.icons8.com/external-tal-revivo-shadow-tal-revivo/24/null/external-mongodb-a-cross-platform-document-oriented-database-program-logo-shadow-tal-revivo.png"/>
-        </div> */}
       </div>
     </div>
   );

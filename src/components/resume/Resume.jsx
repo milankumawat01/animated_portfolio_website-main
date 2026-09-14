@@ -35,54 +35,83 @@ const Resume = () => {
               {/* design */}
               <div className=" flex flex-col gap-1 sm:gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
-                  Data Science Intern
+                  AI Engineer
                 </h1>
                 <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
-                  Learn and Build
+                  True Value Infosoft Pvt. Ltd.
                 </span>
                 <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
-                  June 2023 - Aug 2023
+                  May 2025 - Present
                 </span>
-                <p className=" text-[.9rem] text-justify break-words text-gray-500">
-                  <ul>•Worked on various projects in AI-ML domain.</ul>
-                  <ul>•Hands-on experience with Deep Learning. </ul>
-                </p>
+                <ul className=" text-[.9rem] text-justify break-words text-gray-500 list-none">
+                  <li>
+                    • Build production AI and backend systems using Python,
+                    FastAPI, REST APIs, MongoDB, PostgreSQL and React.
+                  </li>
+                  <li>
+                    • Built Hiro end-to-end from frontend and backend to
+                    database, auth, AI integrations and production deployment;
+                    reached 5,000+ candidates.
+                  </li>
+                  <li>
+                    • Built Salezo, a sales outreach platform for multi-source
+                    lead capture across WhatsApp, RCS, SMS and email.
+                  </li>
+                  <li>
+                    • Built AI chatbots, voice-call agents, document-processing
+                    workflows and n8n automations.
+                  </li>
+                  <li>
+                    • Led technical execution and coordinated teams of up to
+                    15+ members, handling client requirements and delivery.
+                  </li>
+                </ul>
               </div>
               <br />
               <div className=" flex flex-col gap-1 sm:gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
-                  Front End Developer/ Designer{" "}
+                  Trainee to Full Stack Developer
                 </h1>
                 <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
-                  Digi21 Services pvt. ltd{" "}
+                  eAdmin Business Process Pvt. Ltd.
                 </span>
                 <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
-                  April 2023 - June 2023
+                  July 2024 - April 2025
                 </span>
-                <p className=" text-[.9rem] text-justify break-words text-gray-500">
-                  <ul>•Flutter app developer.</ul>
-                  <ul>•Front End web developer. </ul>
-                  <ul>• UI/UX designer. </ul>
-                </p>
+                <ul className=" text-[.9rem] text-justify break-words text-gray-500 list-none">
+                  <li>
+                    • Developed backend APIs, authentication and database
+                    integrations using Python, FastAPI, Django, React, Flutter,
+                    PostgreSQL and MongoDB.
+                  </li>
+                  <li>
+                    • Worked with engineering teams to turn business
+                    requirements into production-ready features.
+                  </li>
+                </ul>
               </div>
-              <br></br>
+              <br />
               <div className=" flex flex-col gap-1 sm:gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
-                  UI/UX Intern
+                  Freelance Developer
                 </h1>
                 <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
-                  eAdmin Business Process pvt. ltd.{" "}
+                  Independent
                 </span>
                 <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
-                  June 2023 - Aug 2023
+                  Ongoing
                 </span>
-                <p className=" text-[.9rem] text-justify break-words text-gray-500">
-                  <ul>
-                    • Conducted user research, created wireframes and
-                    prototypes, and developed high-fidelity designs.
-                  </ul>
-                  <ul>• Worked on Figma and Adobe Creative Suite.</ul>
-                </p>
+                <ul className=" text-[.9rem] text-justify break-words text-gray-500 list-none">
+                  <li>
+                    • Delivered 8+ projects including websites, ecommerce
+                    systems, MVPs, automation tools and installable
+                    applications.
+                  </li>
+                  <li>
+                    • Handled client communication, requirement gathering,
+                    deployment and project handover.
+                  </li>
+                </ul>
               </div>
             </div>
           </fieldset>
@@ -105,6 +134,19 @@ const Resume = () => {
               {/* design */}
               <div className=" flex flex-col gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
                 <h1 className="text-[1.4rem] font-semibold sm:text-xl">
+                  M.Tech, Artificial Intelligence & Machine Learning
+                </h1>
+                <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
+                  BITS Pilani
+                </span>
+                <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
+                  Year 2026 - Present
+                </span>
+              </div>
+              <br />
+              <br />
+              <div className=" flex flex-col gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
+                <h1 className="text-[1.4rem] font-semibold sm:text-xl">
                   B.Tech, Computer Science
                 </h1>
                 <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
@@ -115,7 +157,7 @@ const Resume = () => {
                 </span>
                 <p className=" text-[.9rem] text-justify text-gray-500">
                   Relevant Coursework: Software Engineering, Software
-                  Development, DSA. GPA: 9.1
+                  Development, DSA. CGPA: 8.5/10
                 </p>
               </div>
               <br />
@@ -129,19 +171,6 @@ const Resume = () => {
                 </span>
                 <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
                   Year 2017 - Year 2019
-                </span>
-              </div>
-              <br />
-              <br />
-              <div className=" flex flex-col gap-1 border-2 border-yellow-400 shadow-[0px_0px_16px_1px_rgba(0,0,0,0.1)] p-3 rounded-lg">
-                <h1 className="text-[1.4rem] font-semibold sm:text-xl">
-                  Matriculation
-                </h1>
-                <span className=" text-[.9rem] font-semibold text-gray-500 sm:text-base">
-                  St. Anselm’s North City School{" "}
-                </span>
-                <span className=" text-[.9rem] font-semibold text-yellow-500 sm:text-base">
-                  Year 2008 - Year 2017
                 </span>
               </div>
             </div>
