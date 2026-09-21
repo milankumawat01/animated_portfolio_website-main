@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0–P2 and Wave 4 batches 1+2 done. Batch 3 dispatching.
+**Last updated:** 2026-09-22 — **all eight stations built.** P0–P3 done, P4 in progress.
 
 ---
 
@@ -20,9 +20,9 @@
 | P3D | Experience station | ✅ Done | agent | 5/12 calls · 13k/90k tris |
 | P3E | Skills station | ✅ Done | agent | 3/8 calls · 3.5k/25k tris |
 | P3F | How I Build station | ✅ Done | agent | 5/16 calls · 1.8k/30k tris |
-| P3G | Writing station | 🟦 In progress | agent | batch 3 |
-| P3H | Contact station | 🟦 In progress | agent | batch 3 · deps ready |
-| P4 | Interaction & Polish | ⬜ Not started | — | Blocked by all P3 |
+| P3G | Writing station | ✅ Done | agent | 5/10 calls · 7.5k/20k tris |
+| P3H | Contact station | ✅ Done | agent | 10/20 calls · 2.8k/70k tris |
+| P4 | Interaction & Polish | 🟦 In progress | main | — |
 | P5 | Performance & Assets | ⬜ Not started | — | Blocked by P4 |
 | P6 | A11y, SEO, Fallback | ⬜ Not started | — | Blocked by P4 |
 | P7 | QA & Deploy | ⬜ Not started | — | Blocked by P5 + P6 |
@@ -144,6 +144,24 @@ Filled in by each station agent from the `?debug=1` HUD.
   scroll by up to 100vh. For Experience the sticky child is pinned across local
   0.226–0.746; for Build, 0.48–0.857. Reveals fire at 0.08, which on some stations is
   while the content is still below the fold. Worth a single pass over all eight.
+- [from P3G → P4] **How I Build bleeds two stations either side.** Its blueprint grid
+  plane is `PLANE_W = 200 × PLANE_D = 190` world units centred on Build's anchor at
+  z −210, so it spans z −310 to −110 — across the whole of Writing *and* Contact. It
+  is the most visible thing in Writing's lower half and directly fights that station's
+  "light, airy, weightless" brief. One constant in `scenes/build/BlueprintGrid.tsx`.
+- [from P3G → P4, judgement call] The environment cross-fade interpolates between
+  station *centres*, so Writing's background is already lerping toward Contact's
+  near-black through its last third. Writing fades its sheets out over global
+  0.888–0.908 to cope. This may be exactly right — approaching the dark bookend
+  should feel like dusk — but it is worth looking at once with all eight present.
+- [from P3H → P4] Local hover store at `src/scenes/contact/useTileHover.ts`. That is
+  **three** local stores now (projects, skills, contact) for P4 to absorb into
+  `useInteraction`. Contact's also exports `CONTACT_TILE_IDS`.
+- [from P3H → P7] A vertex-stage varying carrying *arithmetic* on `uv.y` came back as
+  a constant 0 under ANGLE/SwiftShader — three separate formulations all failed, and
+  the lamp cone drew nothing. Moved to the fragment stage, which is correct either
+  way. **Unknown whether this reproduces on real GPU drivers**; worth a look during
+  cross-browser testing since it would silently blank geometry.
 - [from P0 → P5/assets] `simple-icons@16.32.0` has **no mark** for: **OpenAI**,
   **LlamaIndex**, **VS Code**, **RAG**. `TechLogo` renders a monogram tile for these
   until Milan supplies 128×128 SVGs. Aliases resolved for the rest — see
@@ -333,3 +351,39 @@ Filled in by each station agent from the `?debug=1` HUD.
   says it is at station X, X's DOM section is on screen. It also reads live state
   (`window.__scrollState`, `window.__frameStats` under `?debug=1`) instead of scraping
   a HUD that only repaints five times a second, which was making checks flaky.
+- [P3G] 2026-09-22 — done. Sheets of paper falling toward the lens: 5 draw calls,
+  7.5k/20k triangles, zero added lights (the key is in `paper.frag`). One shallow
+  cosine fold rather than a wave train, so it bends like paper instead of rippling
+  like cloth, and front/back are genuinely different stock so a turn is legible.
+  Scroll-up reversal verified numerically, not by eye: travel climbed 1.38→6.98
+  scrolling down and went 6.80→6.11 scrolling up — a real reversal, not a slowdown.
+  Caught a real bug by arithmetic that no screenshot would have shown: the Y-squeeze
+  plus lift could drop a blank sheet to 0.71 units from the lens axis, inside its own
+  half-diagonal, so it would have clipped the near plane at certain spawn angles.
+  Also fixed a carousel end-stop bug where clicking to card three snapped back to zero.
+  Covers procedural behind `USE_ARTICLE_IMAGES = false`; the four `href` are `'#'` and
+  are marked `aria-disabled` with click prevented, so they do not yank the page.
+
+- [P3H] 2026-09-22 — done, and the bookend closes. **Both cross-station imports are
+  real**: `MonogramPoints` from P3A runs the hero's dissolve in reverse (1→0 across
+  local 0.12–0.62, settled well before the footer), and `createDeskGroup('low')` from
+  P3B places the About desk far and dim. Neither was reimplemented.
+  10/20 draw calls, 2.8k/70k triangles; 5 draw calls at low. All four contact links
+  verified in a real browser and the resume PDF actually resolves — 200,
+  application/pdf, 147,518 bytes, magic `%PDF-`.
+  Glass panels are one instanced mesh rather than four transmission materials: four
+  meshes sharing a material is still four draw calls, and instancing is the only thing
+  that genuinely shares. Contact is the shortest station (115vh) so the pin window is
+  only 15.2vh; the agent measured it and rebuilt the layout as a full-height
+  space-between column until the child fit exactly 100vh, because the first attempt
+  was 943px in a 900px viewport and clipped the eyebrow.
+
+- [wave 4] 2026-09-22 — **all eight stations built, integrated and green.** Build,
+  lint, typecheck and the full QA suite pass. Camera sweeps all eight with no
+  discontinuity, every station within budget, zero console errors, zero failed
+  requests, and the camera tracks the DOM at all six viewports from 390 to 2560.
+  Six engine/design-system bugs were found by agents and fixed centrally rather than
+  worked around: the vertex-shader prelude, the reduced-motion blur, the DOF focus
+  default, `Card` clobbering its own styles, `CodeBlock` retyping, and the HUD judging
+  co-mounted stations against a single budget.
+  Nothing anyone reported needed a change to a file they did not own except those six.

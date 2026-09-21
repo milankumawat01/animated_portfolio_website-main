@@ -256,10 +256,17 @@ try {
   await scrollTo(n.page, 0)
   await n.page.locator('header nav ul li button', { hasText: 'Projects' }).click()
   await n.page.waitForTimeout(2200)
-  const landed = await n.page.evaluate(
-    () => window.scrollY / (document.body.scrollHeight - window.innerHeight),
+  /**
+   * Compare CANONICAL progress, not raw scroll. `scrollTo` targets a canonical
+   * position and maps it back through the measured layout, so raw scrollY will not
+   * match the canonical range whenever a section has outgrown its share.
+   */
+  const landed = await n.page.evaluate(() => window.__scrollState?.progress ?? -1)
+  note(
+    landed > 0.22 && landed < 0.3,
+    'clicking a nav link travels there',
+    `canonical p=${landed.toFixed(3)}`,
   )
-  note(landed > 0.22 && landed < 0.3, 'clicking a nav link travels there', landed.toFixed(3))
   note(n.errors.length === 0, 'nav: no console errors', n.errors.slice(0, 2).join(' | '))
   await n.ctx.close()
 
