@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+:root {
+  --page-bg: #05080e;
+}
+
+html,
+body {
+  background: var(--page-bg);
+  color: #f2f6fc;
+}
