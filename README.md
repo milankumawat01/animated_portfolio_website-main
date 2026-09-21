@@ -145,7 +145,8 @@ hand-write keyframes; a dev-only check in `scenes/index.ts` warns if one does.
 
 ## What is verified, and what is not
 
-`pnpm test` (27 checks), `pnpm qa` (30) and `pnpm budgets` (12) all pass, and CI runs
+`pnpm test` (33 checks across a desktop and a mobile project), `pnpm qa` (30) and
+`pnpm budgets` (12) all pass, and CI runs
 all three on every push. Between them they cover: the camera visiting all eight
 stations with no discontinuity, theme flips at every boundary, the active station's
 DOM always being on screen at six viewports from 390 to 2560, all three quality tiers,
