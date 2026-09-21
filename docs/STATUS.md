@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0 + P1 done, P2 in progress.
+**Last updated:** 2026-09-22 — P0–P2 done. Wave 4 dispatching.
 
 ---
 
@@ -13,12 +13,12 @@
 |---|---|---|---|---|
 | P0 | Foundation & Scaffold | ✅ Done | main | Next 15.5.25 · R3F 9.7 · three 0.186 |
 | P1 | Core 3D Engine & Contracts | ✅ Done | main | Contracts FROZEN. Registries sealed. |
-| P2 | Design System & DOM Kit | 🟦 In progress | main | — |
-| P3A | Hero station | ⬜ Not started | — | Blocked by P2 · batch 1 |
+| P2 | Design System & DOM Kit | ✅ Done | main | Kit complete. Import from `@/components/ui`. |
+| P3A | Hero station | 🟦 In progress | agent | batch 1 |
 | P3B | About station | ⬜ Not started | — | Blocked by P2 · batch 2 |
-| P3C | Projects station | ⬜ Not started | — | Blocked by P2 · batch 1 |
+| P3C | Projects station | 🟦 In progress | agent | batch 1 |
 | P3D | Experience station | ⬜ Not started | — | Blocked by P2 · batch 2 |
-| P3E | Skills station | ⬜ Not started | — | Blocked by P2 · batch 1 |
+| P3E | Skills station | 🟦 In progress | agent | batch 1 |
 | P3F | How I Build station | ⬜ Not started | — | Blocked by P2 · batch 2 |
 | P3G | Writing station | ⬜ Not started | — | Blocked by P2 · batch 3 |
 | P3H | Contact station | ⬜ Not started | — | Blocked by P3A + P3B · batch 3 |
@@ -136,3 +136,36 @@ Filled in by each station agent from the `?debug=1` HUD.
   Also installed `@playwright/test` and added `scripts/verify*.mjs`. Playwright's
   own Chromium download fails on this machine, so the harness drives the installed
   Chrome via `channel: 'chrome'`. P7 formalises these into `tests/`.
+- [P2] 2026-09-22 — done. Tokens, type scale, both themes, the full component kit and
+  the chrome. Everything is exported from `@/components/ui` and `@/components/chrome`;
+  station agents import from those barrels and never reach into a file.
+
+  Built beyond the phase doc, because eight agents would each have invented them
+  otherwise: `Headline` (parses `[brackets]` and renders the blue half — the headline
+  rule is now mechanically enforced, not a convention), `Icon` (the named stroke icons
+  the copy asks for: code / bulb / users / mail / linkedin / github / file), and
+  `RevealGroup`. Components live in `primitives.tsx` rather than one file each; the
+  barrel is the public surface, so file granularity is invisible to callers.
+
+  Verified: kitchen-sink page rendered every component in both themes, screenshotted,
+  reviewed, deleted. Dark mode resolves entirely through the semantic aliases — no
+  component reaches a raw palette token. Nav active state follows the camera across
+  all eight stations, correctly holding "Projects" through experience/skills/build
+  which have no nav link of their own; clicking a link lands at p=0.250. Full
+  `scripts/qa.mjs` run: 24/24 checks pass.
+
+  Three bugs found by actually looking at it:
+  - `import * as simpleIcons` pulled the entire ~3,300-icon package into the client
+    bundle: **2.71MB → 572kB** first load after switching to explicit named imports
+    and a static map. A namespace import plus a dynamic lookup cannot be tree-shaken.
+  - The debug HUD reported **1 draw call / 1 triangle on every station**. `gl.info`
+    resets at the top of every `render()` call and EffectComposer's final pass is a
+    single fullscreen triangle, so the HUD was measuring post-processing, not the
+    scene. `StatsCollector` now wraps `gl.render` and snapshots the counters right
+    after the root-scene render. **This mattered: every station agent is told to
+    verify its budget from this HUD, and it was lying.**
+  - `Headline` emitted a double space around a bracketed span.
+
+  Also: simple-icons has no LinkedIn mark (dropped over trademark), so `Icon` draws
+  its own. `tsconfig` `incremental` is now false so concurrent agents running
+  `tsc --noEmit` do not fight over `tsconfig.tsbuildinfo`.

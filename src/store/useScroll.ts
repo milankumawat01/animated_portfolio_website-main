@@ -6,6 +6,7 @@ import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { StationId } from '@/engine/types'
+import { isDebug } from '@/engine/quality'
 import { STATION_RANGES, resolveStation } from '@/lib/curves'
 import { clamp, damp } from '@/lib/math'
 
@@ -154,9 +155,10 @@ export const useScrollController = (reducedMotion: boolean): void => {
     gsap.ticker.add(update)
     useScroll.setState({ ready: true })
 
-    if (process.env.NODE_ENV === 'development') {
+    if (isDebug()) {
       // Lets a headless browser drive the real scroll instead of fighting Lenis
-      // with window.scrollTo, which Lenis would immediately undo.
+      // with window.scrollTo, which Lenis would immediately undo. Gated on
+      // ?debug=1 rather than NODE_ENV so it also works against a production build.
       ;(window as unknown as { __lenis: Lenis }).__lenis = instance
     }
 

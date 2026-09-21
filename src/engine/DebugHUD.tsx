@@ -9,23 +9,56 @@ import { isDebug } from './quality'
 
 /**
  * `?debug=1`. Every later phase self-verifies its budget from this, so the numbers
- * have to be honest: they are read straight off `gl.info.render` after the frame.
+ * have to be honest — see the note on `StatsCollector` for what that took.
  */
 
 export const frameStats = {
   fps: 0,
   frameMs: 0,
+  /** draw calls for the station geometry itself — what the manifest budgets mean */
   drawCalls: 0,
   triangles: 0,
+  /** how many render passes ran this frame; 1 with post FX off, more with it on */
+  passes: 0,
   programs: 0,
   textures: 0,
   geometries: 0,
 }
 
-/** Lives inside the Canvas and samples the renderer. Rendered by `Experience`. */
+/**
+ * Lives inside the Canvas and samples the renderer. Rendered by `Experience`.
+ *
+ * Reading `gl.info.render` straight from a useFrame gives the wrong answer as soon as
+ * post-processing is on. `info.autoReset` clears the counters at the top of every
+ * `render()` call, and EffectComposer's last pass is a single fullscreen triangle — so
+ * the numbers you read next frame are that pass, not the scene. The HUD showed
+ * "1 draw call / 1 triangle" on every station.
+ *
+ * So we wrap `gl.render` and snapshot the counters immediately after the call that
+ * drew the *root scene*. That is the station's real cost, with or without post,
+ * which is what the manifest budgets are about.
+ */
 export function StatsCollector() {
   const gl = useThree((s) => s.gl)
+  const rootScene = useThree((s) => s.scene)
   const acc = useRef({ frames: 0, elapsed: 0, last: performance.now() })
+  const captured = useRef({ calls: 0, triangles: 0, passes: 0 })
+
+  useEffect(() => {
+    const original = gl.render.bind(gl)
+    const patched: typeof gl.render = (scene, camera) => {
+      original(scene, camera)
+      captured.current.passes++
+      if (scene === rootScene) {
+        captured.current.calls = gl.info.render.calls
+        captured.current.triangles = gl.info.render.triangles
+      }
+    }
+    gl.render = patched
+    return () => {
+      gl.render = original
+    }
+  }, [gl, rootScene])
 
   useFrame(() => {
     const now = performance.now()
@@ -41,14 +74,18 @@ export function StatsCollector() {
       a.elapsed = 0
     }
 
+    // These describe the previous frame — useFrame runs before the render.
+    frameStats.drawCalls = captured.current.calls
+    frameStats.triangles = captured.current.triangles
+    frameStats.passes = captured.current.passes
+    captured.current.passes = 0
+
     const info = gl.info
-    frameStats.drawCalls = info.render.calls
-    frameStats.triangles = info.render.triangles
     frameStats.programs = info.programs?.length ?? 0
     frameStats.textures = info.memory.textures
     frameStats.geometries = info.memory.geometries
     // No renderPriority: a non-zero priority switches R3F to manual rendering and
-    // nothing would ever be drawn. These numbers describe the previous frame.
+    // nothing would ever be drawn.
   })
 
   return null
@@ -134,6 +171,7 @@ export function DebugHUD() {
         value={`${fmt(frameStats.triangles)} / ${fmt(station?.budget.triangles ?? 0)}`}
         warn={overTris}
       />
+      <Row label="render passes" value={String(frameStats.passes)} />
       <Row label="programs" value={String(frameStats.programs)} />
       <Row label="textures" value={String(frameStats.textures)} />
       <Row label="geometries" value={String(frameStats.geometries)} />

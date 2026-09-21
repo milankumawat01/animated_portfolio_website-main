@@ -8,6 +8,7 @@ import { getCameraAt } from '@/lib/curves'
 import { damp } from '@/lib/math'
 import { scrollState } from '@/store/useScroll'
 import { useQuality } from '@/store/useQuality'
+import { isDebug } from './quality'
 
 /**
  * The camera is driven entirely by scroll. Nothing else moves it.
@@ -27,7 +28,7 @@ const localUp = new Vector3()
 const WORLD_UP = new Vector3(0, 1, 0)
 const parallaxOffset = new Vector3()
 
-/** Dev-only readout so a headless browser can assert the path has no seams. */
+/** `?debug=1` readout, so a headless browser can assert the path has no seams. */
 const cameraProbe: number[] = [0, 0, 0]
 
 const POSITION_LAMBDA = 6
@@ -46,6 +47,7 @@ export function CameraRig() {
   const reducedMotion = useQuality((s) => s.reducedMotion)
   const isTouch = useQuality((s) => s.isTouch)
   const parallaxEnabled = !reducedMotion && !isTouch
+  const debug = isDebug()
 
   useFrame((state, rawDelta) => {
     const cam = ref.current
@@ -98,7 +100,7 @@ export function CameraRig() {
     cam.up.set(Math.sin(roll), Math.cos(roll), 0)
     cam.lookAt(currentLook)
 
-    if (process.env.NODE_ENV === 'development') {
+    if (debug) {
       cameraProbe[0] = cam.position.x
       cameraProbe[1] = cam.position.y
       cameraProbe[2] = cam.position.z

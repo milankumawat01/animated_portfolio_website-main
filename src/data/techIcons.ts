@@ -1,49 +1,17 @@
 /**
- * Maps every technology name used on the site to its `simple-icons` export key.
+ * The simple-icons gap list, verified by `scripts/check-icons.mjs` against
+ * simple-icons@16.32.0.
  *
- * Four marks are NOT in simple-icons (verified by scripts/check-icons.mjs against
- * simple-icons@16.32.0) and are listed in MISSING_ICONS. Components render a
- * monogram tile for those until Milan supplies an SVG — see docs/04-ASSET-MANIFEST.md §A5.
+ * The name-to-mark map itself lives in `components/ui/TechLogo.tsx`, where it has to
+ * be a static map of explicit imports so the bundler can tree-shake the other ~3,300
+ * icons out of the client bundle.
  */
 
-export const ICON_SLUGS: Readonly<Record<string, string>> = {
-  Python: 'siPython',
-  FastAPI: 'siFastapi',
-  'Node.js': 'siNodedotjs',
-  PostgreSQL: 'siPostgresql',
-  MongoDB: 'siMongodb',
-  Redis: 'siRedis',
-  Claude: 'siClaude',
-  Gemini: 'siGooglegemini',
-  LangChain: 'siLangchain',
-  'Next.js': 'siNextdotjs',
-  React: 'siReact',
-  TypeScript: 'siTypescript',
-  'Tailwind CSS': 'siTailwindcss',
-  Tailwind: 'siTailwindcss',
-  HTML: 'siHtml5',
-  HTML5: 'siHtml5',
-  CSS: 'siCss',
-  CSS3: 'siCss',
-  Supabase: 'siSupabase',
-  Convex: 'siConvex',
-  Cloudflare: 'siCloudflare',
-  'Cloudflare R2': 'siCloudflare',
-  Firebase: 'siFirebase',
-  Docker: 'siDocker',
-  Nginx: 'siNginx',
-  Vercel: 'siVercel',
-  DigitalOcean: 'siDigitalocean',
-  Ubuntu: 'siUbuntu',
-  GitHub: 'siGithub',
-  Postman: 'siPostman',
-  Figma: 'siFigma',
-  Resend: 'siResend',
-  Notion: 'siNotion',
-  Express: 'siExpress',
-}
-
-/** Names with no simple-icons mark. Rendered as a monogram tile. */
+/**
+ * Names with no simple-icons mark, rendered as a monogram tile.
+ * LinkedIn is also absent from simple-icons but is not listed here — we draw our
+ * own stroke glyph for it in `components/ui/Icon.tsx`.
+ */
 export const MISSING_ICONS: readonly string[] = [
   'OpenAI',
   'LlamaIndex',
