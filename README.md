@@ -92,6 +92,14 @@ but they are worth knowing up front.
   be tree-shaken and pulls 2.2 MB into the client bundle.
 - **`next dev` and `next build` cannot share `.next`.** Set `NEXT_DIST_DIR` if you
   need both at once.
+- **`pnpm build` occasionally dies with `An error occurred in next/font` and a
+  `TypeError: Cannot read properties of null`.** That is a failed network fetch to
+  Google Fonts, not a code error — all four faces come from `next/font/google`. It
+  hit roughly one build in five on a flaky connection; just run it again. Next caches
+  the fetch in `.next/cache`, so it only bites on a cold build. If it becomes
+  tiresome, self-host: drop the woff2 files into `public/fonts/` and switch
+  `src/app/layout.tsx` to `next/font/local` — `docs/ASSET-PROMPTS.md` §A6 has the
+  detail, and the display face is already set up to be swapped that way.
 
 ---
 

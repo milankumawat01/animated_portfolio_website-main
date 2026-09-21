@@ -577,6 +577,11 @@ not been verified** and it needs real hardware — see the P7 handover.
 Everything is committed, one commit per phase. `pnpm test`, `pnpm budgets` and
 `pnpm qa` all pass on `main`.
 
+**One known flake:** `pnpm build` fails roughly one time in five with
+`An error occurred in next/font` — a failed network fetch to Google Fonts, not a code
+error. Re-running fixes it, and Next caches the result so it only bites on a cold
+build. Self-hosting the faces would remove it entirely; see README and §A6.
+
 **For Milan, in priority order:**
 1. `docs/ASSET-PROMPTS.md` — the morning list. Question 0 (the GitHub 404) and the
    employment-date overlap are the two that a recruiter would actually notice.
