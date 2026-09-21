@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    PLACEHOLDER MK lockup — a geometric stand-in for asset A1.
+    Closed, filled paths with no strokes, so the hero particle sampler can use it
+    as-is. Replace this file with Milan's real monogram and nothing else changes.
+  -->
+  <path fill="#0A1220" d="M56 372 L56 140 L92 140 L152 232 L212 140 L248 140 L248 372 L212 372 L212 200 L152 292 L92 200 L92 372 Z" />
+  <path fill="#0A1220" d="M272 140 L308 140 L308 238 L400 140 L448 140 L348 246 L456 372 L408 372 L322 270 L308 286 L308 372 L272 372 Z" />
+</svg>

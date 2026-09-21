@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-21 — P0 done, P1 in progress.
+**Last updated:** 2026-09-22 — P0 + P1 done, P2 in progress.
 
 ---
 
@@ -12,8 +12,8 @@
 | Phase | Name | Status | Owner | Notes |
 |---|---|---|---|---|
 | P0 | Foundation & Scaffold | ✅ Done | main | Next 15.5.25 · R3F 9.7 · three 0.186 |
-| P1 | Core 3D Engine & Contracts | 🟦 In progress | main | — |
-| P2 | Design System & DOM Kit | ⬜ Not started | — | Blocked by P1 |
+| P1 | Core 3D Engine & Contracts | ✅ Done | main | Contracts FROZEN. Registries sealed. |
+| P2 | Design System & DOM Kit | 🟦 In progress | main | — |
 | P3A | Hero station | ⬜ Not started | — | Blocked by P2 · batch 1 |
 | P3B | About station | ⬜ Not started | — | Blocked by P2 · batch 2 |
 | P3C | Projects station | ⬜ Not started | — | Blocked by P2 · batch 1 |
@@ -35,7 +35,7 @@ Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ 
 
 See `docs/04-ASSET-MANIFEST.md` for specs. Tick when the file lands in `assets/incoming/`.
 
-- [ ] A1 `monogram.svg` 🔴
+- [~] A1 `monogram.svg` 🔴 — geometric placeholder at `public/monogram.svg`, replace with the real mark
 - [ ] A2 `portrait.jpg` 🔴
 - [ ] A2 `desk-dark.jpg` 🔴
 - [ ] A2 `workspace.jpg` 🟡
@@ -99,3 +99,40 @@ Filled in by each station agent from the `?debug=1` HUD.
   for per-station strings and `techIcons.ts` for the icon slug map). GLSL raw import
   verified through both the webpack rule and the turbopack rule. Resume PDF copied
   from `.old/` to `public/`. Build, lint and typecheck all clean.
+- [P1] 2026-09-22 — done. Engine, both registries and all eight stubs landed;
+  `src/scenes/index.ts` and `src/sections/index.ts` are now frozen.
+
+  Camera continuity is structural, not manual: `lib/curves.ts` owns a single list of
+  waypoints and `stationCamera(id)` hands each manifest a `to` that IS the next
+  station's `from`, so a seam cannot be introduced by editing a manifest. Stations may
+  add shaping waypoints (`mids`) between boundaries — that is how hero pulls back to
+  z=13 and still hands off to About on its way forward. A dev-only check in
+  `scenes/index.ts` warns if anyone hand-writes keyframes and breaks this.
+
+  Verified in headless Chrome (`node scripts/verify.mjs`, dev server running):
+  page height exactly 12.8 viewports; all 8 `data-station` sections present; camera
+  sweeps 0→1 with no discontinuity; `data-theme` flips dark→light at p≈0.113 and
+  light→dark at p≈0.905, both exactly the computed midpoints; background cross-fades
+  smoothly; `?q=low|medium|high` yields 2 / 6 / 14 shader programs; reduced motion
+  detected; no-WebGL mounts zero canvases while all 8 DOM sections still render;
+  resize holds 12.8vh at 390/768/1280/1440/1920/2560 with no horizontal overflow;
+  zero console errors and zero failed requests.
+
+  Bug found and fixed during verification: `StatsCollector` and `FirstFrameSignal`
+  each passed a `useFrame` renderPriority. Any non-zero priority switches R3F to
+  manual rendering, so nothing was being drawn at all — draw calls sat at 1 forever.
+  Both now use the default priority.
+
+  Two deviations from the phase doc, both deliberate:
+  - `src/components/chrome/{Nav,ScrollHint,index}.tsx` exist as null-returning
+    placeholders because `app/page.tsx` (P1-owned, frozen) mounts them. **P2 owns
+    these files and replaces them.** P1 and P2 are both solo and sequential, so there
+    is no parallel-conflict risk.
+  - Added `src/engine/SiteRuntime.tsx` (boots quality + scroll; renders nothing) and
+    `public/monogram.svg` + `src/app/icon.svg`. The favicon was the only console
+    error on the page; the monogram is a geometric placeholder with closed filled
+    paths, so P3A's particle sampler can consume it as-is.
+
+  Also installed `@playwright/test` and added `scripts/verify*.mjs`. Playwright's
+  own Chromium download fails on this machine, so the harness drives the installed
+  Chrome via `channel: 'chrome'`. P7 formalises these into `tests/`.
