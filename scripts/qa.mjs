@@ -99,8 +99,14 @@ await new Promise((resolve, reject) => {
 })
 await new Promise((r) => setTimeout(r, 1200))
 
+/**
+ * Locally we drive the installed Chrome: Playwright's own Chromium download fails on
+ * the dev machine. On CI that channel does not exist, so use the bundled browser.
+ */
+const USE_BUNDLED = args.includes('--ci') || process.env.CI === 'true'
+
 const browser = await chromium.launch({
-  channel: 'chrome',
+  ...(USE_BUNDLED ? null : { channel: 'chrome' }),
   headless: true,
   args: [
     '--use-gl=angle',

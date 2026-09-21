@@ -52,7 +52,7 @@ const [lo, hi] = STATION_RANGES[station]
 const url = `http://localhost:${PORT}/?debug=1${Q ? `&q=${Q}` : ''}`
 
 const browser = await chromium.launch({
-  channel: 'chrome',
+  ...(process.env.CI === 'true' ? null : { channel: 'chrome' }),
   headless: true,
   args: [
     '--use-gl=angle',
