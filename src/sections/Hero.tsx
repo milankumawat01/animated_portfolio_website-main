@@ -1,55 +1,98 @@
 'use client'
 
+import {
+  Button,
+  Eyebrow,
+  Headline,
+  Icon,
+  Reveal,
+  Script,
+  SectionShell,
+  StatBlock,
+  TechRow,
+} from '@/components/ui'
 import { copy } from '@/data/copy'
-import { stationVh } from '@/lib/curves'
+import { heroStack, profile, stats } from '@/data/profile'
 
 /**
- * P1 STUB — replaced wholesale by the station agent that owns this file.
- * Carries the eyebrow and headline so the scroll length and the camera mapping are
- * already correct before any real content lands.
+ * 01 — HERO, the DOM half.
+ *
+ * The particle monogram owns the right of the frame, so the type stays in a single
+ * left column and stops well short of it. Everything enters on the shared reveal —
+ * `Headline`, `Reveal` and `Script` all read the station's progress themselves, so
+ * there is nothing to wire up here beyond the delays that set the cadence.
+ *
+ * `ScrollHint` is mounted globally by `app/page.tsx`; do not add a second one.
  */
-export function Hero() {
-  const c = copy.hero
 
+const c = copy.hero
+
+export function Hero() {
   return (
-    <section
-      id="hero"
-      data-station="hero"
-      data-theme-section="dark"
-      aria-labelledby="hero-heading"
-      style={{
-        position: 'relative',
-        minHeight: `${stationVh('hero')}vh`,
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 clamp(24px, 5vw, 96px)',
-      }}
-    >
-      <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }}>
-        <p
-          style={{
-            font: '600 0.75rem/1 var(--font-body)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            opacity: 0.6,
-            marginBottom: 16,
-          }}
-        >
-          {c.eyebrow}
-        </p>
-        <h2
-          id="hero-heading"
-          style={{
-            font: '800 clamp(2.5rem, 5.2vw, 4.25rem)/1.02 var(--font-display)',
-            letterSpacing: '-0.03em',
-            margin: 0,
-          }}
-        >
-          {c.headline[0]}
-          <br />
-          {c.headline[1].replace(/[[\]]/g, '')}
-        </h2>
+    <SectionShell id="hero" theme="dark">
+      <div className="flex flex-col" style={{ gap: 'clamp(24px, 3.2vw, 40px)' }}>
+        <div style={{ maxWidth: '62ch' }}>
+          <Reveal at={0}>
+            <Eyebrow>{c.eyebrow}</Eyebrow>
+          </Reveal>
+
+          <Headline
+            lines={c.headline}
+            as="h1"
+            size="xl"
+            id="hero-heading"
+            className="mt-5"
+            at={0}
+          />
+
+          <Reveal delay={0.28} at={0}>
+            <p className="t-body-lg mt-6" style={{ maxWidth: '46ch' }}>
+              {c.sub}
+            </p>
+          </Reveal>
+        </div>
+
+        <Reveal delay={0.4} at={0}>
+          <div className="flex flex-wrap items-center" style={{ gap: 14 }}>
+            <Button
+              href="#projects"
+              variant="primary"
+              icon={<Icon name="arrowRight" size={18} />}
+            >
+              {c.primaryCta}
+            </Button>
+            <Button
+              href={profile.resume}
+              variant="ghost"
+              download="Milan_Kumawat_Resume.pdf"
+              icon={<Icon name="download" size={18} />}
+            >
+              {c.ghostCta}
+            </Button>
+
+            <Script rotate={-6} delay={0.72} at={0} className="ml-2 hidden sm:inline-block">
+              {c.scripts[0]}
+            </Script>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.5} at={0}>
+          <StatBlock stats={stats} />
+        </Reveal>
+
+        <Reveal delay={0.6} at={0}>
+          <div className="flex flex-col" style={{ gap: 14 }}>
+            <p className="t-eyebrow m-0">{c.stripLabel}</p>
+            <TechRow names={heroStack} size={24} gap={26} />
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.7} at={0}>
+          <p className="t-meta m-0" style={{ maxWidth: '32ch' }}>
+            {c.sideNote}
+          </p>
+        </Reveal>
       </div>
-    </section>
+    </SectionShell>
   )
 }

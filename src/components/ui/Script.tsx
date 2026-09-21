@@ -46,6 +46,7 @@ export function Script({
     <motion.span
       className={cn('t-script relative inline-block', className)}
       style={{ rotate: reducedMotion ? 0 : rotate, ...style }}
+      /* Same keys in both variants — see the note in Reveal.tsx. */
       initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
       animate={shown ? { opacity: 1, y: 0 } : { opacity: 0, y: reducedMotion ? 0 : 10 }}
       transition={{ duration: reducedMotion ? 0.3 : 0.62, ease: EASE.out, delay: shown ? delay : 0 }}

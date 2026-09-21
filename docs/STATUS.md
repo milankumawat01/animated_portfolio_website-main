@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0–P2 done. Wave 4 dispatching.
+**Last updated:** 2026-09-22 — P0–P2 and Wave 4 batch 1 (3A/3C/3E) done.
 
 ---
 
@@ -14,11 +14,11 @@
 | P0 | Foundation & Scaffold | ✅ Done | main | Next 15.5.25 · R3F 9.7 · three 0.186 |
 | P1 | Core 3D Engine & Contracts | ✅ Done | main | Contracts FROZEN. Registries sealed. |
 | P2 | Design System & DOM Kit | ✅ Done | main | Kit complete. Import from `@/components/ui`. |
-| P3A | Hero station | 🟦 In progress | agent | batch 1 |
+| P3A | Hero station | ✅ Done | agent | 3/24 calls · 1.5k/180k tris |
 | P3B | About station | ⬜ Not started | — | Blocked by P2 · batch 2 |
-| P3C | Projects station | 🟦 In progress | agent | batch 1 |
+| P3C | Projects station | ✅ Done | agent | 9/28 calls · 6k/40k tris |
 | P3D | Experience station | ⬜ Not started | — | Blocked by P2 · batch 2 |
-| P3E | Skills station | 🟦 In progress | agent | batch 1 |
+| P3E | Skills station | ✅ Done | agent | 3/8 calls · 3.5k/25k tris |
 | P3F | How I Build station | ⬜ Not started | — | Blocked by P2 · batch 2 |
 | P3G | Writing station | ⬜ Not started | — | Blocked by P2 · batch 3 |
 | P3H | Contact station | ⬜ Not started | — | Blocked by P3A + P3B · batch 3 |
@@ -73,6 +73,59 @@ Filled in by each station agent from the `?debug=1` HUD.
 
 > Append only. Format: `- [from P3C → P2] need a <Chip variant="ghost"> — worked around with a local style.`
 
+- [from P3A/P3C → P4] **COMPOSITION PASS — the big one.** Two stations reviewed so
+  far and both have the same class of problem, so treat it as systemic rather than
+  per-station:
+  1. *Hero*: the particle mark overlaps the headline column at 1440×900. "Milan
+     Kumawat" reads through a dense cloud. One offset constant in `hero/Scene.tsx`.
+  2. *Projects*: the glass slabs render as a ~40px thumbnail strip. They are meant to
+     be the set piece and the DOM cards are carrying the whole station. Root cause is
+     the camera path, not the scene: `curves.ts` puts the camera ~53 units from the
+     projects anchor at local 0 and still ~18 at local 0.5, so a 1.6-unit slab is
+     tiny for most of the station. Cheapest safe fix is to scale the arc and slabs up
+     in `projects/Scene.tsx`; the alternative is tightening the path in `curves.ts`,
+     which reframes every station and would invalidate tuning the agents already did.
+  3. *`SectionShell`*: a 100vh sticky child inside a 1.4–2.2× viewport section pins
+     for only `H − 100vh`, so DOM copy starts scrolling away around local 0.3–0.55
+     while the camera is still doing its most interesting work. Structural; decide it
+     once, across all eight stations, with everything built.
+  Do this with all eight stations present, not piecemeal.
+- [from P3A → P3H] `MonogramPoints` gained an optional count-aware `opacity` prop
+  (default `0.22 × (150000/count)^0.47`, clamped 0.14–0.85) so a low-count cloud does
+  not saturate to a white lump. The required four-prop call works unchanged at any
+  count. Other optional props: `spread`, `idle`, `size`.
+- [from P3A → P1, FIXED] `SHADER_PRELUDE` bundled `aaLine`, which calls `fwidth`.
+  Derivatives do not exist in a GLSL ES 1.0 vertex stage, so any vertex shader
+  including it failed to link **silently** — geometry simply never drew. `lib/shader.ts`
+  now exports `VERTEX_PRELUDE` (derivative-free) and `FRAGMENT_PRELUDE` (adds `aaLine`
+  and a new `aaGrid`); `SHADER_PRELUDE` is aliased to the fragment set so existing
+  fragment shaders keep working. Both running agents were messaged.
+- [from P3C → P4] Local hover store at `src/scenes/projects/useProjectHover.ts`
+  (`{ hovered: string | null, setHovered(id) }`, keyed on `Project.id`, read via
+  `.getState()` in useFrame). Three import sites. Absorb into `useInteraction`.
+- [from P3C → P2, FIXED] `Reveal`, `Headline` and `Script` left `filter: blur(6px)`
+  painted on permanently under reduced motion — the entire DOM overlay rendered out of
+  focus on every station. `reducedMotion` starts false and flips true after device
+  detection, and the reduced variants dropped the `filter` key, so motion animated
+  only `opacity` and never cleared the blur from the first render. Both variants now
+  declare the same keys. Verified fixed with `--reduced` probe.
+- [from P3C → P5] `Slab.tsx` has `const USE_PROJECT_IMAGES = false` with the real
+  image-load path already written behind it. Flip it when A3 lands.
+- [from P3E → P4] Local hover store at `src/scenes/skills/useSkillHover.ts`
+  (`{ hoveredCategory: string | null, setHoveredCategory(id) }`). Written from
+  `sections/Skills.tsx` on pointer **and focus/blur**, so keyboard users get the
+  highlight too — preserve that when absorbing it into `useInteraction`.
+- [from P3E → P1, FIXED] `postState.dofFocusDistance` defaulted to 0.02, which focuses
+  at ~5 world units. Every station frames its subject 8–20 units out, so at the `high`
+  tier the entire site rendered as mush and read as a shader bug. Added
+  `focusAtDistance(worldUnits)` to `engine/PostFX.tsx` and defaulted to ~13 units.
+  Stations should call the helper rather than guess.
+- [from P3E → P1, FIXED] R3F forces `pointerEvents: 'auto'` on the container div
+  `<Canvas>` creates, which silently defeated the `pointer-events: none` wrapper.
+  Nothing was broken in practice (the DOM overlay is z-10 and always won) but the
+  guarantee the comment described was not real. Now set via the `style` prop, which
+  merges into that container. A station re-enabling it on the canvas element still
+  works.
 - [from P0 → P5/assets] `simple-icons@16.32.0` has **no mark** for: **OpenAI**,
   **LlamaIndex**, **VS Code**, **RAG**. `TechLogo` renders a monogram tile for these
   until Milan supplies 128×128 SVGs. Aliases resolved for the rest — see
@@ -169,3 +222,45 @@ Filled in by each station agent from the `?debug=1` HUD.
   Also: simple-icons has no LinkedIn mark (dropped over trademark), so `Icon` draws
   its own. `tsconfig` `incremental` is now false so concurrent agents running
   `tsc --noEmit` do not fight over `tsconfig.tsbuildinfo`.
+- [P3A] 2026-09-22 — done. 150k-point GPU monogram, one draw call at any count.
+  Measured 3/24 draw calls and 1.5k/180k triangles at high (points are counted under
+  `render.points`, not `render.triangles`; the 1.5k is the fog sphere and dust quads),
+  1/24 at low. Zero console errors at all three tiers and under reduced motion.
+  Monogram is legible as MK at p=0; the dissolve frays left-to-right, M releasing
+  before K. `MonogramPoints` verified standalone with only the four required props —
+  P3H can consume it.
+  **Not verified:** velocity-driven chromatic aberration (the probe scrolls with
+  `immediate: true` so velocity is always 0) and 60fps at high (SwiftShader gave 0–4fps,
+  a meaningless number). Both need real hardware — carried to P7.
+- [P3C] 2026-09-22 — done. Four glass slabs on a shallow arc, scroll-driven three-slab
+  traverse, one shared `MeshTransmissionMaterial` across all four (the decision the
+  phase doc called out as the most important; confirmed one element in the tree,
+  instance handed to the other three). Steady state 9/28 draw calls, 6k/40k triangles;
+  8/28 at low with caustics off. Zero console errors at every tier.
+  Deviations, all reasoned: project screenshots are procedural canvas textures (A3
+  absent — and requesting the missing files would 404 on every load); caustics
+  composite normally rather than additive, because additive on a near-white page
+  clamps to white and the pools were invisible; caustic planes tilted ~57° because the
+  camera runs at slab height and a flat plane collapsed to a smear.
+  **Not verified:** carousel smoothness and absence of ripple/idle under reduced
+  motion (both are motion properties, unjudgeable from stills at 1–7fps), and GPU
+  frame time under 8ms at high. Carried to P7 on real hardware.
+- [P3E] 2026-09-22 — done. Seeded force-directed graph, 200 iterations once at mount
+  then frozen and memoised. Three objects total: one `LineSegments` for every edge,
+  one `InstancedMesh` of icosahedrons for every node, one `InstancedMesh` of
+  billboarded atlas quads for every logo. 3/8 draw calls at medium and high, 2 at low;
+  3.5k/25k triangles — a seventh of the budget. Zero console errors at every tier.
+  Runtime 512×512 icon atlas built from the same explicit `simple-icons` imports the
+  DOM uses, with monogram tiles for the four gaps so 3D and DOM agree.
+  Pointer-events verified empirically, not reasoned about: `auto` while Skills is
+  mounted, fully restored after scrolling past, and every link on hero/skills/writing/
+  contact hit-tested afterwards. Layout determinism verified by settling the camera to
+  an identical position on two loads and diffing the graph region pixel by pixel.
+  Node counts are 24 at low and 42 at medium/high rather than the doc's 48/80 — there
+  are only 36 leaves in `data/skills.ts` and padding would mean inventing content.
+  **Not verified:** 60fps at high, and how the drag *feels*. Both need real hardware.
+
+- [batch 1] 2026-09-22 — 3A + 3C + 3E integrated. `pnpm build`, `pnpm lint`,
+  `pnpm typecheck` and the full `scripts/qa.mjs` suite all clean (24/24). Three engine
+  bugs surfaced by the agents and fixed centrally: the vertex-shader prelude, the
+  reduced-motion blur, and the DOF focus default. Next: batch 2 (3B/3D/3F).

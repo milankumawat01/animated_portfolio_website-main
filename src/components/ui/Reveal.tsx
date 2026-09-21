@@ -53,12 +53,16 @@ export function Reveal({
 
   const MotionTag = motion[as as keyof typeof motion] as typeof motion.div
 
+  /**
+   * Both variants must declare the SAME KEYS whether or not motion is reduced.
+   * `reducedMotion` starts false and flips true once device detection runs, so a
+   * variant that drops `filter` leaves the blur from the first render painted on
+   * forever — the whole overlay renders permanently out of focus.
+   */
   const hidden = reducedMotion
-    ? { opacity: 0 }
+    ? { opacity: 0, y: 0, filter: 'blur(0px)' }
     : { opacity: 0, y: 24, filter: 'blur(6px)' }
-  const visible = reducedMotion
-    ? { opacity: 1 }
-    : { opacity: 1, y: 0, filter: 'blur(0px)' }
+  const visible = { opacity: 1, y: 0, filter: 'blur(0px)' }
 
   if (words && typeof children === 'string') {
     const parts = children.split(' ')

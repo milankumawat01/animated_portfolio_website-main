@@ -28,12 +28,28 @@ import { useQuality } from '@/store/useQuality'
  * Always write every frame you want a non-default value; the defaults are restored
  * by whatever writes last, so a station that stops writing simply stops affecting it.
  */
+export const CAMERA_NEAR = 0.1
+export const CAMERA_FAR = 260
+
+/**
+ * Convert a distance in world units to the normalised depth `DepthOfField` wants.
+ *
+ * Always use this rather than guessing. The old hardcoded default of 0.02 focused at
+ * roughly 5 world units, and every station frames its subject 8–20 units out — so at
+ * the `high` tier the whole site rendered as mush and it looked like a shader bug.
+ *
+ *   useFrame(() => { postState.dofFocusDistance = focusAtDistance(14) })
+ */
+export const focusAtDistance = (worldUnits: number): number =>
+  (worldUnits - CAMERA_NEAR) / (CAMERA_FAR - CAMERA_NEAR)
+
 export const postState = {
   bloomIntensity: 0.9,
   bloomThreshold: 0.75,
   /** extra chromatic aberration on top of the velocity-driven amount */
   chromaticAberration: 0,
-  dofFocusDistance: 0.02,
+  /** ~13 world units — a sane mid-station subject distance. */
+  dofFocusDistance: focusAtDistance(13),
   dofBokehScale: 2.2,
   vignette: 0.42,
 }
@@ -55,7 +71,7 @@ export function PostFX() {
   const bloom = useRef<BloomEffect>(null)
   const ca = useRef<ChromaticAberrationEffect>(null)
   const dof = useRef<DepthOfFieldEffect>(null)
-  const smoothed = useRef({ bloom: 0.9, ca: 0, focus: 0.02 })
+  const smoothed = useRef({ bloom: 0.9, ca: 0, focus: postState.dofFocusDistance })
 
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.1)
@@ -76,6 +92,7 @@ export function PostFX() {
     }
 
     if (dof.current) {
+      if (!Number.isFinite(s.focus)) s.focus = postState.dofFocusDistance
       s.focus = damp(s.focus, postState.dofFocusDistance, 4, dt)
       const com = dof.current.circleOfConfusionMaterial
       if (com && 'focusDistance' in com) {
@@ -114,7 +131,7 @@ export function PostFX() {
       />
       <DepthOfField
         ref={dof}
-        focusDistance={0.02}
+        focusDistance={postState.dofFocusDistance}
         focalLength={0.05}
         bokehScale={2.2}
         height={480}

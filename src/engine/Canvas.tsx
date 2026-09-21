@@ -47,6 +47,15 @@ export function Experience() {
     >
       <R3FCanvas
         dpr={dpr}
+        /**
+         * R3F forces `pointerEvents: 'auto'` on the container div it creates, which
+         * silently defeated the `pointer-events: none` on the wrapper above. Nothing
+         * broke — the DOM overlay is z-10 and always won — but the guarantee the
+         * comment describes was not real. Setting it here merges into that container.
+         * A station that needs dragging re-enables it on the canvas element itself,
+         * which still works: none on the parent, auto on the child.
+         */
+        style={{ pointerEvents: 'none' }}
         frameloop="always"
         shadows={tier === 'high'}
         gl={{

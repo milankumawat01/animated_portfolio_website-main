@@ -99,7 +99,14 @@ vec3 curlNoise(vec3 p) {
 }
 `
 
-/** Small utilities most stations end up wanting. */
+/**
+ * Small utilities most stations end up wanting.
+ *
+ * Safe in BOTH stages — nothing here touches a derivative. `aaLine` used to live in
+ * this chunk and it silently broke every vertex shader that included it: `fwidth`
+ * does not exist in a GLSL ES 1.0 vertex stage, the program fails to link, and the
+ * geometry simply never draws. It is in FRAGMENT_ONLY now.
+ */
 export const COMMON = glsl`
 float hash11(float n){ return fract(sin(n) * 43758.5453123); }
 vec2  hash21(float n){ return fract(sin(vec2(n, n + 1.0)) * vec2(43758.5453, 22578.1459)); }
@@ -109,12 +116,6 @@ float remap(float v, float a, float b, float c, float d){
   return c + (d - c) * clamp((v - a) / max(b - a, 1e-6), 0.0, 1.0);
 }
 
-/** Anti-aliased line, width in pixels, using screen-space derivatives. */
-float aaLine(float d, float width){
-  float w = fwidth(d) * width;
-  return 1.0 - smoothstep(0.0, w, abs(d));
-}
-
 /** Soft round sprite for point clouds. Feed it gl_PointCoord. */
 float roundSprite(vec2 uv, float softness){
   float d = length(uv - 0.5) * 2.0;
@@ -122,5 +123,39 @@ float roundSprite(vec2 uv, float softness){
 }
 `
 
-/** Everything, in dependency order. Prepend to a fragment or vertex shader. */
-export const SHADER_PRELUDE = `${COMMON}\n${SIMPLEX_3D}\n${CURL_NOISE}`
+/**
+ * Helpers that use screen-space derivatives. **Fragment stage only.**
+ * Including any of this in a vertex shader fails to link.
+ */
+export const FRAGMENT_ONLY = glsl`
+/** Anti-aliased line, width in pixels, using screen-space derivatives. */
+float aaLine(float d, float width){
+  float w = fwidth(d) * width;
+  return 1.0 - smoothstep(0.0, w, abs(d));
+}
+
+/** Anti-aliased procedural grid. 1 on a line, 0 between. */
+float aaGrid(vec2 uv, float frequency, float thickness){
+  vec2 g = abs(fract(uv * frequency) - 0.5);
+  vec2 w = fwidth(uv * frequency) * thickness;
+  vec2 l = 1.0 - smoothstep(vec2(0.0), w, g);
+  return max(l.x, l.y);
+}
+`
+
+/**
+ * Prepend to a **vertex** shader. Derivative-free, so it always links.
+ *
+ *   const vert = `${VERTEX_PRELUDE}\n${mySource}`
+ */
+export const VERTEX_PRELUDE = `${COMMON}\n${SIMPLEX_3D}\n${CURL_NOISE}`
+
+/** Prepend to a **fragment** shader. Everything, including the derivative helpers. */
+export const FRAGMENT_PRELUDE = `${VERTEX_PRELUDE}\n${FRAGMENT_ONLY}`
+
+/**
+ * @deprecated Ambiguous: the name reads as "safe anywhere" but it carries `fwidth`.
+ * Prefer VERTEX_PRELUDE or FRAGMENT_PRELUDE. Aliased to the fragment set so shaders
+ * already importing it keep working.
+ */
+export const SHADER_PRELUDE = FRAGMENT_PRELUDE
