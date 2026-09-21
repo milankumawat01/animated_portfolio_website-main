@@ -28,7 +28,7 @@ import { MARKER_PROGRESS } from '@/scenes/experience/Helix'
  * is built as two outer columns with a deliberately empty one between them, and
  * the 3D climbs up the gap.
  *
- * THE TIMELINE IS A FILMSTRIP. The three roles are a real `<ol>` — a list of jobs
+ * THE TIMELINE IS A FILMSTRIP. The three roles are a real `<ol role="list">` — a list of jobs
  * that is not a list is an accessibility failure — inside a masked window that
  * slides so the role the camera is level with sits in the middle. The thresholds
  * come from `scenes/experience/Helix`, the same constants that place the rings, so
@@ -76,7 +76,7 @@ function Timeline({ active }: { active: number }) {
     const view = windowRef.current
     const item = itemRefs.current[active]
     if (!view || !item) return
-    // offsetTop is relative to the <ol>, which is the positioned ancestor.
+    // offsetTop is relative to the <ol role="list">, which is the positioned ancestor.
     setOffset(view.clientHeight / 2 - (item.offsetTop + item.offsetHeight / 2))
   }, [active])
 
@@ -106,7 +106,7 @@ function Timeline({ active }: { active: number }) {
           'linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%)',
       }}
     >
-      <ol
+      <ol role="list"
         ref={listRef}
         className="relative m-0 flex list-none flex-col gap-5 p-0"
         style={{
@@ -178,7 +178,7 @@ function Timeline({ active }: { active: number }) {
                   {role.title}
                 </p>
 
-                <ul className="mt-3 flex list-none flex-col gap-1.5 p-0">
+                <ul role="list" className="mt-3 flex list-none flex-col gap-1.5 p-0">
                   {role.bullets.map((bullet) => (
                     <li key={bullet} className="t-body flex gap-3">
                       <span
@@ -284,7 +284,7 @@ function ExperienceContent() {
           {c.scripts[0]}
         </Script>
 
-        <ul className="mt-1 flex list-none flex-col gap-4 p-0">
+        <ul role="list" className="mt-1 flex list-none flex-col gap-4 p-0">
           {experienceRail.map((item, i) => (
             <Reveal as="li" key={item.title} delay={0.36 + i * 0.07}>
               <div className="flex gap-4">

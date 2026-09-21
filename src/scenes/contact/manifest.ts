@@ -1,6 +1,9 @@
 import type { SceneManifest } from '@/engine/types'
 import { stationCamera } from '@/lib/curves'
-import { ContactScene } from './Scene'
+import { lazy } from 'react'
+
+/** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
+const ContactScene = lazy(() => import('./Scene').then((m) => ({ default: m.ContactScene })))
 
 /**
  * 08 — CONTACT. The bookend: dark again, warm lamp, quiet.

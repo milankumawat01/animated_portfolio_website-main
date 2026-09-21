@@ -27,6 +27,13 @@ export function Footer({ className }: { className?: string }) {
 
   return (
     <footer
+      /**
+       * A <footer> scoped inside a sectioning element is not `contentinfo`, and this
+       * one lives inside the Contact <section> by design so it scrolls with that
+       * station. The explicit role gives screen-reader users the landmark back
+       * without moving it out of the station.
+       */
+      role="contentinfo"
       className={cn('relative w-full', className)}
       style={{
         borderTop: '1px solid rgba(255,255,255,0.09)',
@@ -63,7 +70,7 @@ export function Footer({ className }: { className?: string }) {
       </div>
 
       <nav aria-label="Footer" className="mt-12">
-        <ul className="flex list-none flex-wrap gap-x-8 gap-y-3 p-0" style={{ margin: 0 }}>
+        <ul role="list" className="flex list-none flex-wrap gap-x-8 gap-y-3 p-0" style={{ margin: 0 }}>
           {footerNavItems.map((item) => (
             <li key={item.station}>
               <button
@@ -85,7 +92,7 @@ export function Footer({ className }: { className?: string }) {
         className="mt-10 flex flex-wrap items-end justify-between gap-6"
         style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 24 }}
       >
-        <ul className="flex list-none items-center gap-3 p-0" style={{ margin: 0 }}>
+        <ul role="list" className="flex list-none items-center gap-3 p-0" style={{ margin: 0 }}>
           {socials.map((s) => (
             <li key={s.id}>
               <a

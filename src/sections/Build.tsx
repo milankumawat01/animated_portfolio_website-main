@@ -25,7 +25,7 @@ import { buildScript, pillars, process } from '@/data/process'
  * content that only arrives at 0.6. What happens after 0.35 is the 3D: the camera
  * leaves the copy behind and dollies along the finished pipeline.
  *
- * The five steps are an `<ol>` and each checklist a `<ul>`, which is both the
+ * The five steps are an `<ol role="list">` and each checklist a `<ul role="list">`, which is both the
  * correct semantics for an ordered process and what the P6 a11y pass audits.
  */
 
@@ -119,7 +119,7 @@ export function Build() {
           </div>
 
           {/* right — the five steps, in order */}
-          <ol className="flex flex-col gap-3">
+          <ol role="list" className="flex flex-col gap-3">
             {process.map((step, i) => (
               <Reveal as="li" key={step.n} delay={0.28 + i * 0.06}>
                 <Card className="flex items-start gap-4 px-5 py-4">
@@ -142,7 +142,7 @@ export function Build() {
                     </h3>
                     <p className="t-meta mt-0.5">{step.description}</p>
 
-                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                    <ul role="list" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
                       {step.checklist.map((item) => (
                         <li key={item} className="t-meta flex items-center gap-1.5">
                           <Tick />

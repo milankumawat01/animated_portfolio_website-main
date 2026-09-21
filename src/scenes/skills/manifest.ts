@@ -1,6 +1,9 @@
 import type { SceneManifest } from '@/engine/types'
 import { stationCamera } from '@/lib/curves'
-import { SkillsScene } from './Scene'
+import { lazy } from 'react'
+
+/** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
+const SkillsScene = lazy(() => import('./Scene').then((m) => ({ default: m.SkillsScene })))
 
 /**
  * 05 — SKILLS. The camera block is derived from `lib/curves`, never hand-written.

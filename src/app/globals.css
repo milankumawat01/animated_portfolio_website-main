@@ -18,7 +18,13 @@
   --ink-900: #0a1220;
   --ink-700: #1b2a41;
   --ink-500: #47586f;
-  --ink-400: #6b7c93;
+  /**
+   * Darkened from #6B7C93 for WCAG AA. `.t-meta` (13px) and `.t-eyebrow` (12px)
+   * both use it, so it needs 4.5:1, and the old value measured 3.82 on the Writing
+   * background and 3.93 on Build — failing on four of the six light surfaces.
+   * This clears 4.87 on the worst of them.
+   */
+  --ink-400: #5a6b83;
 
   /* surfaces */
   --surface-page: #f5f8fc;
@@ -82,7 +88,16 @@
   --border: rgba(255, 255, 255, 0.11);
   --brand: var(--brand-400);
   --brand-soft: rgba(59, 130, 246, 0.14);
-  --on-brand: #ffffff;
+  /**
+   * Dark ink, not white. On dark stations `--brand` is the brighter #3B82F6, and
+   * white on it measures 3.68:1 — the primary pill label on the hero and the nav CTA
+   * both failed AA. Dark ink on the same blue is 5.45:1.
+   *
+   * Do NOT "fix" this by darkening --brand in dark instead: --brand is also drawn as
+   * 12px text on #05080E (the Contact eyebrow number), where #3B82F6 passes at 5.45
+   * and #2563EB would fail at 3.88.
+   */
+  --on-brand: #05080e;
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 40px rgba(0, 0, 0, 0.45);
   --card-blur-bg: rgba(10, 15, 23, 0.6);
 }
@@ -187,7 +202,7 @@ canvas {
 
 :focus-visible {
   outline: 2px solid var(--brand);
-  outline-offset: 3px;
+  outline-offset: 2px;
   border-radius: 4px;
 }
 

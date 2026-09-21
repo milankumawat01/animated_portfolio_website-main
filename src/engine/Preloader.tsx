@@ -8,9 +8,10 @@ import { lockScroll, unlockScroll } from '@/store/useScroll'
  * Holds scroll until the world is ready, then wipes away.
  *
  * `useProgress` only reports on things that actually went through a THREE loader, so
- * a page whose stations are all procedural sits at 0/0 forever. The gate below treats
- * "nothing is loading and nothing has loaded" as done once the first frame is on
- * screen, rather than waiting for a number that will never arrive.
+ * a page whose stations are all procedural sits at 0/0 forever — the gate below
+ * treats "nothing is loading and nothing has loaded" as done.
+ *
+ * It deliberately does NOT wait for the first WebGL frame. See MAX_FRAME_WAIT_MS.
  */
 
 let firstFrameSeen = false
@@ -24,7 +25,37 @@ export const notifyFirstFrame = (): void => {
   firstFrameListeners.clear()
 }
 
+/** Subscribe to the first rendered WebGL frame. */
+export const useFirstFrame = (): boolean => {
+  const [seen, setSeen] = useState(firstFrameSeen)
+  useEffect(() => {
+    if (firstFrameSeen) {
+      setSeen(true)
+      return
+    }
+    const fn = () => setSeen(true)
+    firstFrameListeners.add(fn)
+    return () => {
+      firstFrameListeners.delete(fn)
+    }
+  }, [])
+  return seen
+}
+
 const MIN_VISIBLE_MS = 700
+/**
+ * How long the panel will wait for the first WebGL frame before giving up on it.
+ *
+ * It used to wait indefinitely (4s bail), which made Largest Contentful Paint a
+ * function of GPU initialisation: the hero headline could not reveal until the
+ * panel lifted, and the panel would not lift until three.js had compiled its first
+ * frame. Measured at 7.7s LCP on a throttled run.
+ *
+ * The DOM is the content and it is ready long before the world is. So the panel now
+ * leaves on the content's schedule, and the canvas fades itself in when it is ready
+ * — a beat later, which reads as the world arriving rather than as a wait.
+ */
+const MAX_FRAME_WAIT_MS = 450
 const WIPE_MS = 600
 
 /** The MK lockup, drawn on. Replaced by assets/incoming/monogram.svg when it lands. */
@@ -90,9 +121,12 @@ export function Preloader() {
   const assetsDone = total === 0 ? !active : progress >= 100 && !active
 
   useEffect(() => {
-    if (ready || !frameReady || !assetsDone) return
+    if (ready || !assetsDone) return
     const waited = performance.now() - mountedAt.current
-    const delay = Math.max(0, MIN_VISIBLE_MS - waited)
+    // Hold a short grace for the first frame so the common (fast) case still hands
+    // over to a painted world — but never let it gate the handover.
+    const graceLeft = frameReady ? 0 : Math.max(0, MAX_FRAME_WAIT_MS - waited)
+    const delay = Math.max(graceLeft, MIN_VISIBLE_MS - waited, 0)
     const id = window.setTimeout(() => setReady(true), delay)
     return () => window.clearTimeout(id)
   }, [ready, frameReady, assetsDone])
@@ -114,6 +148,7 @@ export function Preloader() {
   return (
     <div
       role="status"
+      data-preloader=""
       aria-live="polite"
       aria-label={`Loading, ${shown} percent`}
       style={{

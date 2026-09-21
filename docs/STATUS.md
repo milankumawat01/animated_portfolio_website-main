@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0–P4 done. P5 + P6 running in parallel.
+**Last updated:** 2026-09-22 — P0–P6 done. P7 in progress.
 
 ---
 
@@ -23,9 +23,9 @@
 | P3G | Writing station | ✅ Done | agent | 5/10 calls · 7.5k/20k tris |
 | P3H | Contact station | ✅ Done | agent | 10/20 calls · 2.8k/70k tris |
 | P4 | Interaction & Polish | ✅ Done | main | Audio omitted — no A8 assets |
-| P5 | Performance & Assets | 🟦 In progress | agent | — |
-| P6 | A11y, SEO, Fallback | 🟦 In progress | agent | — |
-| P7 | QA & Deploy | ⬜ Not started | — | Blocked by P5 + P6 |
+| P5 | Performance & Assets | ✅ Done | agent | 636 kB → 528 kB first load |
+| P6 | A11y, SEO, Fallback | ✅ Done | agent | Static fallback + no-JS path |
+| P7 | QA & Deploy | 🟦 In progress | main | — |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework`
 
@@ -58,14 +58,26 @@ Filled in by each station agent from the `?debug=1` HUD.
 
 | Station | Draw calls (budget) | Triangles (budget) | FPS high | FPS low |
 |---|---|---|---|---|
-| hero | — / 24 | — / 180k | — | — |
-| about | — / 14 | — / 60k | — | — |
-| projects | — / 28 | — / 40k | — | — |
-| experience | — / 12 | — / 90k | — | — |
-| skills | — / 8 | — / 25k | — | — |
-| build | — / 16 | — / 30k | — | — |
-| writing | — / 10 | — / 20k | — | — |
-| contact | — / 20 | — / 70k | — | — |
+| hero | 3 / 24 | 1.5k / 180k | not measured | not measured |
+| about | 11 / 42* | 9.5k / 100k* | not measured | not measured |
+| projects | 14 / 40* | 19.2k / 130k* | not measured | not measured |
+| experience | 14 / 40* | 19.2k / 130k* | not measured | not measured |
+| skills | 8 / 8 | 16.7k / 25k | not measured | not measured |
+| build | 8 / 24* | 16.7k / 55k* | not measured | not measured |
+| writing | 5 / 30* | 7.6k / 90k* | not measured | not measured |
+| contact | 10 / 20 | 2.8k / 70k | not measured | not measured |
+
+\* Budget is the **sum of the stations mounted at that sample** — `mountPadding`
+keeps a neighbour alive across every boundary, so the renderer's totals are almost
+never one station's cost alone. Worst case over 24 scroll samples at `q=high`,
+from `node scripts/check-budgets.mjs`. Every station is inside its own budget;
+nothing needed renegotiating.
+
+**FPS is deliberately blank.** Every measurement tonight ran in headless Chrome on
+SwiftShader, a software rasteriser, which reports 0–5fps at every tier regardless of
+what the scene does. Writing a number there would be worse than leaving it empty.
+**60fps desktop / 30fps mid-tier Android is the one acceptance criterion that has
+not been verified** and it needs real hardware — see the P7 handover.
 
 ---
 
@@ -425,3 +437,90 @@ Filled in by each station agent from the `?debug=1` HUD.
      is now commented at both ends.
 
   Full QA green. Build, lint, typecheck clean.
+- [P5] 2026-09-22 — done. **First Load JS 636 kB → 528 kB**; excluding the three
+  core chunks (which cache separately) the initial payload is 330 kB gzipped,
+  against a 400 kB target.
+
+  Two things produced it, and the second was the bigger surprise:
+  1. **Code splitting.** Seven stations are now `lazy()` behind their manifest's
+     import — that had to be the manifest, because `SceneDirector` consumes
+     `manifest.Scene` and a static import there keeps every station in the entry
+     graph no matter what the director does. Hero stays static: it renders at
+     progress 0 and must not wait on a round trip. Verified in the network panel,
+     one chunk per station arriving as its `mountPadding` window opens.
+  2. **69 kB gzipped of dead `n8ao`.** `@react-three/postprocessing` ships a
+     pre-bundled dist that imports `n8ao` at the top; the `<N8AO>` component
+     tree-shakes but the package import does not, because `n8ao` never declares
+     itself side-effect free. Every visitor was downloading an ambient-occlusion
+     pass **with a base64 neural denoise model embedded in it**. Scoped
+     `sideEffects: false` rule in `next.config.ts`.
+
+  `scripts/check-budgets.mjs` is the standing gate — 12 assertions, all green,
+  wired into CI. It takes its budget denominator from the HUD rather than a table of
+  its own, so it cannot drift when someone tunes a `mountPadding`. It asserts no
+  frame rate and says so in its own output.
+
+  `scripts/optimize-assets.mjs` is a safe no-op today: writes nothing, exits 0, and
+  prints all 22 empty slots grouped by priority with the spec, the consumer, and what
+  ships instead. `sharp` is now installed, so the resize/encode path is live the
+  moment files land.
+
+  No GPU leak: geometries never grow across three full scroll cycles, and About and
+  Skills each add exactly one texture on first visit and none after — the procedural
+  portrait canvas and the runtime icon atlas being cached, which is correct.
+
+  Skipped: `build-atlas.mjs`. It needs the Skills station to consume a baked atlas
+  instead of building one at runtime, and shipping an unused 512×512 webp would be
+  pure waste. It is the smallest item on the list (~80 ms).
+
+- [P6] 2026-09-22 — done, and it found more than it was sent to find.
+
+  **The no-WebGL path was functional but wrong, for a specific reason:**
+  `SceneDirector` is the only thing that writes `--page-bg` and flips `data-theme`,
+  and it lives inside the canvas. With no WebGL, `data-theme` stayed `"dark"` forever
+  and all six light stations rendered dark tokens on near-black. `StaticBackdrop`
+  now drives both from the same centre-to-centre blend the 3D uses, so a build with
+  WebGL and one without change theme at identical scroll positions.
+
+  **The page was unreadable with JavaScript disabled.** The server-rendered HTML
+  carries 137 `opacity:0` and 113 `blur(6px)` inline styles — Motion's SSR "before"
+  state. Crawlers got the text (verified by grepping `curl` output for strings from
+  every station), but a human with JS off got a blank page behind a preloader that
+  never resolved. A `<noscript>` stylesheet now releases all of it.
+
+  **Keyboard navigation was measured, not reasoned about.** The naive
+  "scroll to the station" approach left **46 of 120 tab stops below the fold**,
+  because several stations have DOM taller than their sticky pin window. The fix
+  probes the real layout — scroll, force a synchronous `getBoundingClientRect`,
+  correct, up to four times, all before paint — then hands Lenis one smooth move.
+  After it: 0 of 55 off-screen, and 0px of native scroll-into-view fighting Lenis
+  across 55 consecutive tabs.
+
+  **Two contrast failures, both fixed at the token:**
+  - `--ink-400` `#6B7C93` measured **3.82:1** on the Writing background — `.t-meta`
+    and `.t-eyebrow` are 12–13px so they need 4.5. Now `#5A6B83`, clearing 4.87 on
+    the worst surface.
+  - White on `--brand-400` in dark measured **3.68:1** — the primary pill label on
+    the hero and the nav CTA. `--on-brand` in the dark block is now `#05080E`
+    (5.45:1). Deliberately **not** fixed by darkening `--brand`, which would have
+    broken the Contact eyebrow at 12px.
+
+  Also: the a11y layer is mounted from `layout.tsx` rather than `page.tsx`, because
+  the skip link and station nav must be the first two stops in the tab order and
+  `page.tsx` renders after the preloader. Signed off.
+
+- [main] 2026-09-22 — P5/P6 integration. Applied both contrast tokens,
+  `outline-offset` 3px → 2px to match the design system, `role="list"` on all 34
+  lists (Tailwind v4's preflight strips list semantics from every one of them, and
+  Safari + VoiceOver honour that), `role="contentinfo"` on the footer, `role="group"`
+  on the Skills cards, Escape-returns-focus plus a real focus trap in the mobile
+  menu, and Projects' dead `View Project` links now match Writing's `aria-disabled`
+  treatment.
+
+  **Fixed the LCP dependency P5 found.** The hero headline could not reveal until the
+  preloader lifted, and the preloader waited for the first WebGL frame — so Largest
+  Contentful Paint was a function of GPU initialisation on every device (7.7s on a
+  throttled software-rasterised run). The preloader now leaves on the content's
+  schedule with only a 450 ms grace for the first frame, and the canvas fades itself
+  in when it is ready. The world arriving a beat after the text reads as assembly,
+  not as a wait.

@@ -1,6 +1,11 @@
 import type { SceneManifest } from '@/engine/types'
 import { stationCamera } from '@/lib/curves'
-import { ProjectsScene } from './Scene'
+import { lazy } from 'react'
+
+/** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
+const ProjectsScene = lazy(() =>
+  import('./Scene').then((m) => ({ default: m.ProjectsScene })),
+)
 
 /**
  * 03 · PROJECTS — the lightest and most specular station.

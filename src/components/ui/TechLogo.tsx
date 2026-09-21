@@ -171,7 +171,7 @@ export function TechRow({
   className?: string
 }) {
   return (
-    <ul
+    <ul role="list"
       className={cn('flex list-none flex-wrap items-center p-0', className)}
       style={{ gap, margin: 0, color: 'var(--fg-muted)' }}
     >

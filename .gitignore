@@ -37,3 +37,6 @@ next-env.d.ts
 
 # probe output from scripts/station-probe.mjs
 .probe/
+
+# per-agent build dirs (NEXT_DIST_DIR)
+.next-*/

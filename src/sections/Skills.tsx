@@ -55,6 +55,9 @@ function CategoryCard({ index, id }: { index: number; id: string }) {
   return (
     <Card
       interactive
+      // Focusable and named, so it works — but without a role a screen reader
+      // announces an unnamed group, and an axe run flags a bare div[tabindex].
+      role="group"
       tabIndex={0}
       aria-label={`${category.title} — ${category.sub}`}
       onPointerEnter={enter}

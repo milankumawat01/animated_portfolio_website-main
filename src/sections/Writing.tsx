@@ -35,7 +35,7 @@ import { clamp } from '@/lib/math'
  * second beat further down: what happens after 0.93 is the 3D, sheets still
  * falling past a lens that is already on its way to Contact.
  *
- * THE CARDS ARE A `<ul>`. Four articles are a list of articles.
+ * THE CARDS ARE A `<ul role="list">`. Four articles are a list of articles.
  *
  * THE LINKS GO NOWHERE YET. A9 has not landed, so every `href` in `data/articles`
  * is `'#'`. They are rendered as real anchors — a fake button would be worse — but
@@ -169,7 +169,7 @@ export function Writing() {
         </div>
 
         {/* ------------------------------------------------ the four articles */}
-        <ul
+        <ul role="list"
           ref={track}
           className="flex snap-x snap-proximity overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           /* Bleeds to the viewport edge so the fourth card peeks rather than being

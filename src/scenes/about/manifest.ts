@@ -1,6 +1,16 @@
 import type { SceneManifest } from '@/engine/types'
 import { stationCamera } from '@/lib/curves'
-import { AboutScene } from './Scene'
+import { lazy } from 'react'
+
+/**
+ * CODE SPLIT (P5). This station's geometry, shaders and materials sit behind a
+ * dynamic import, so none of it is in the initial payload. `SceneDirector` already
+ * wraps every station in `<Suspense fallback={null}>`, and `mountPadding` below
+ * mounts the station well before the camera arrives — that lead time is the
+ * download window. Hero is the one station left as a static import, because it
+ * renders at progress 0 and must not wait on a second round trip.
+ */
+const AboutScene = lazy(() => import('./Scene').then((m) => ({ default: m.AboutScene })))
 
 /**
  * 02 · ABOUT — the first light station, and the first object on the site with a

@@ -49,6 +49,11 @@ jobs:
         env:
           CI: 'true'
 
+      - name: Performance budgets
+        run: node scripts/check-budgets.mjs --no-build --ci
+        env:
+          CI: 'true'
+
       - name: Upload failure screenshots
         if: failure()
         uses: actions/upload-artifact@v4

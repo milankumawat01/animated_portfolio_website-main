@@ -160,7 +160,9 @@ try {
   await page.goto(`${BASE}/?debug=1`, { waitUntil: 'networkidle', timeout: 60000 })
   await page.waitForTimeout(3500)
 
-  note((await page.locator('[role="status"]').count()) === 0, 'preloader dismissed')
+  // Target the preloader specifically: the a11y layer renders a permanent
+  // role="status" live region, so that selector alone is no longer unique.
+  note((await page.locator('[data-preloader]').count()) === 0, 'preloader dismissed')
 
   const stations = await page.$$eval('[data-station]', (e) =>
     e.map((x) => x.getAttribute('data-station')),

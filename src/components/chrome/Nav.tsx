@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { navItems, profile } from '@/data/profile'
 import { copy } from '@/data/copy'
@@ -40,11 +40,53 @@ export function Nav() {
     [],
   )
 
+  /**
+   * While the overlay is open it owns the keyboard: Escape closes it and returns
+   * focus to the button that opened it, and Tab cycles within the panel instead of
+   * walking into the page behind it. Without the trap, tabbing past the last link
+   * silently moves focus to content the user cannot see.
+   */
+  const menuTrigger = useRef<HTMLButtonElement>(null)
+  const menuPanel = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (!menuOpen) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false)
+
+    const focusables = () =>
+      Array.from(
+        menuPanel.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.offsetParent !== null)
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false)
+        menuTrigger.current?.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = focusables()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey && (active === first || !menuPanel.current?.contains(active))) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    // Move focus into the panel so the trap has somewhere to start.
+    const id = window.setTimeout(() => focusables()[0]?.focus(), 60)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.clearTimeout(id)
+    }
   }, [menuOpen])
 
   const go = (station: string) => {
@@ -114,7 +156,7 @@ export function Nav() {
           </button>
 
           {!isMobile ? (
-            <ul className="flex list-none items-center gap-1 p-0" style={{ margin: 0 }}>
+            <ul role="list" className="flex list-none items-center gap-1 p-0" style={{ margin: 0 }}>
               {navItems.map((item) => {
                 const active = item.station === activeLink
                 return (
@@ -173,6 +215,7 @@ export function Nav() {
               </button>
             ) : (
               <button
+                ref={menuTrigger}
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-expanded={menuOpen}
@@ -214,7 +257,11 @@ export function Nav() {
       <AnimatePresence>
         {menuOpen ? (
           <motion.div
+            ref={menuPanel}
             id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
             className="fixed inset-0 z-40 flex flex-col justify-center"
             style={{ background: 'var(--bg)', padding: 'var(--gutter)' }}
             initial={{ opacity: 0 }}
@@ -222,7 +269,7 @@ export function Nav() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.28, ease: EASE.out }}
           >
-            <ul className="flex list-none flex-col gap-2 p-0" style={{ margin: 0 }}>
+            <ul role="list" className="flex list-none flex-col gap-2 p-0" style={{ margin: 0 }}>
               {navItems.map((item, i) => (
                 <motion.li
                   key={item.station}

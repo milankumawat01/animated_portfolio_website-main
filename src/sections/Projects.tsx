@@ -39,6 +39,17 @@ const LAST = projects.length - 1
 /** Which slab the 3D has centred, from the same formula `Scene.tsx` uses. */
 const indexFromProgress = (p: number): number => clamp(Math.round(p * LAST), 0, LAST)
 
+/**
+ * A link with no destination yet. It stays an `<a>` — markup a crawler and a screen
+ * reader should see — but announces itself disabled and does not jump the page to
+ * the top, which is all `href="#"` would otherwise do and which fights Lenis.
+ * Matches the treatment in `Writing.tsx`. Delete when A9 supplies real URLs.
+ */
+const DEAD = {
+  'aria-disabled': true,
+  onClick: (e: React.MouseEvent) => e.preventDefault(),
+} as const
+
 export function Projects() {
   return (
     <SectionShell id="projects" theme="light" contained={false}>
@@ -182,7 +193,11 @@ function ProjectsBody() {
                   </div>
 
                   <div className="mt-5">
-                    <ArrowLink href={project.href} aria-label={`${projectsCopy.cardCta}: ${project.name}`}>
+                    <ArrowLink
+                      href={project.href}
+                      aria-label={`${projectsCopy.cardCta}: ${project.name}`}
+                      {...(project.href === '#' ? DEAD : null)}
+                    >
                       {projectsCopy.cardCta}
                     </ArrowLink>
                   </div>

@@ -1,6 +1,9 @@
 import type { SceneManifest } from '@/engine/types'
 import { stationCamera } from '@/lib/curves'
-import { BuildScene } from './Scene'
+import { lazy } from 'react'
+
+/** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
+const BuildScene = lazy(() => import('./Scene').then((m) => ({ default: m.BuildScene })))
 
 /**
  * 06 — HOW I BUILD.
