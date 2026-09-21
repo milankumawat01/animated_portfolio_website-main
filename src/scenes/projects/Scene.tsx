@@ -23,7 +23,7 @@ import { scrollState } from '@/store/useScroll'
 import { postState } from '@/engine/PostFX'
 import { Caustics } from './Caustics'
 import { Slab, type SlabActivity } from './Slab'
-import { useProjectHover } from './useProjectHover'
+import { hoveredIdIn } from '@/store/useInteraction'
 
 /**
  * PROJECTS — "four things that shipped".
@@ -45,23 +45,39 @@ const [RANGE_START, RANGE_END] = STATION_RANGES.projects
 
 /** Arc radius. Large relative to the step, which is what makes the arc shallow. */
 const ARC_RADIUS = 9
-/** Angular gap between slabs, radians. 9 · sin(0.255) ≈ 2.27 units of lateral pitch. */
-const ARC_STEP = 0.255
+/**
+ * Angular gap between slabs, radians. 9 · sin(0.345) ≈ 3.04 units of lateral pitch,
+ * which holds the same slab-width-to-gap ratio now that the slabs are larger.
+ */
+const ARC_STEP = 0.345
 /**
  * The arc rides above the camera's look target. The DOM cards occupy the lower third
  * of the viewport for this whole station, so the slabs have to sit in the band
  * between the intro paragraph and the card row rather than on the horizon.
  */
-const BASE_Y = 1.0
-const ACTIVE_LIFT = 0.3
+const BASE_Y = 1.2
+const ACTIVE_LIFT = 0.4
 const ACTIVE_SCALE = 0.08
 /** 6°, the hover tilt ceiling from the scene bible. */
 const HOVER_TILT = 0.1047
 /** Lean of the caustic pools, on top of the geometry's baked -90° X rotation. */
 const CAUSTIC_TILT = 1.0
 
-const SLAB_W = 1.6
-const SLAB_H = 1.0
+/**
+ * Scaled up 1.35x from the scene bible's 1.6 x 1.0. The bible sizes the slabs for a
+ * close read, but the camera path only closes to ~8 units at the very end of this
+ * station and sits ~18 units out through the middle of it — at the original size
+ * the whole carousel rendered as a ~40px thumbnail strip and the DOM cards were
+ * carrying the entire section. The arc step scales with them.
+ */
+const SLAB_W = 2.16
+const SLAB_H = 1.35
+/**
+ * Depth is 0.06 and must stay there: `Slab.tsx` hardcodes `HALF_DEPTH = 0.03` and
+ * positions the screenshot plane against it. Deepening the slab without changing
+ * that constant buries the screenshot inside the slab body, which renders as a
+ * blank grey panel — found exactly that way.
+ */
 const SLAB_D = 0.06
 
 const CAROUSEL_LAMBDA = 5.5
@@ -171,7 +187,7 @@ export function ProjectsScene({ quality, reducedMotion }: SceneProps) {
     const targetT = local * (projects.length - 1)
     c.t = reducedMotion ? targetT : damp(c.t, targetT, CAROUSEL_LAMBDA, dt)
 
-    const hovered = useProjectHover.getState().hovered
+    const hovered = hoveredIdIn('projects')
     const activeIndex = clamp(Math.round(c.t), 0, projects.length - 1)
     const idle = reducedMotion ? 0 : 1
 

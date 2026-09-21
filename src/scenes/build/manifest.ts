@@ -29,6 +29,10 @@ export const buildManifest: SceneManifest = {
     fogFar: 170,
     theme: 'light',
   },
+  // Tight: the camera enters Writing still standing in this station's volume
+  // (writing's first waypoint is world z -198, in front of this anchor at -210),
+  // so a generous padding keeps the blueprint floor on screen well into Writing.
+  mountPadding: 0.035,
   Scene: BuildScene,
   budget: { drawCalls: 16, triangles: 30_000 },
 }

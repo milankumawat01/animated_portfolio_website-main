@@ -20,7 +20,7 @@ import { STATION_RANGES } from '@/lib/curves'
 import { clamp } from '@/lib/math'
 import { getLenis } from '@/store/useScroll'
 import { useQuality } from '@/store/useQuality'
-import { useProjectHover } from '@/scenes/projects/useProjectHover'
+import { useInteraction } from '@/store/useInteraction'
 
 /**
  * The DOM half of station 03.
@@ -51,8 +51,14 @@ function ProjectsBody() {
   const c = copy.projects
   const progress = useStationProgress()
   const activeIndex = indexFromProgress(progress)
-  const setHovered = useProjectHover((s) => s.setHovered)
-  const hovered = useProjectHover((s) => s.hovered)
+  const setInteractionHovered = useInteraction((s) => s.setHovered)
+  const setHovered = useCallback(
+    (id: string | null) => setInteractionHovered(id ? { station: 'projects', id } : null),
+    [setInteractionHovered],
+  )
+  const hovered = useInteraction((s) =>
+    s.hovered?.station === 'projects' ? s.hovered.id : null,
+  )
   const reducedMotion = useQuality((s) => s.reducedMotion)
 
   const goTo = useCallback((index: number) => {
@@ -141,6 +147,7 @@ function ProjectsBody() {
                   onFocusCapture={() => setHovered(project.id)}
                   onBlurCapture={() => setHovered(null)}
                   data-active={isActive || undefined}
+                  data-cursor="view"
                   style={{
                     padding: 20,
                     height: '100%',

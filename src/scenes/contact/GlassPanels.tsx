@@ -13,7 +13,8 @@ import {
 import type { QualityTier } from '@/engine/types'
 import { glsl } from '@/lib/shader'
 import { damp, hash11 } from '@/lib/math'
-import { CONTACT_TILE_IDS, useTileHover } from './useTileHover'
+import { hoveredIdIn } from '@/store/useInteraction'
+import { CONTACT_TILE_IDS } from './tiles'
 
 /**
  * THE 3D ECHO OF THE FOUR CONTACT TILES.
@@ -33,7 +34,7 @@ import { CONTACT_TILE_IDS, useTileHover } from './useTileHover'
  * and the idle float are switched off and they become the flat planes the tier
  * table asks for — same mesh, same one draw call.
  *
- * Hover comes from `useTileHover`, read imperatively inside `useFrame`. Never
+ * Hover comes from `useInteraction`, read imperatively inside `useFrame`. Never
  * subscribe: this component must not re-render on a pointer move.
  */
 
@@ -232,7 +233,7 @@ export function GlassPanels({
     if (!m) return
     const attr = m.geometry.getAttribute('aHeat') as InstancedBufferAttribute
     const arr = attr.array as Float32Array
-    const hovered = useTileHover.getState().hovered
+    const hovered = hoveredIdIn('contact')
 
     let changed = false
     for (let i = 0; i < count; i++) {

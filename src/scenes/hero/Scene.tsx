@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import {
   AdditiveBlending,
@@ -16,6 +16,7 @@ import {
 import type { QualityTier, SceneProps } from '@/engine/types'
 import { postState } from '@/engine/PostFX'
 import { scrollState } from '@/store/useScroll'
+import { useInteraction } from '@/store/useInteraction'
 import { glsl } from '@/lib/shader'
 import { clamp, hash11, remapClamped } from '@/lib/math'
 import { MonogramPoints } from './MonogramPoints'
@@ -41,7 +42,7 @@ const PARTICLES: Record<QualityTier, number> = {
 const DUST: Record<QualityTier, number> = { low: 0, medium: 2, high: 4 }
 
 /** World size of the mark's longest axis. Fits the z=4 frame with margin to spare. */
-const MONOGRAM_SCALE = 4.9
+const MONOGRAM_SCALE = 3.1
 
 /**
  * The mark leans right of the station origin so it clears the DOM headline, which
@@ -49,10 +50,20 @@ const MONOGRAM_SCALE = 4.9
  * — the offset is the scene's business, not the component's, because Contact
  * reuses the component with a different composition.
  */
-const MONOGRAM_OFFSET: [number, number, number] = [1.15, 0.15, 0]
+/**
+ * Sized and placed to the frame at p=0, which is the tightest it ever gets: the
+ * camera starts 4 units out at 62° fov, so only x -2.4..2.4 is on screen, and the
+ * headline column owns everything left of x ≈ -0.2. A 4.9-scale mark at x 1.15
+ * spanned -1.3..3.6 — it sat on top of 'Milan Kumawat' AND ran off the right
+ * edge. This spans roughly -0.05..3.1: clear of the headline, and the camera
+ * pulls back to z=13 almost immediately so the right edge is only briefly tight.
+ */
+const MONOGRAM_OFFSET: [number, number, number] = [1.52, 0.35, 0]
 
 /** brand-400 — docs/01-DESIGN-SYSTEM.md §1. */
 const PARTICLE_COLOR = '#3B82F6'
+/** The brand ramp, for the Konami pulse. */
+const EGG_COLORS = ['#3B82F6', '#2563EB', '#1D4ED8', '#F5A524', '#16A34A'] as const
 
 /** Local progress over which the mark comes apart. */
 const DISSOLVE_IN = 0.04
@@ -221,6 +232,21 @@ export function HeroScene({ progress, active, quality, reducedMotion }: ScenePro
 
   const dustCount = DUST[quality]
 
+  /**
+   * Konami. Cycles the cloud through the brand ramp for three seconds, wherever
+   * you are on the page. A subscription is fine here — it changes twice, ever.
+   */
+  const easterEgg = useInteraction((s) => s.easterEgg)
+  const [eggStep, setEggStep] = useState(0)
+  useEffect(() => {
+    if (!easterEgg) return
+    const id = window.setInterval(() => setEggStep((n) => n + 1), 260)
+    return () => window.clearInterval(id)
+  }, [easterEgg])
+  const particleColor = easterEgg
+    ? EGG_COLORS[eggStep % EGG_COLORS.length]
+    : PARTICLE_COLOR
+
   return (
     <group ref={group} name="hero">
       <group position={MONOGRAM_OFFSET}>
@@ -228,7 +254,7 @@ export function HeroScene({ progress, active, quality, reducedMotion }: ScenePro
           count={PARTICLES[quality]}
           dissolve={dissolve}
           scale={MONOGRAM_SCALE}
-          color={PARTICLE_COLOR}
+          color={particleColor}
           spread={quality === 'low' ? 1.6 : 1.9}
           idle={!reducedMotion}
         />

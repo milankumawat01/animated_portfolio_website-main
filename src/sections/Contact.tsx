@@ -13,9 +13,11 @@ import {
   SectionShell,
 } from '@/components/ui'
 import { Footer } from '@/components/chrome'
+import { Magnetic } from '@/components/interaction'
 import { copy } from '@/data/copy'
 import { profile } from '@/data/profile'
-import { useTileHover, type ContactTileId } from '@/scenes/contact/useTileHover'
+import { useInteraction } from '@/store/useInteraction'
+import type { ContactTileId } from '@/scenes/contact/tiles'
 
 /**
  * 08 — CONTACT, and the footer.
@@ -56,7 +58,12 @@ import { useTileHover, type ContactTileId } from '@/scenes/contact/useTileHover'
  */
 export function Contact() {
   const c = copy.contact
-  const setHovered = useTileHover((s) => s.setHovered)
+  const setInteractionHovered = useInteraction((s) => s.setHovered)
+  const setHovered = useCallback(
+    (id: ContactTileId | null) =>
+      setInteractionHovered(id ? { station: 'contact', id } : null),
+    [setInteractionHovered],
+  )
 
   const onEnter = useCallback(
     (id: ContactTileId) => () => setHovered(id),
@@ -143,9 +150,11 @@ export function Contact() {
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               <Reveal delay={0.46}>
-                <Button href={`mailto:${profile.email}`} icon="→">
-                  {c.cta}
-                </Button>
+                <Magnetic strength={0.3}>
+                  <Button href={`mailto:${profile.email}`} icon="→">
+                    {c.cta}
+                  </Button>
+                </Magnetic>
               </Reveal>
               <Reveal delay={0.52}>
                 <p className="t-meta" style={{ maxWidth: '30ch' }}>

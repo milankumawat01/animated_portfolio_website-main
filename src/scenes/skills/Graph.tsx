@@ -25,7 +25,7 @@ import { scrollState } from '@/store/useScroll'
 import { skills } from '@/data/skills'
 import { ATLAS_CELL_UV, cellUv, getTechAtlas } from './lib/atlas'
 import { LEAVES_PER_TIER, buildGraph } from './lib/forceLayout'
-import { useSkillHover } from './useSkillHover'
+import { hoveredIdIn } from '@/store/useInteraction'
 import nodeVert from './shaders/node.vert'
 import nodeFrag from './shaders/node.frag'
 import edgeVert from './shaders/edge.vert'
@@ -419,7 +419,7 @@ export function Graph({ quality, reducedMotion, progress }: GraphProps) {
     const b = built
 
     // --- highlight ---------------------------------------------------------
-    const hovered = useSkillHover.getState().hoveredCategory
+    const hovered = hoveredIdIn('skills')
     const hoveredIndex = hovered ? skills.findIndex((c) => c.id === hovered) : -1
     s.dim = damp(s.dim, hoveredIndex >= 0 ? 1 : 0, 9, dt)
 

@@ -11,6 +11,7 @@ import {
   StatBlock,
   TechRow,
 } from '@/components/ui'
+import { Magnetic } from '@/components/interaction'
 import { copy } from '@/data/copy'
 import { heroStack, profile, stats } from '@/data/profile'
 
@@ -54,13 +55,15 @@ export function Hero() {
 
         <Reveal delay={0.4} at={0}>
           <div className="flex flex-wrap items-center" style={{ gap: 14 }}>
-            <Button
-              href="#projects"
-              variant="primary"
-              icon={<Icon name="arrowRight" size={18} />}
-            >
-              {c.primaryCta}
-            </Button>
+            <Magnetic strength={0.3}>
+              <Button
+                href="#projects"
+                variant="primary"
+                icon={<Icon name="arrowRight" size={18} />}
+              >
+                {c.primaryCta}
+              </Button>
+            </Magnetic>
             <Button
               href={profile.resume}
               variant="ghost"

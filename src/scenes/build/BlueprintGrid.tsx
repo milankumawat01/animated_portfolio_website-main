@@ -23,8 +23,14 @@ import gridFrag from './shaders/grid.frag'
  * of a function of how big the plane happens to be.
  */
 
-const PLANE_W = 200
-const PLANE_D = 190
+/**
+ * Sized to this station, not to the world. At 200x190 with a fade reaching 92
+ * units, the floor was still ~60% opaque at the Writing anchor 37 units away and
+ * dominated that station's lower half — which directly fights its 'light, airy,
+ * weightless' brief. The pipeline is 28 units wide; 96 is generous for it.
+ */
+const PLANE_W = 96
+const PLANE_D = 88
 /** pushed back so the grid reads behind the pipeline as well as under it */
 const PLANE_Z = -8
 
@@ -63,8 +69,8 @@ export function BlueprintGrid() {
         uMajorFreq: { value: 0.2 },
         uMinorAlpha: { value: 0.26 },
         uMajorAlpha: { value: 0.55 },
-        uFadeNear: { value: 40 },
-        uFadeFar: { value: 92 },
+        uFadeNear: { value: 18 },
+        uFadeFar: { value: 40 },
         uFade: { value: 1 },
       },
       fog: true,

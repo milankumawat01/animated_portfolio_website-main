@@ -19,7 +19,7 @@ import type { Project } from '@/data/projects'
 import { VERTEX_PRELUDE } from '@/lib/shader'
 import { clamp, damp } from '@/lib/math'
 import { scrollState } from '@/store/useScroll'
-import { useProjectHover } from './useProjectHover'
+import { hoveredIdIn } from '@/store/useInteraction'
 import rippleChunk from './shaders/ripple.vert'
 
 /* -------------------------------------------------------------------------- */
@@ -362,7 +362,7 @@ export function Slab({
     const target = rippleOn ? clamp(Math.abs(scrollState.velocity), 0, 1.4) : 0
     uniforms.uAmp.value = damp(uniforms.uAmp.value, target, 9, dt)
 
-    const hovered = useProjectHover.getState().hovered === project.id
+    const hovered = hoveredIdIn('projects') === project.id
     const base = low ? 0.55 : 0.42
     const wanted = base + activity.active * 0.22 + (hovered ? 0.34 : 0)
     imageMaterial.emissiveIntensity = damp(imageMaterial.emissiveIntensity, wanted, 7, dt)

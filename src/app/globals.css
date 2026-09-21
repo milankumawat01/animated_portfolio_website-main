@@ -203,6 +203,16 @@ canvas {
   border: 0;
 }
 
+/*
+ * The custom cursor replaces the native one — but only where it actually renders.
+ * `Cursor` adds this class on fine pointers with motion allowed, and removes it on
+ * unmount, so a touch user or a reduced-motion user never loses their pointer.
+ */
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}
+
 /* The theme flip should read as a fade, not a jump. */
 .theme-fade,
 .theme-fade *:not(svg):not(path) {

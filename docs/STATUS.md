@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — **all eight stations built.** P0–P3 done, P4 in progress.
+**Last updated:** 2026-09-22 — P0–P4 done. P5 + P6 running in parallel.
 
 ---
 
@@ -22,9 +22,9 @@
 | P3F | How I Build station | ✅ Done | agent | 5/16 calls · 1.8k/30k tris |
 | P3G | Writing station | ✅ Done | agent | 5/10 calls · 7.5k/20k tris |
 | P3H | Contact station | ✅ Done | agent | 10/20 calls · 2.8k/70k tris |
-| P4 | Interaction & Polish | 🟦 In progress | main | — |
-| P5 | Performance & Assets | ⬜ Not started | — | Blocked by P4 |
-| P6 | A11y, SEO, Fallback | ⬜ Not started | — | Blocked by P4 |
+| P4 | Interaction & Polish | ✅ Done | main | Audio omitted — no A8 assets |
+| P5 | Performance & Assets | 🟦 In progress | agent | — |
+| P6 | A11y, SEO, Fallback | 🟦 In progress | agent | — |
 | P7 | QA & Deploy | ⬜ Not started | — | Blocked by P5 + P6 |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework`
@@ -387,3 +387,41 @@ Filled in by each station agent from the `?debug=1` HUD.
   default, `Card` clobbering its own styles, `CodeBlock` retyping, and the HUD judging
   co-mounted stations against a single budget.
   Nothing anyone reported needed a change to a file they did not own except those six.
+- [P4] 2026-09-22 — done. Interaction layer and the composition pass.
+
+  **Consolidation.** The three station-local hover stores (`useProjectHover`,
+  `useSkillHover`, `useTileHover`) are folded into `store/useInteraction.ts` and
+  deleted. The store is keyed by `{ station, id }` and exposes `hoveredIdIn(station)`
+  for non-reactive reads inside `useFrame` — a hovered slab must never re-render its
+  siblings. `CONTACT_TILE_IDS` moved to `scenes/contact/tiles.ts`, since it is data
+  rather than state.
+
+  **Interaction.** Custom cursor (10px dot damped at 18, 36px ring damped at 10 — the
+  lag between them is the whole effect), driven declaratively by `data-cursor`
+  attributes so no station carries cursor logic. Magnetic CTAs at strength 0.3.
+  A 120ms brightness dip and 2px nudge on station arrival. Konami code pulses the hero
+  monogram through the brand ramp for three seconds, and a console greeting. All of it
+  disabled on coarse pointers and under reduced motion.
+
+  **No audio.** A8 was never supplied and the brief is explicit: omit the system
+  rather than ship a toggle that does nothing. There is no `lib/audio.ts` and no
+  `SoundToggle`.
+
+  **Composition pass — three real defects, all found by looking at frames:**
+  1. *Hero.* The particle mark sat on top of "Milan Kumawat". Resized 4.9 → 3.1 and
+     moved to x 1.52. At p=0 the camera is 4 units out at 62° fov, so only x −2.4..2.4
+     is on screen and the headline column owns everything left of −0.2; the old mark
+     spanned −1.3..3.6, overlapping the headline *and* running off the right edge.
+     A first attempt at x 2.45 over-corrected and cropped the K.
+  2. *How I Build bled into two stations.* Its blueprint floor was a 200×190 plane with
+     a fade reaching 92 units, so it was still ~60% opaque at the Writing anchor and
+     dominated that station's lower half. Now 96×88 with an 18→40 fade, and Build's
+     `mountPadding` tightened to 0.035. Writing is clean and light again.
+  3. *Projects rendered as a ~40px thumbnail strip.* Slabs scaled 1.35× and the arc
+     step with them. A first attempt at 1.7× ran them off the top of the frame, and
+     also deepened `SLAB_D` — which silently buried the screenshot plane inside the
+     slab body, because `Slab.tsx` hardcodes `HALF_DEPTH = 0.03` against the original
+     depth. The slabs rendered as blank grey panels. Depth reverted and the coupling
+     is now commented at both ends.
+
+  Full QA green. Build, lint, typecheck clean.

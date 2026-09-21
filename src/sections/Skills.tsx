@@ -13,7 +13,7 @@ import {
 } from '@/components/ui'
 import { copy } from '@/data/copy'
 import { skills, skillsCopy } from '@/data/skills'
-import { useSkillHover } from '@/scenes/skills/useSkillHover'
+import { useInteraction } from '@/store/useInteraction'
 
 /**
  * 05 — SKILLS & STACK.
@@ -43,7 +43,11 @@ const GRADIENT: React.CSSProperties = {
 
 function CategoryCard({ index, id }: { index: number; id: string }) {
   const category = skills[index]
-  const setHovered = useSkillHover((s) => s.setHoveredCategory)
+  const setInteractionHovered = useInteraction((s) => s.setHovered)
+  const setHovered = useCallback(
+    (id: string | null) => setInteractionHovered(id ? { station: 'skills', id } : null),
+    [setInteractionHovered],
+  )
 
   const enter = useCallback(() => setHovered(id), [setHovered, id])
   const leave = useCallback(() => setHovered(null), [setHovered])

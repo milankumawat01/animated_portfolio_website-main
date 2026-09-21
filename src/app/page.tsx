@@ -3,6 +3,7 @@ import { SiteRuntime } from '@/engine/SiteRuntime'
 import { Preloader } from '@/engine/Preloader'
 import { DebugHUD } from '@/engine/DebugHUD'
 import { Nav, ScrollHint } from '@/components/chrome'
+import { InteractionLayer } from '@/components/interaction'
 import { sections } from '@/sections'
 
 /**
@@ -27,6 +28,7 @@ export default function Page() {
       </main>
 
       <ScrollHint />
+      <InteractionLayer />
       <DebugHUD />
     </>
   )
