@@ -24,7 +24,13 @@ export interface CardProps extends ComponentPropsWithoutRef<'div'> {
   interactive?: boolean
 }
 
-export function Card({ blur = false, interactive = false, className, ...rest }: CardProps) {
+export function Card({
+  blur = false,
+  interactive = false,
+  className,
+  style,
+  ...rest
+}: CardProps) {
   return (
     <div
       className={cn(
@@ -32,6 +38,13 @@ export function Card({ blur = false, interactive = false, className, ...rest }: 
         interactive && 'transition-[transform,box-shadow] duration-200',
         className,
       )}
+      {...rest}
+      /**
+       * `style` is destructured out of `rest` and applied AFTER the spread. The
+       * earlier version merged it into the defaults and then spread `rest`, so the
+       * spread clobbered the whole style object and any card given a `style` prop
+       * silently lost its background, radius, border and shadow.
+       */
       style={{
         background: blur ? 'var(--card-blur-bg)' : 'var(--card-bg)',
         backdropFilter: blur ? 'blur(20px) saturate(140%)' : undefined,
@@ -39,9 +52,8 @@ export function Card({ blur = false, interactive = false, className, ...rest }: 
         borderRadius: 'var(--r-lg)',
         border: '1px solid var(--border)',
         boxShadow: 'var(--card-shadow)',
-        ...rest.style,
+        ...style,
       }}
-      {...rest}
     />
   )
 }

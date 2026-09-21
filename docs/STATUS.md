@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0–P2 and Wave 4 batch 1 (3A/3C/3E) done.
+**Last updated:** 2026-09-22 — P0–P2 and Wave 4 batches 1+2 done. Batch 3 dispatching.
 
 ---
 
@@ -15,13 +15,13 @@
 | P1 | Core 3D Engine & Contracts | ✅ Done | main | Contracts FROZEN. Registries sealed. |
 | P2 | Design System & DOM Kit | ✅ Done | main | Kit complete. Import from `@/components/ui`. |
 | P3A | Hero station | ✅ Done | agent | 3/24 calls · 1.5k/180k tris |
-| P3B | About station | ⬜ Not started | — | Blocked by P2 · batch 2 |
+| P3B | About station | ✅ Done | agent | 8/14 calls · 8k/60k tris |
 | P3C | Projects station | ✅ Done | agent | 9/28 calls · 6k/40k tris |
-| P3D | Experience station | ⬜ Not started | — | Blocked by P2 · batch 2 |
+| P3D | Experience station | ✅ Done | agent | 5/12 calls · 13k/90k tris |
 | P3E | Skills station | ✅ Done | agent | 3/8 calls · 3.5k/25k tris |
-| P3F | How I Build station | ⬜ Not started | — | Blocked by P2 · batch 2 |
-| P3G | Writing station | ⬜ Not started | — | Blocked by P2 · batch 3 |
-| P3H | Contact station | ⬜ Not started | — | Blocked by P3A + P3B · batch 3 |
+| P3F | How I Build station | ✅ Done | agent | 5/16 calls · 1.8k/30k tris |
+| P3G | Writing station | 🟦 In progress | agent | batch 3 |
+| P3H | Contact station | 🟦 In progress | agent | batch 3 · deps ready |
 | P4 | Interaction & Polish | ⬜ Not started | — | Blocked by all P3 |
 | P5 | Performance & Assets | ⬜ Not started | — | Blocked by P4 |
 | P6 | A11y, SEO, Fallback | ⬜ Not started | — | Blocked by P4 |
@@ -126,6 +126,24 @@ Filled in by each station agent from the `?debug=1` HUD.
   guarantee the comment described was not real. Now set via the `style` prop, which
   merges into that container. A station re-enabling it on the canvas element still
   works.
+- [from P3F → P2, FIXED] `Card` silently discarded its own styling whenever a `style`
+  prop was passed: it merged `style` into the defaults and then spread `{...rest}`
+  *after*, clobbering the whole object. Cards lost background, radius, border and
+  shadow. Two stations hit it independently. `style` is now destructured out and
+  applied last.
+- [from P3F → P2, FIXED] `CodeBlock` retyped from scratch every time the station was
+  re-entered, because the effect restarted on `active` false→true. Now latched with a
+  done ref. P3F's local `BuildCode` wrapper is now redundant but harmless.
+- [from P3B → P1, FIXED] The HUD compared whole-scene draw calls against a single
+  station's budget, but `mountPadding` keeps a neighbour alive across every boundary
+  — so About read as over budget purely because Projects was warming up next to it.
+  `SceneDirector` now exports `mountedStations` and the HUD sums their budgets.
+- [from P3D/P3F → P4] Measured `SectionShell` pin windows, for the composition pass:
+  global progress is `scroll / (pageHeight − 100vh)` while a section's top sits at
+  `rangeStart × pageHeight`, so local progress runs **ahead** of the section's own
+  scroll by up to 100vh. For Experience the sticky child is pinned across local
+  0.226–0.746; for Build, 0.48–0.857. Reveals fire at 0.08, which on some stations is
+  while the content is still below the fold. Worth a single pass over all eight.
 - [from P0 → P5/assets] `simple-icons@16.32.0` has **no mark** for: **OpenAI**,
   **LlamaIndex**, **VS Code**, **RAG**. `TechLogo` renders a monogram tile for these
   until Milan supplies 128×128 SVGs. Aliases resolved for the rest — see
@@ -264,3 +282,54 @@ Filled in by each station agent from the `?debug=1` HUD.
   `pnpm typecheck` and the full `scripts/qa.mjs` suite all clean (24/24). Three engine
   bugs surfaced by the agents and fixed centrally: the vertex-shader prelude, the
   reduced-motion blur, and the DOF focus default. Next: batch 2 (3B/3D/3F).
+- [P3B] 2026-09-22 — done. `createDeskGroup(quality)` is a pure function with no React
+  anywhere, verified standalone in plain Node: transpiled and imported with `document`
+  and `window` asserted undefined, returning a `THREE.Group` of 4 meshes / 4 materials
+  at 2.7k–7.3k triangles, placeable in a foreign scene. **P3H's dependency is real.**
+  ~24 primitives merged by material into 4 draw calls; because three.js batches by
+  mesh and not by shared material, the per-object scale-in stagger had to move into
+  the vertex shader (each vertex carries its object's pivot and delay, one `uReveal`
+  uniform drives all four meshes). Station total 7–8/14 draw calls, 8k/60k triangles.
+  Portrait placeholder is procedural; `USE_PORTRAIT_IMAGE = false` flips it when A2
+  lands. Needed nothing from files it did not own.
+
+- [P3D] 2026-09-22 — done. Helix of light rising 18 units over three turns, with a
+  comet head that rides 2.1 units *ahead* of the camera so the light pulls you up.
+  5/12 draw calls, 13k/90k triangles at high — the loosest load on the site. All
+  three timeline cards centre on their year markers; the agent measured the real pin
+  window (local 0.226–0.746) rather than trusting the brief's estimate and moved the
+  markers to 0.22/0.48/0.74 to suit, so **no shell change was needed**.
+  Notable finding: this station cannot be "the bloom station". `--surface-page` is
+  ~0.97 luminance after ACES, so any bloom threshold low enough to catch the comet
+  blows the whole background white. It earns its light through saturation instead.
+  No `Text3D` — there is no Satoshi typeface JSON, and shipping helvetiker next to
+  Satoshi would be worse than DOM labels, which the phase doc allows as a final state.
+
+- [P3F] 2026-09-22 — done. Wireframe blueprint pipeline: **five draw calls, zero
+  lights, zero assets, zero textures.** All five node frames merged into one
+  `LineSegments`, all five conduits into one geometry with one material, all 25
+  orbiting glyphs into one `InstancedMesh` whose orbit is computed in the vertex
+  shader. Added a fifth conduit the spec did not ask for — a feedback loop from
+  Iterate back to Understand — which is `while (curiosity)` drawn as a circuit.
+  Verified the diagram constructs itself across the frame sequence, the grid has no
+  moiré at grazing angles, and the typewriter does not retype on re-entry (measured
+  in the DOM: 5/132 chars on entry, 132 after, still 132 after leaving and returning).
+  `active` is a reserved word in GLSL ES 1.00 — three shaders failed to link on it.
+  Now noted in `lib/shader.ts` for everyone else.
+
+- [batch 2] 2026-09-22 — 3B + 3D + 3F integrated. Build, lint, typecheck and the full
+  QA suite clean.
+  **One real regression caught and fixed:** at 390×844 the page grew to 13.6 viewports
+  because About and How I Build have DOM content taller than the viewport, inflating
+  their sections past their allotted scroll share. That slid every later station's DOM
+  out from under the camera visiting it, compounding to ~6% by the footer. Fixed in
+  `lib/curves.ts` with `measureStationLayout()` / `toCanonicalProgress()`: the live
+  section heights are measured and raw scroll is remapped into the canonical progress
+  space the manifests describe, so the camera tracks the DOM whatever the content
+  does. Spans are computed as each section's share of total section height, which
+  makes the remap *exactly* the identity wherever nothing overflows — desktop
+  behaviour is bit-identical and no agent's tuning was invalidated.
+  The QA suite now asserts the real invariant at six viewports: whenever the camera
+  says it is at station X, X's DOM section is on screen. It also reads live state
+  (`window.__scrollState`, `window.__frameStats` under `?debug=1`) instead of scraping
+  a HUD that only repaints five times a second, which was making checks flaky.

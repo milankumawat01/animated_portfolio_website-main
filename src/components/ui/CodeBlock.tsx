@@ -38,18 +38,27 @@ export function CodeBlock({
   const [shownChars, setShownChars] = useState(typewriter && !reducedMotion ? 0 : code.length)
   const raf = useRef(0)
 
+  /**
+   * Once it has typed out, it stays typed out. Without this the effect restarts from
+   * zero every time `active` goes false → true, so scrolling away and back retyped
+   * the whole block — which reads as a glitch, not an effect.
+   */
+  const done = useRef(false)
+
   useEffect(() => {
     if (!typewriter || reducedMotion) {
       setShownChars(code.length)
+      done.current = true
       return
     }
-    if (!active) return
+    if (!active || done.current) return
 
     const start = performance.now()
     const tick = (t: number) => {
       const n = Math.min(code.length, Math.floor(((t - start) / 1000) * CHARS_PER_SECOND))
       setShownChars(n)
       if (n < code.length) raf.current = requestAnimationFrame(tick)
+      else done.current = true
     }
     raf.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf.current)

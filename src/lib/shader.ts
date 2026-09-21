@@ -6,6 +6,18 @@
  * copies of simplex noise is eight copies to keep in sync.
  */
 
+/**
+ * RESERVED WORDS that bite in GLSL ES 1.00 and are easy to reach for.
+ *
+ *   active  attribute  varying  uniform  input  output  filter  sampler
+ *   common  partition  namespace  inline  public  external  row_major
+ *
+ * `active` in particular is a natural name for "is this node lit up", and three
+ * shaders failed to link on it in one station. The error is truncated to
+ * `'active' : Illegal` with no line context, so it is expensive to find. Name such a
+ * local `heat`, `lit` or `strength`.
+ */
+
 /** Template tag. Identity at runtime; exists so editors syntax-highlight the string. */
 export const glsl = (strings: TemplateStringsArray, ...values: unknown[]): string =>
   strings.reduce((acc, s, i) => acc + s + (i < values.length ? String(values[i]) : ''), '')

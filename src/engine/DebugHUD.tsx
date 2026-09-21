@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { scenes } from '@/scenes'
+import { mountedStations } from './SceneDirector'
 import { scrollState } from '@/store/useScroll'
 import { useQuality } from '@/store/useQuality'
 import { isDebug } from './quality'
@@ -43,6 +44,13 @@ export function StatsCollector() {
   const rootScene = useThree((s) => s.scene)
   const acc = useRef({ frames: 0, elapsed: 0, last: performance.now() })
   const captured = useRef({ calls: 0, triangles: 0, passes: 0 })
+
+  useEffect(() => {
+    if (isDebug()) {
+      // Live counters for the test harness — see the note in useScroll.
+      ;(window as unknown as { __frameStats: typeof frameStats }).__frameStats = frameStats
+    }
+  }, [])
 
   useEffect(() => {
     const original = gl.render.bind(gl)
@@ -113,8 +121,24 @@ export function DebugHUD() {
   if (!on) return null
 
   const station = scenes.find((s) => s.id === scrollState.activeStation)
-  const overDraw = station ? frameStats.drawCalls > station.budget.drawCalls : false
-  const overTris = station ? frameStats.triangles > station.budget.triangles : false
+
+  /**
+   * Compare against the sum of every MOUNTED station's budget, not just the active
+   * one. `mountPadding` keeps a neighbour alive across every boundary, so the
+   * renderer's totals are almost never one station's cost alone — judging them
+   * against a single budget flagged About as over budget purely because Projects
+   * was warming up beside it.
+   */
+  const mounted = scenes.filter((s) => mountedStations.includes(s.id))
+  const budget = (mounted.length ? mounted : station ? [station] : []).reduce(
+    (acc, s) => ({
+      drawCalls: acc.drawCalls + s.budget.drawCalls,
+      triangles: acc.triangles + s.budget.triangles,
+    }),
+    { drawCalls: 0, triangles: 0 },
+  )
+  const overDraw = budget.drawCalls > 0 && frameStats.drawCalls > budget.drawCalls
+  const overTris = budget.triangles > 0 && frameStats.triangles > budget.triangles
   const bad = '#FF6B6B'
   const ok = '#8BE9A0'
 
@@ -163,14 +187,15 @@ export function DebugHUD() {
       />
       <Row
         label="draw calls"
-        value={`${frameStats.drawCalls} / ${station?.budget.drawCalls ?? '—'}`}
+        value={`${frameStats.drawCalls} / ${budget.drawCalls}`}
         warn={overDraw}
       />
       <Row
         label="triangles"
-        value={`${fmt(frameStats.triangles)} / ${fmt(station?.budget.triangles ?? 0)}`}
+        value={`${fmt(frameStats.triangles)} / ${fmt(budget.triangles)}`}
         warn={overTris}
       />
+      <Row label="mounted" value={mounted.map((m) => m.id).join('+') || '—'} />
       <Row label="render passes" value={String(frameStats.passes)} />
       <Row label="programs" value={String(frameStats.programs)} />
       <Row label="textures" value={String(frameStats.textures)} />

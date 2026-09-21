@@ -72,7 +72,23 @@ const server = spawn('pnpm', ['exec', 'next', 'start', '-p', String(PORT)], {
   stdio: ['ignore', 'pipe', 'pipe'],
   shell: true,
 })
+/**
+ * `pnpm exec next start` under a shell spawns a tree, and on Windows
+ * `process.kill(-pid)` does not reach it — the server survives, keeps the port, and
+ * the next run refuses to start. `taskkill /T` kills the whole tree.
+ */
 const stop = () => {
+  if (process.platform === 'win32') {
+    try {
+      spawn('taskkill', ['/pid', String(server.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        shell: true,
+      })
+      return
+    } catch {
+      /* fall through */
+    }
+  }
   try {
     process.kill(-server.pid)
   } catch {
@@ -169,12 +185,19 @@ try {
   for (let i = 0; i <= 40; i++) {
     const frac = i / 40
     await scrollTo(page, frac)
+    const live = await page.evaluate(() => ({
+      cam: window.__cameraProbe ?? null,
+      theme: document.documentElement.getAttribute('data-theme'),
+      station: window.__scrollState?.activeStation ?? '?',
+      calls: window.__frameStats?.drawCalls ?? 0,
+      tris: window.__frameStats?.triangles ?? 0,
+    }))
     const hud = await page.locator('[data-debug-hud]').innerText().catch(() => '')
-    const cam = await page.evaluate(() => window.__cameraProbe ?? null)
-    const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
-    const station = /station\s+(\w+)/.exec(hud)?.[1] ?? '?'
-    const calls = /draw calls\s+(\d+)\s*\/\s*(\d+)/.exec(hud)
-    const tris = /triangles\s+([\d.k]+)\s*\/\s*([\d.k]+)/.exec(hud)
+    const cam = live.cam
+    const theme = live.theme
+    const station = live.station
+    const calls = [null, String(live.calls), /draw calls\s+\d+\s*\/\s*(\d+)/.exec(hud)?.[1] ?? '?']
+    const tris = [null, String(live.tris), /triangles\s+[\d.k]+\s*\/\s*([\d.k]+)/.exec(hud)?.[1] ?? '?']
     const over = /OVER BUDGET/.test(hud)
     if (cam && last) maxStep = Math.max(maxStep, Math.hypot(...cam.map((v, k) => v - last[k])))
     if (cam) last = cam
@@ -185,7 +208,11 @@ try {
   }
 
   const seen = [...new Set(rows.map((r) => r.station))]
-  note(seen.length === 8, 'camera visits all eight stations', seen.join(' → '))
+  note(
+    seen.length === 8 && !seen.includes('?'),
+    'camera visits all eight stations',
+    seen.includes('?') ? 'window.__scrollState missing — is this a stale build?' : seen.join(' → '),
+  )
   note(maxStep < 40, 'no camera discontinuity', `largest step ${maxStep.toFixed(1)}u`)
 
   const overRows = rows.filter((r) => r.over)
@@ -298,15 +325,60 @@ try {
     [2560, 1440],
   ]) {
     await v.page.setViewportSize({ width: w, height: h })
-    await v.page.waitForTimeout(600)
+    // Let the relayout, Lenis resize and the station re-measure all settle.
+    await v.page.waitForTimeout(1200)
     const r = await v.page.evaluate(() => ({
       ratio: document.body.scrollHeight / window.innerHeight,
       overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
     }))
+    /**
+     * The page is allowed to grow past 12.8 viewports on a narrow screen — tall
+     * copy on a phone is correct, not a bug. What must hold is that the camera
+     * still tracks the DOM, which `toCanonicalProgress` guarantees by remapping
+     * measured section positions. That is asserted separately below.
+     */
     note(
-      !r.overflow && Math.abs(r.ratio - 12.8) < 0.3,
-      `${w}×${h}: no h-overflow, height holds`,
+      !r.overflow && r.ratio >= 12.5,
+      `${w}×${h}: no h-overflow, page tall enough`,
       `${r.ratio.toFixed(1)}vh`,
+    )
+
+    /**
+     * The invariant that actually matters: whenever the camera says it is at station
+     * X, X's DOM section must be on screen. Sampling and checking overlap is robust,
+     * where scrolling to a section and asking which station is active was not — it
+     * raced the post-resize relayout and gave a different answer each run.
+     */
+    const mismatches = await v.page.evaluate(async () => {
+      const bad = []
+      const limit = document.body.scrollHeight - window.innerHeight
+      for (let i = 0; i <= 20; i++) {
+        const l = window.__lenis
+        const top = (limit * i) / 20
+        if (l) l.scrollTo(top, { immediate: true, force: true })
+        else window.scrollTo({ top, behavior: 'instant' })
+        // Two frames is plenty now that we read the live object, not the HUD.
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+        await new Promise((r) => setTimeout(r, 60))
+
+        const active = window.__scrollState?.activeStation
+        // Do not pass vacuously if the debug hook is missing.
+        if (!active) { bad.push(`${(i / 20).toFixed(2)}:no __scrollState`); break }
+
+        const el = document.querySelector(`[data-station="${active}"]`)
+        if (!el) { bad.push(`${(i / 20).toFixed(2)}:${active}:missing`); continue }
+        const r = el.getBoundingClientRect()
+        const onScreen = r.bottom > 0 && r.top < window.innerHeight
+        if (!onScreen) {
+          bad.push(`${(i / 20).toFixed(2)}:${active} off-screen by ${Math.round(r.top > 0 ? r.top - window.innerHeight : -r.bottom)}px`)
+        }
+      }
+      return bad
+    })
+    note(
+      mismatches.length === 0,
+      `${w}×${h}: active station's DOM is always on screen`,
+      mismatches.slice(0, 3).join(' | '),
     )
   }
   note(v.errors.length === 0, 'viewports: no console errors', v.errors.slice(0, 2).join(' | '))

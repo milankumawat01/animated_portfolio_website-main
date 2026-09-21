@@ -273,3 +273,128 @@ export const getCameraAt = (
 
 /** Debug helper: the whole path as points, for a line overlay. */
 export const samplePath = (divisions = 240): Vector3[] => positionCurve.getPoints(divisions)
+
+// ---------------------------------------------------------------------------
+// Measured layout → canonical progress
+// ---------------------------------------------------------------------------
+
+/**
+ * A station's DOM can be taller than the scroll share it was allocated. At 390px
+ * wide, About and How I Build both overflow, and the page grows from 12.8 viewports
+ * to 13.6 — which slides every later station's DOM out from under the camera that is
+ * supposed to be visiting it. The drift compounds to about 6% by the footer.
+ *
+ * Rather than forbidding tall content (which just means unreadable content on a
+ * phone), we measure where the sections actually are and remap raw scroll into the
+ * canonical progress space that `STATION_RANGES` describes. Everything downstream —
+ * the camera path, the manifests, `SectionShell` — keeps using the canonical numbers
+ * and never has to know.
+ *
+ * With no measurements this is the identity, so the engine still works before the
+ * first measure pass and in any non-DOM context.
+ */
+let measured: { id: StationId; start: number; end: number }[] | null = null
+
+export const setMeasuredLayout = (
+  spans: { id: StationId; start: number; end: number }[] | null,
+): void => {
+  measured = spans && spans.length === STATION_PATHS.length ? spans : null
+}
+
+export const hasMeasuredLayout = (): boolean => measured !== null
+
+export const toCanonicalProgress = (raw: number): number => {
+  const p = raw < 0 ? 0 : raw > 1 ? 1 : raw
+  if (!measured) return p
+
+  for (let i = 0; i < measured.length; i++) {
+    const m = measured[i]
+    const isLast = i === measured.length - 1
+    if (p < m.end || isLast) {
+      const span = m.end - m.start
+      const t = span > 1e-6 ? (p - m.start) / span : 0
+      const clamped = t < 0 ? 0 : t > 1 ? 1 : t
+      const [a, b] = STATION_RANGES[m.id]
+      return a + clamped * (b - a)
+    }
+  }
+  return p
+}
+
+/** The inverse of `toCanonicalProgress` — canonical back to raw scroll fraction. */
+export const fromCanonicalProgress = (canonical: number): number => {
+  const p = canonical < 0 ? 0 : canonical > 1 ? 1 : canonical
+  if (!measured) return p
+
+  for (let i = 0; i < measured.length; i++) {
+    const m = measured[i]
+    const [a, b] = STATION_RANGES[m.id]
+    const isLast = i === measured.length - 1
+    if (p < b || isLast) {
+      const span = b - a
+      const t = span > 1e-6 ? (p - a) / span : 0
+      const clamped = t < 0 ? 0 : t > 1 ? 1 : t
+      return m.start + clamped * (m.end - m.start)
+    }
+  }
+  return p
+}
+
+/**
+ * Measure the live section layout. Call on mount and on resize.
+ * Returns true when a usable measurement was taken.
+ */
+export const measureStationLayout = (): boolean => {
+  if (typeof document === 'undefined') return false
+
+  const heights: { id: StationId; height: number }[] = []
+  let total = 0
+  for (const id of STATION_ORDER) {
+    const el = document.querySelector<HTMLElement>(`[data-station="${id}"]`)
+    if (!el) {
+      setMeasuredLayout(null)
+      return false
+    }
+    const height = el.getBoundingClientRect().height
+    if (!(height > 0)) {
+      setMeasuredLayout(null)
+      return false
+    }
+    heights.push({ id, height })
+    total += height
+  }
+  if (total <= 0) {
+    setMeasuredLayout(null)
+    return false
+  }
+
+  /**
+   * Spans are each station's share of the TOTAL SECTION HEIGHT, not its offset over
+   * the scroll limit. That distinction matters: when every section is exactly its
+   * allotted share — which is the case at every width where nothing overflows — this
+   * reproduces `STATION_RANGES` exactly and the remap is the identity. Only a station
+   * that actually outgrew its share redistributes anything. Measuring against the
+   * scroll limit instead would shift every station by up to a viewport even on a
+   * desktop where nothing is wrong.
+   */
+  let cursor = 0
+  const spans = heights.map((h, i) => {
+    const start = cursor / total
+    cursor += h.height
+    return {
+      id: h.id,
+      start: i === 0 ? 0 : start,
+      end: i === heights.length - 1 ? 1 : cursor / total,
+    }
+  })
+
+  for (let i = 0; i < spans.length; i++) {
+    if (spans[i].end < spans[i].start) {
+      setMeasuredLayout(null)
+      return false
+    }
+  }
+
+  setMeasuredLayout(spans)
+  return true
+}

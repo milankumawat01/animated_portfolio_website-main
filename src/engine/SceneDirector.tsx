@@ -20,6 +20,17 @@ import { DEFAULT_MOUNT_PADDING, type StationId } from './types'
  * read as a fade rather than a switch.
  */
 
+/**
+ * Which stations are mounted right now.
+ *
+ * `mountPadding` deliberately keeps a neighbour alive across every boundary, so the
+ * renderer's draw-call total is almost never one station's cost alone. The debug HUD
+ * reads this to compare against the SUM of the mounted stations' budgets — otherwise
+ * a station looks over budget purely because its neighbour is warming up, which is
+ * exactly what happened to About sitting next to Projects.
+ */
+export const mountedStations: StationId[] = ['hero']
+
 /** Blended environment for the current frame. `Lighting` reads this. */
 export const envState = {
   background: '#05080E',
@@ -117,6 +128,14 @@ export function SceneDirector() {
           return progress >= m.range[0] - pad && progress <= m.range[1] + pad
         })
         .map((m) => m.id)
+
+      if (
+        mountedStations.length !== nowMounted.length ||
+        mountedStations.some((id, i) => id !== nowMounted[i])
+      ) {
+        mountedStations.length = 0
+        mountedStations.push(...nowMounted)
+      }
 
       setMounted((prev) =>
         prev.length === nowMounted.length && prev.every((id, i) => id === nowMounted[i])

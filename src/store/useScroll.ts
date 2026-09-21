@@ -7,7 +7,13 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { StationId } from '@/engine/types'
 import { isDebug } from '@/engine/quality'
-import { STATION_RANGES, resolveStation } from '@/lib/curves'
+import {
+  STATION_RANGES,
+  fromCanonicalProgress,
+  measureStationLayout,
+  resolveStation,
+  toCanonicalProgress,
+} from '@/lib/curves'
 import { clamp, damp } from '@/lib/math'
 
 /**
@@ -58,9 +64,11 @@ export const useScroll = create<ScrollStore>(() => ({
 
   scrollTo: (station, opts) => {
     if (!lenis) return
-    const [start] = STATION_RANGES[station]
+    const [start, end] = STATION_RANGES[station]
     // Aim a little past the station edge so its reveals have already triggered.
-    const target = (start + Math.min(0.02, (STATION_RANGES[station][1] - start) * 0.2)) * lenisLimit()
+    const canonical = start + Math.min(0.02, (end - start) * 0.2)
+    // Canonical → raw, because the DOM may not occupy its nominal share.
+    const target = fromCanonicalProgress(canonical) * lenisLimit()
     lenis.scrollTo(target, {
       duration: opts?.immediate ? 0 : 1.4,
       easing: (t: number) => 1 - Math.pow(1 - t, 4),
@@ -120,7 +128,12 @@ export const useScrollController = (reducedMotion: boolean): void => {
 
       const limit = lenisLimit()
       const scroll = instance.scroll
-      const progress = clamp(scroll / limit, 0, 1)
+      /**
+       * Raw scroll position, remapped into canonical progress space. A station whose
+       * DOM outgrows its allotted share (About and How I Build both do at 390px)
+       * would otherwise slide out from under the camera visiting it.
+       */
+      const progress = toCanonicalProgress(clamp(scroll / limit, 0, 1))
 
       // Lenis reports velocity in px/frame. ~40px/frame is a brisk flick.
       const rawVelocity = clamp(instance.velocity / 40, -1, 1)
@@ -159,14 +172,34 @@ export const useScrollController = (reducedMotion: boolean): void => {
       // Lets a headless browser drive the real scroll instead of fighting Lenis
       // with window.scrollTo, which Lenis would immediately undo. Gated on
       // ?debug=1 rather than NODE_ENV so it also works against a production build.
-      ;(window as unknown as { __lenis: Lenis }).__lenis = instance
+      const w = window as unknown as { __lenis: Lenis; __scrollState: typeof scrollState }
+      w.__lenis = instance
+      // The live object, mutated in place every frame. Test harnesses read this
+      // instead of scraping the HUD, which only re-renders five times a second and
+      // therefore reports a stale station right after a scroll or a resize.
+      w.__scrollState = scrollState
     }
 
-    const onResize = () => instance.resize()
-    window.addEventListener('resize', onResize)
+    // Measure once the DOM has settled, then again whenever it can have changed.
+    const remeasure = () => {
+      instance.resize()
+      measureStationLayout()
+    }
+    const firstMeasure = window.setTimeout(remeasure, 120)
+    const secondMeasure = window.setTimeout(remeasure, 900)
+    window.addEventListener('resize', remeasure)
+
+    const ro =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => remeasure())
+        : null
+    ro?.observe(document.body)
 
     return () => {
-      window.removeEventListener('resize', onResize)
+      window.clearTimeout(firstMeasure)
+      window.clearTimeout(secondMeasure)
+      window.removeEventListener('resize', remeasure)
+      ro?.disconnect()
       gsap.ticker.remove(raf)
       gsap.ticker.remove(update)
       instance.off('scroll', onScroll)
