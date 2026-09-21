@@ -244,10 +244,19 @@ export function StatBlock({ stats, className }: { stats: readonly Stat[]; classN
             borderLeft: i === 0 ? 'none' : '1px solid var(--border)',
           }}
         >
-          <dt className="sr-only">{s.label}</dt>
+          {/*
+            The value reads first and the label sits under it, but a <dl>'s div
+            wrapper may only contain dt/dd — a stray <span> in here is a serious axe
+            violation. So the label is the real <dt>, reordered visually rather than
+            duplicated into a sr-only copy plus a span.
+          */}
+          <dt className="t-meta" style={{ order: 2 }}>
+            {s.label}
+          </dt>
           <dd
             className="m-0"
             style={{
+              order: 1,
               fontFamily: 'var(--font-display), sans-serif',
               fontWeight: 800,
               fontSize: 'clamp(1.6rem, 2.6vw, 2.25rem)',
@@ -258,7 +267,6 @@ export function StatBlock({ stats, className }: { stats: readonly Stat[]; classN
           >
             {s.value}
           </dd>
-          <span className="t-meta">{s.label}</span>
         </div>
       ))}
     </dl>

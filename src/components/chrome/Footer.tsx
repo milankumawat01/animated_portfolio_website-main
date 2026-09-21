@@ -123,7 +123,11 @@ export function Footer({ className }: { className?: string }) {
           <span className="t-meta" style={{ color: 'var(--night-mut)' }}>
             📍 {profile.location}
           </span>
-          <span className="t-meta" style={{ color: 'var(--night-mut)', opacity: 0.75 }}>
+          {/*
+            No opacity here. `--night-mut` already sits at 6.1:1 on the footer, and
+            knocking it to 75% drops it under AA — axe flags exactly this line.
+          */}
+          <span className="t-meta" style={{ color: 'var(--night-mut)' }}>
             {profile.copyright}
           </span>
         </div>

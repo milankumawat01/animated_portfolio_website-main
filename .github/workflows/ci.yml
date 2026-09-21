@@ -44,7 +44,12 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: QA suite
+      - name: Playwright suite
+        run: pnpm exec playwright test
+        env:
+          CI: 'true'
+
+      - name: QA sweep
         run: node scripts/qa.mjs --no-build --ci
         env:
           CI: 'true'
@@ -58,6 +63,9 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: qa-screenshots
-          path: .probe/
+          name: test-artifacts
+          path: |
+            playwright-report/
+            test-results/
+            .probe/
           if-no-files-found: ignore

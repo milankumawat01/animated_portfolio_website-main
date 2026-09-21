@@ -22,7 +22,7 @@
 | **1. `monogram.svg`** | It is the first and last thing on the page. 150,000 particles form it in the hero and reform it in the footer. Right now they form a geometric placeholder MK. |
 | **2. Four `project-*.png`** | The Projects station is four glass slabs with your screenshots behind them. Placeholders read as unfinished. |
 | **3. `portrait.jpg`** | The About station floats your photo on refracting glass. Currently a grey plane. |
-| **4. Answer the three questions in §9** | One of them — the overlapping employment dates — is a real problem on a portfolio a recruiter will read. |
+| **4. Answer the four questions in §A9** | Two are real problems on a portfolio a recruiter will read: your GitHub link 404s, and two jobs overlap by seven months. |
 | Everything else | Genuinely optional. The fallbacks are deliberate, not apologies. |
 
 ---
@@ -304,9 +304,16 @@ sources: freesound.org, or generate with Suno/Udio. Drop into `assets/incoming/a
 
 ---
 
-## A9 · Three questions only you can answer 🟡
+## A9 · Four questions only you can answer 🟡
 
-These are not assets, and one of them matters more than any image on this page.
+These are not assets, and two of them matter more than any image on this page.
+
+**0. `github.com/milankumawat` returns 404.** 🔴 The automated link check found this:
+that profile does not exist. LinkedIn (`linkedin.com/in/milankumawat`) resolves fine —
+200. The GitHub URL appears in the nav-adjacent footer, on the Contact station, in the
+`sameAs` of the JSON-LD `Person` schema, and in the console greeting. A dead GitHub
+link on a developer portfolio is worse than no link at all, so this one is worth doing
+first. Send me the real username and it is a one-line change in `src/data/profile.ts`.
 
 **1. The employment dates overlap.** The site currently says:
 
@@ -358,3 +365,25 @@ Then:
 pnpm build     # the pipeline optimises and places everything, and
                # tells you exactly which 🔴 assets are still missing
 ```
+
+---
+
+## And when you are ready to ship
+
+```bash
+pnpm test      # 27 Playwright checks
+pnpm budgets   # frame budget, bundle size, GPU leak
+pnpm qa        # full-page sweep at six viewports
+```
+
+All three pass right now. Deploying is the one thing I could not do for you, because
+it needs your Vercel account:
+
+1. `vercel` → link the repo. `vercel.json` is already written, with immutable cache
+   headers for the generated asset folders.
+2. Set `NEXT_PUBLIC_SITE_URL` to the real domain — the sitemap, canonical URL and OG
+   card all read it.
+3. Point the domain, then check the OG card in the LinkedIn, X and WhatsApp preview
+   debuggers. All three render it differently and all three matter for a portfolio.
+4. Run Lighthouse against the deployed URL. It needs a public URL, so it is the one
+   acceptance criterion that could not be checked locally.

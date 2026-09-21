@@ -3,7 +3,7 @@
 > Live tracker. Agents update **only their own row**, and **append** to the log.
 > Never rewrite another agent's line. See `docs/05-PARALLEL-PLAYBOOK.md` §5.
 
-**Last updated:** 2026-09-22 — P0–P6 done. P7 in progress.
+**Last updated:** 2026-09-22 — **all phases done.** Site builds, tests green, ready to deploy.
 
 ---
 
@@ -25,7 +25,7 @@
 | P4 | Interaction & Polish | ✅ Done | main | Audio omitted — no A8 assets |
 | P5 | Performance & Assets | ✅ Done | agent | 636 kB → 528 kB first load |
 | P6 | A11y, SEO, Fallback | ✅ Done | agent | Static fallback + no-JS path |
-| P7 | QA & Deploy | 🟦 In progress | main | — |
+| P7 | QA & Deploy | ✅ Done | main | Deploy is Milan's — needs his Vercel account |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework`
 
@@ -46,9 +46,9 @@ See `docs/04-ASSET-MANIFEST.md` for specs. Tick when the file lands in `assets/i
 - [ ] A4 four `article-*.jpg` 🟡
 - [ ] A5 gap-list logos 🟡
 - [ ] A6 Satoshi woff2 🟡
-- [ ] A7 `Milan_Kumawat_Resume.pdf` 🔴
+- [x] A7 `Milan_Kumawat_Resume.pdf` 🔴 — in `public/`, verified 200 / %PDF- / 147,518 bytes
 - [ ] A8 audio 🟢
-- [ ] A9 answers: eAdmin dates · email domain live · article URLs 🟡
+- [ ] A9 answers: **github.com/milankumawat 404s** · eAdmin dates overlap · email domain · article URLs 🔴
 
 ---
 
@@ -524,3 +524,65 @@ not been verified** and it needs real hardware — see the P7 handover.
   schedule with only a 450 ms grace for the first frame, and the canvas fades itself
   in when it is ready. The world arriving a beat after the text reads as assembly,
   not as a wait.
+- [P7] 2026-09-22 — done. Test suite, CI, deploy config and handover.
+
+  **`tests/` — 33 Playwright checks, all passing** across a desktop and a mobile
+  project, plus `pnpm budgets` (12) and `pnpm qa` (30). CI runs all three on push.
+  Between them they cover: the camera visiting all eight stations with no
+  discontinuity, theme flips at every boundary, the active station's DOM always on
+  screen at six viewports from 390 to 2560, all three quality tiers, reduced motion
+  with nothing left stuck behind a blur, the no-WebGL path *including that the theme
+  still changes*, keyboard navigation with focus never landing off-screen, axe with
+  zero serious or critical violations on both the main page and `/fallback`, link
+  integrity, the resume PDF's actual bytes, and no GPU leak across three scroll cycles.
+
+  **Three real defects the suite found on its first run:**
+  - `StatBlock`'s `<dl>` put a bare `<span>` inside the `dt`/`dd` wrapper — a serious
+    axe violation. The label is now the real `<dt>`, reordered visually rather than
+    duplicated into a screen-reader copy plus a span.
+  - The footer copyright ran `--night-mut` at 75% opacity, dropping it under AA.
+  - **`https://github.com/milankumawat` returns 404.** LinkedIn resolves (200). The
+    GitHub URL is in the footer, the Contact station, the JSON-LD `sameAs` and the
+    console greeting. A dead GitHub link on a developer's portfolio is worse than no
+    link, so this is now question 0 in `docs/ASSET-PROMPTS.md`. One line in
+    `src/data/profile.ts` once Milan supplies the right username.
+
+  Three further failures were the harness's own fault and are worth recording,
+  because they all looked like engine bugs:
+  - `settle()` returned as soon as two samples agreed, which could not distinguish
+    "the scroll finished" from "the scroll has not started" — so it asserted against
+    the *previous* position. It now needs three consecutive stable samples and a
+    minimum elapsed time.
+  - `scrollToStation` ran a binary search inside a single `page.evaluate`, where the
+    GSAP ticker cannot run, so every iteration read the same stale progress.
+  - The focus test sampled 120ms after Tab, mid-way through a Lenis scroll animation
+    and a CSS panel slide. It now waits for the scroll to settle and then polls.
+
+  **Deploy is not done, and cannot be from here** — it needs Milan's Vercel account.
+  `vercel.json` is written with immutable cache headers, the CI pipeline is green, and
+  the steps are at the end of `docs/ASSET-PROMPTS.md`.
+
+  **Unverified, and stated as such in the README rather than ticked off:** frame rate
+  (every measurement ran on a software rasteriser reporting 0–5fps regardless — draw
+  calls and triangles are the proxy, and all eight stations are comfortably inside
+  budget), cross-browser beyond Chrome (Safari is the one to check: transmission plus
+  `backdrop-filter` is a known cliff and Projects is where it would show), a real
+  screen-reader pass, and Lighthouse + the social OG card, both of which need a
+  public URL.
+
+---
+
+## Handover
+
+Everything is committed, one commit per phase. `pnpm test`, `pnpm budgets` and
+`pnpm qa` all pass on `main`.
+
+**For Milan, in priority order:**
+1. `docs/ASSET-PROMPTS.md` — the morning list. Question 0 (the GitHub 404) and the
+   employment-date overlap are the two that a recruiter would actually notice.
+2. The five 🔴 assets. Every one has a working procedural placeholder today, so this
+   is replace-and-improve, not fix-it.
+3. Deploy to Vercel, set `NEXT_PUBLIC_SITE_URL`, check the OG card in the LinkedIn,
+   X and WhatsApp debuggers, run Lighthouse.
+4. Open it on a real GPU and a real phone and read the `?debug=1` HUD. That is the
+   one acceptance criterion nothing here could verify.
