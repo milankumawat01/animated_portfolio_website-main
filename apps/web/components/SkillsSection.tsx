@@ -55,7 +55,7 @@ export const SkillsSection: React.FC = () => {
                 rotation="-3"
               />
               <svg
-                className="w-12 h-8 text-slate-700 -ml-4 mt-0.5"
+                  className="w-12 h-8 text-text-secondary -ml-4 mt-0.5"
                 viewBox="0 0 50 32"
                 fill="none"
               >
@@ -70,7 +70,7 @@ export const SkillsSection: React.FC = () => {
             </div>
 
             {/* Photo Card Container with Crisp Floating Badge */}
-            <div className="relative w-full max-w-[340px] mx-auto lg:mx-0 aspect-[356/438] rounded-2xl overflow-visible shadow-card border-4 border-white bg-slate-900 group">
+            <div className="relative w-full max-w-[340px] mx-auto lg:mx-0 aspect-[356/438] rounded-2xl overflow-visible shadow-card border-4 border-surface-elevated bg-surface-well group">
               <Image
                 src="/images/skills-desk.png"
                 alt="Coding workspace setup with Goku and laptop"
@@ -104,7 +104,7 @@ export const SkillsSection: React.FC = () => {
             {skillCategories.map((cat, idx) => (
               <div
                 key={idx}
-                className="p-5 rounded-2xl bg-white border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 space-y-3.5 flex flex-col justify-between group"
+                className="p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 space-y-3.5 flex flex-col justify-between group"
               >
                 {/* Category Header (Icon never vanishes on hover) */}
                 <div className="flex items-center gap-3">
@@ -129,7 +129,7 @@ export const SkillsSection: React.FC = () => {
                       className="flex flex-col items-center gap-1 group/skill cursor-default"
                       title={skill.name}
                     >
-                      <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover/skill:bg-blue-50 group-hover/skill:border-blue/30 group-hover/skill:scale-105 transition-all shadow-xs">
+                      <div className="w-11 h-11 rounded-xl bg-bg-soft border border-border flex items-center justify-center group-hover/skill:bg-blue-light group-hover/skill:border-blue/30 group-hover/skill:scale-105 transition-all shadow-xs">
                         <TechIcon
                           name={skill.iconKey}
                           size={24}

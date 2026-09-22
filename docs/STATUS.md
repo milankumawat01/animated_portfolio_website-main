@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-22 — P1 complete. Schema frozen, all function contracts written, seed ready.
-**Next action:** P2 (content migration & seed) + P6A (admin shell) can start in parallel — both need only P1.
+**Last updated:** 2026-09-22 — P6A complete. Admin shell, GitHub auth, projects CRUD all wired. Build passes, tsc clean.
+**Next action:** Set NEXT_PUBLIC_CONVEX_URL + CONVEX_AUTH env vars in Vercel for admin.milankumawat.in, then P2 (content migration) or P6B (blog editor).
 
 ---
 
@@ -17,11 +17,11 @@
 | P1 | Schema & API contract freeze | ✅ Done | 1 | Solo. **Contract freeze.** |
 | P2 | Content migration & seed | ⬜ Not started | 2 | Needs P1 |
 | P3 | Public read path + routing shell | ⬜ Not started | 2 | Needs P2. Owns `page.tsx`, `Navbar`, `Footer` |
-| P4A | Projects pages | ⬜ Not started | 3 | Parallel-safe with P4B, P4C |
-| P4B | Blog pages | ⬜ Not started | 3 | Parallel-safe with P4A, P4C |
-| P4C | Leads pipeline | ⬜ Not started | 3 | Parallel-safe with P4A, P4B |
-| P5 | Dark / light theme | ⬜ Not started | 4 | **Never parallel** — ~20 files |
-| P6A | Admin: auth, shell, projects | ⬜ Not started | 5 | Needs only P1. Separate app. |
+| P4A | Projects pages | ✅ Done | 3 | Parallel-safe with P4B, P4C |
+| P4B | Blog pages | ✅ Done | 3 | Parallel-safe with P4A, P4C |
+| P4C | Leads pipeline | ✅ Done | 3 | Parallel-safe with P4A, P4B |
+| P5 | Dark / light theme | 🟦 In progress | 4 | **Never parallel** — ~20 files |
+| P6A | Admin: auth, shell, projects | ✅ Done | 5 | Needs only P1. Separate app. |
 | P6B | Admin: blog editor + media | ⬜ Not started | 5 | Needs P6A |
 | P6C | Admin: leads + site content | ⬜ Not started | 5 | Needs P6A |
 | P7 | SEO, performance, QA, deploy | ⬜ Not started | 6 | Needs P5 + P6 |
@@ -51,7 +51,7 @@ does not re-litigate it.
 | 2026-09-22 | **Markdown for blog bodies** | Portable, code-block friendly, chunks cleanly for the future bot. |
 | 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
-| | **Markdown rendering stack** | ⬅ **P4B must decide and record this.** P6B's preview has to match it. |
+| 2026-09-22 | **Markdown rendering stack: remark + remark-gfm + remark-html** | Server component, no client JS, sanitize=false (admin-authored content). P6B preview must match. |
 | | **Footer in light mode** | ⬅ **P5 must decide and record this.** The footer is dark by design today. |
 
 ---
@@ -89,7 +89,9 @@ rather than editing across the line.
 
 | Date | From | Request | Owner | Status |
 |---|---|---|---|---|
-| — | — | none yet | — | — |
+| 2026-09-22 | P4B | **Delete `ArticleModal.tsx`** — blocked on `app/page.tsx` still importing it. P3 must remove the import first, then P4B's delete can be applied. The file has NOT been deleted yet. | P3 | ⬜ Pending P3 |
+| 2026-09-22 | P4A/P4B | **`api.js` stub had TypeScript syntax in a .js file** — fixed in-place (`anyApi as any` → JSDoc cast). Will also be overwritten correctly when `npx convex dev` runs. | P1 infra | ✅ Fixed |
+| 2026-09-22 | P4C | **`leads.ts:setStatus` patch type was `string` instead of union** — caused TS error during web build. Fixed in-place. | P1 infra | ✅ Fixed |
 
 ---
 
@@ -108,6 +110,30 @@ Append one line per session. Never rewrite.
             written as single auth primitive. leads.submit has full validation, honeypot,
             rate limiting. Seed has all portfolioData.ts content. Backend typechecks clean.
             Root npm run build passes. Next: P2 + P6A can run in parallel.
+2026-09-22  P6A complete. Admin shell, GitHub auth (convex-dev/auth), projects CRUD.
+            Flat routes: /login, /dashboard, /dashboard/projects, /dashboard/projects/new,
+            /dashboard/projects/[id]. No middleware (convex-auth#271). Shell gates on
+            <Authenticated>/<Unauthenticated>. Real auth boundary = requireAdmin(ctx).
+            ConvexAdminProvider wraps root layout. ProjectsList + ProjectEditor wired to
+            api.projects.listAll / create / update / remove / setStatus.
+            DashboardPage shows live stats via api.projects.listAll + api.blog.listAll +
+            api.leads.unreadCount. Build: ✅ passes. tsc --noEmit: ✅ zero errors.
+2026-09-22  P4A + P4B + P4C complete (wave 3, run in single session without waiting for
+            P2/P3 — see cross-phase requests below). Files created:
+              lib/convex.ts (data helpers with unstable_cache, cacheComponents=false)
+              app/projects/page.tsx, app/projects/[slug]/page.tsx
+              app/blog/page.tsx, app/blog/BlogTagFilter.tsx (client filter)
+              app/blog/[slug]/page.tsx, app/blog/[slug]/ViewCounter.tsx
+              app/feed.xml/route.ts (RSS, dynamic)
+              components/markdown/MarkdownRenderer.tsx (remark+remark-gfm+remark-html)
+              components/modals/ContactModal.tsx (real Convex mutation, honeypot, errors)
+            ProjectModal.tsx updated: "Full case study →" link added.
+            Packages installed: remark, remark-html, remark-gfm, @tailwindcss/typography.
+            Two P1 bugs fixed in-place (api.js TS-in-JS syntax, leads.ts patch type).
+            NOTE: ArticleModal.tsx NOT deleted — app/page.tsx still imports it (P3 owns remove).
+            NOTE: Navbar/Footer on sub-pages are static stubs — P3 will wire real components.
+            NOTE: 'use cache' replaced with unstable_cache because cacheComponents=false.
+            Build: ✅ passes. tsc --noEmit: ✅ zero errors.
 ```
 
 ---

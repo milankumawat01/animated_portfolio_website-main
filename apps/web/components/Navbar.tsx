@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Menu, X } from 'lucide-react';
+import { ArrowRight, Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 interface NavbarProps {
   onOpenContact: () => void;
@@ -12,6 +13,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
   const [activeSection, setActiveSection] = useState('home');
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const navLinks = [
     { label: 'Home', href: '#home', id: 'home' },
@@ -20,6 +23,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
     { label: 'Writing', href: '#writing', id: 'writing' },
     { label: 'Contact', href: '#contact', id: 'contact' },
   ];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
     <header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 backdrop-blur-md border-b border-[#E4E9F1] shadow-soft py-3 text-ink'
+          ? 'bg-surface-elevated/90 backdrop-blur-md border-b border-border shadow-soft py-3 text-text-primary'
           : 'bg-transparent py-5 text-white'
       }`}
     >
@@ -63,14 +70,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
         {/* Logo */}
         <Link href="#home" className="flex items-center gap-2.5 group select-none">
           <div className="flex items-center font-extrabold text-2xl tracking-tighter">
-            <span className={`transition-colors ${scrolled ? 'text-ink group-hover:text-blue' : 'text-white group-hover:text-blue-300'}`}>
+            <span className={`transition-colors ${scrolled ? 'text-text-primary group-hover:text-blue' : 'text-white group-hover:text-blue-300'}`}>
               M
             </span>
             <span className="text-blue transition-colors group-hover:opacity-80">
               K
             </span>
           </div>
-          <span className={`font-bold text-sm tracking-tight hidden sm:inline-block ${scrolled ? 'text-ink' : 'text-white'}`}>
+          <span className={`font-bold text-sm tracking-tight hidden sm:inline-block ${scrolled ? 'text-text-primary' : 'text-white'}`}>
             Milan Kumawat
           </span>
         </Link>
@@ -85,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
                 href={link.href}
                 className={`relative flex flex-col items-center text-[13px] font-semibold transition-colors py-1 ${
                   scrolled
-                    ? isActive ? 'text-ink' : 'text-text-secondary hover:text-ink'
+                    ? isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
                     : isActive ? 'text-white' : 'text-slate-300 hover:text-white'
                 }`}
               >
@@ -100,6 +107,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
 
         {/* Action Button & Mobile Toggle */}
         <div className="flex items-center gap-3">
+          {/* Theme Toggle */}
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className={`p-2 rounded-lg transition-colors ${
+                scrolled ? 'text-text-secondary hover:text-text-primary hover:bg-bg-soft' : 'text-slate-300 hover:text-white hover:bg-white/10'
+              }`}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
+
           <button
             onClick={onOpenContact}
             className={`hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 group ${
@@ -116,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`md:hidden p-2 rounded-lg transition-colors ${
-              scrolled ? 'text-ink hover:bg-slate-100' : 'text-white hover:bg-white/10'
+              scrolled ? 'text-text-primary hover:bg-bg-soft' : 'text-white hover:bg-white/10'
             }`}
             aria-label="Toggle menu"
           >
@@ -127,14 +147,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/98 backdrop-blur-xl border-b border-[#E4E9F1] px-6 py-6 space-y-4 shadow-xl text-ink animate-fadeIn">
+        <div className="md:hidden bg-surface-elevated/98 backdrop-blur-xl border-b border-border px-6 py-6 space-y-4 shadow-xl text-text-primary animate-fadeIn">
           <div className="flex flex-col space-y-3">
             {navLinks.map((link) => (
               <a
                 key={link.id}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-base font-semibold text-slate-800 hover:text-blue py-1.5 flex items-center justify-between"
+                className="text-base font-semibold text-text-primary hover:text-blue py-1.5 flex items-center justify-between"
               >
                 <span>{link.label}</span>
                 {activeSection === link.id && (
@@ -143,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
               </a>
             ))}
           </div>
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-border">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

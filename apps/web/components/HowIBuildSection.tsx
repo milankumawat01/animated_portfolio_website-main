@@ -75,7 +75,7 @@ export const HowIBuildSection: React.FC = () => {
               underline
             />
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white border border-border shadow-soft max-w-sm w-full">
+            <div className="p-4 sm:p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft max-w-sm w-full">
               <div className="flex items-start gap-3">
                 <span className="text-3xl font-serif text-blue select-none leading-none shrink-0 mt-0.5">
                   “
@@ -97,9 +97,9 @@ export const HowIBuildSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           {/* Terminal Window on Left (~4 cols) */}
           <div className="lg:col-span-4 relative flex flex-col justify-between">
-            <div className="rounded-2xl bg-[#0B1220] border border-slate-800 p-5 sm:p-6 shadow-card font-mono-code text-xs text-slate-300 relative overflow-hidden flex-1 flex flex-col justify-between min-h-[350px]">
+            <div className="rounded-2xl bg-surface-well border border-border-dark p-5 sm:p-6 shadow-card font-mono-code text-xs text-slate-300 relative overflow-hidden flex-1 flex flex-col justify-between min-h-[350px]">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                  <div className="flex items-center justify-between border-b border-border-dark pb-3 mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500" />
                     <div className="w-3 h-3 rounded-full bg-amber-500" />

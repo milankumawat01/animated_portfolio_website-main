@@ -6,6 +6,14 @@ import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
 import { PORTFOLIO_DATA } from '@/data/portfolioData';
 
+const logoVariantMap: Record<string, string> = {
+  'bg-slate-900 text-white': 'bg-ink text-white',
+  'bg-blue-600 text-white': 'bg-blue text-white',
+  'bg-blue-50 text-blue-600 border border-blue-200': 'bg-blue-light text-blue border border-blue/20',
+};
+
+const resolveLogoBg = (logoBg: string) => logoVariantMap[logoBg] ?? logoBg;
+
 export const ExperienceSection: React.FC = () => {
   const { experience, personal } = PORTFOLIO_DATA;
 
@@ -85,9 +93,9 @@ export const ExperienceSection: React.FC = () => {
                     <div className="absolute -left-[31px] sm:-left-[39px] top-4 flex items-center">
                       <span className="hidden sm:block absolute right-7 text-xs font-bold text-text-muted whitespace-nowrap text-right w-20 leading-tight">
                         {idx === 0 ? (
-                          <>2025<br /><span className="text-[11px] font-medium text-slate-400">– Present</span></>
+                          <>2025<br /><span className="text-[11px] font-medium text-text-muted">– Present</span></>
                         ) : idx === 1 ? (
-                          <>2024<br /><span className="text-[11px] font-medium text-slate-400">– 2025</span></>
+                          <>2024<br /><span className="text-[11px] font-medium text-text-muted">– 2025</span></>
                         ) : (
                           <>Earlier</>
                         )}
@@ -96,18 +104,18 @@ export const ExperienceSection: React.FC = () => {
                         className={`w-4 h-4 rounded-full border-2 transition-transform group-hover:scale-125 ${
                           idx === 0
                             ? 'bg-blue border-blue-200 ring-4 ring-blue-100'
-                            : 'bg-white border-blue-300'
+                            : 'bg-surface-elevated border-blue-300'
                         }`}
                       />
                     </div>
 
                     {/* Experience Card */}
-                    <div className="p-5 sm:p-6 rounded-2xl bg-white border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 space-y-3.5">
+                    <div className="p-5 sm:p-6 rounded-2xl bg-surface-elevated border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 space-y-3.5">
                       {/* Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-xs shrink-0 ${item.logoBg}`}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-xs shrink-0 ${resolveLogoBg(item.logoBg)}`}
                           >
                             {item.logo === '🎓' ? (
                               <GraduationCap className="w-5 h-5 text-blue" />
@@ -175,7 +183,7 @@ export const ExperienceSection: React.FC = () => {
             {/* Bottom Quote matching reference image */}
             <div className="space-y-3 pt-12">
               <span className="text-4xl font-serif text-blue select-none leading-none block">
-                “
+                "
               </span>
               <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
                 {personal.quotes.experience}

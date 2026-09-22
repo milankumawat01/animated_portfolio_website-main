@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ConvexClientProvider } from '@/lib/convex-client-provider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
 
@@ -54,16 +55,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-      </head>
-      <body className="bg-white text-slate-900 antialiased selection:bg-blue-600 selection:text-white">
-        <ConvexClientProvider>
-          {children}
-        </ConvexClientProvider>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className="bg-bg-primary text-text-primary antialiased selection:bg-blue selection:text-white">
+        <ThemeProvider>
+          <ConvexClientProvider>
+            {children}
+          </ConvexClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

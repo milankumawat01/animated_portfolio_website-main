@@ -17,7 +17,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResume }) => {
   return (
     <section
       id="home"
-      className="relative min-h-screen bg-bg-dark text-white pt-24 sm:pt-28 pb-16 flex flex-col justify-between overflow-hidden"
+      className="relative min-h-screen bg-surface-feature text-white pt-24 sm:pt-28 pb-16 flex flex-col justify-between overflow-hidden"
     >
       {/* Background Ambience & Desk Image */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -31,8 +31,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResume }) => {
             className="object-cover object-[center_right] xl:object-right"
           />
           {/* Gradients for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-bg-dark via-bg-dark/80 to-transparent lg:w-[60%]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-transparent to-bg-dark/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-feature via-surface-feature/80 to-transparent lg:w-[60%]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-feature via-transparent to-surface-feature/40" />
         </div>
 
         {/* Ambient glow */}

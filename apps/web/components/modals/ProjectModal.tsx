@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { X, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2 } from 'lucide-react';
 import { GithubIcon } from '../icons/SocialIcons';
 import { ProjectItem } from '@/data/portfolioData';
@@ -17,22 +18,22 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
   if (!isOpen || !project) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 dark:bg-black/85 backdrop-blur-sm animate-fadeIn overflow-y-auto">
       <div
-        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all my-8 animate-scaleUp"
+        className="relative w-full max-w-3xl bg-surface-elevated rounded-2xl shadow-2xl border border-border overflow-hidden transform transition-all my-8 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80 sticky top-0 z-10 backdrop-blur-md">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-soft/80 sticky top-0 z-10 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue bg-blue-light px-2.5 py-1 rounded-md border border-blue/20">
               Case Study
             </span>
-            <span className="text-sm font-semibold text-slate-700">{project.title}</span>
+            <span className="text-sm font-semibold text-text-secondary">{project.title}</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            className="p-1.5 rounded-full text-text-muted hover:text-text-primary hover:bg-bg-soft transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -42,7 +43,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
         {/* Modal Body */}
         <div className="p-6 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Banner Image Preview */}
-          <div className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-inner group">
+          <div className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-border bg-surface-well shadow-inner group">
             <Image
               src={project.image}
               alt={project.title}
@@ -70,27 +71,27 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
 
           {/* Description */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted">
               Overview
             </h4>
-            <p className="text-slate-700 text-sm sm:text-base leading-relaxed">
+            <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
               {project.longDescription}
             </p>
           </div>
 
           {/* Key Features */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-blue-600" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-blue" />
               Key Features & Capabilities
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {project.keyFeatures.map((feat, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs sm:text-sm text-slate-700"
+                  className="flex items-start gap-2.5 p-3 rounded-xl bg-bg-soft border border-border text-xs sm:text-sm text-text-secondary"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue mt-2 shrink-0"></span>
                   <span>{feat}</span>
                 </div>
               ))}
@@ -100,17 +101,17 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
           {/* System Architecture */}
           {project.architecture && (
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-blue-600" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-blue" />
                 Technical Architecture
               </h4>
               <ul className="space-y-2">
                 {project.architecture.map((arch, idx) => (
                   <li
                     key={idx}
-                    className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600"
+                    className="flex items-start gap-2.5 text-xs sm:text-sm text-text-secondary"
                   >
-                    <Cpu className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <Cpu className="w-4 h-4 text-text-muted shrink-0 mt-0.5" />
                     <span>{arch}</span>
                   </li>
                 ))}
@@ -124,12 +125,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
               {project.stats.map((s, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-xl bg-blue-50/50 border border-blue-100/80 text-center"
+                  className="p-4 rounded-xl bg-blue-light/50 border border-blue/20 text-center"
                 >
-                  <div className="text-xl sm:text-2xl font-black text-blue-700">
+                  <div className="text-xl sm:text-2xl font-black text-blue">
                     {s.value}
                   </div>
-                  <div className="text-2xs sm:text-xs font-medium text-slate-600 mt-0.5">
+                  <div className="text-2xs sm:text-xs font-medium text-text-secondary mt-0.5">
                     {s.label}
                   </div>
                 </div>
@@ -138,12 +139,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
           )}
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
             <a
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm shadow-blue-600/20"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm shadow-blue/20"
             >
               <span>Live Preview</span>
               <ExternalLink className="w-4 h-4" />
@@ -152,14 +153,21 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border text-text-primary font-semibold text-sm transition"
             >
               <GithubIcon className="w-4 h-4" />
               <span>Source Repository</span>
             </a>
+            <Link
+              href={`/projects/${'slug' in project && project.slug ? project.slug : project.id}`}
+              className="flex items-center gap-1 px-4 py-2.5 rounded-xl border border-border hover:border-blue/40 text-text-secondary hover:text-blue font-semibold text-sm transition"
+              onClick={onClose}
+            >
+              Full case study →
+            </Link>
             <button
               onClick={onClose}
-              className="ml-auto px-4 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition"
+              className="ml-auto px-4 py-2.5 text-sm font-medium text-text-muted hover:text-text-primary transition"
             >
               Close
             </button>

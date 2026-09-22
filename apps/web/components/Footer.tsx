@@ -40,7 +40,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenContact, onOpenResume }) =
   };
 
   return (
-    <footer className="bg-[#070A0F] text-white border-t border-slate-800/80 pt-10 pb-6 relative overflow-hidden">
+    <footer className="bg-surface-feature text-white border-t border-border-dark pt-10 pb-6 relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
         {/* Top Header Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-white/5">
@@ -168,7 +168,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenContact, onOpenResume }) =
               Ideas, updates and things I&apos;m building straight to your inbox.
             </p>
             <form onSubmit={handleSubscribe} className="pt-1">
-              <div className="relative flex items-center bg-[#101622] border border-white/15 rounded-full p-1.5 focus-within:border-blue transition-colors max-w-md shadow-inner">
+              <div className="relative flex items-center bg-surface-well border border-white/15 rounded-full p-1.5 focus-within:border-blue transition-colors max-w-md shadow-inner">
                 <input
                   type="email"
                   value={email}
@@ -207,7 +207,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenContact, onOpenResume }) =
             onClick={scrollToTop}
             className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors group cursor-pointer"
           >
-            <div className="w-7 h-7 rounded-full bg-[#131926] border border-white/15 flex items-center justify-center group-hover:border-white/40 transition-colors">
+            <div className="w-7 h-7 rounded-full bg-surface-well border border-white/15 flex items-center justify-center group-hover:border-white/40 transition-colors">
               <ArrowUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-white group-hover:-translate-y-0.5 transition-transform" />
             </div>
             <span className="text-xs font-medium">Back to top</span>

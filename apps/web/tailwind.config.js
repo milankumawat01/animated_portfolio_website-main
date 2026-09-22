@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,13 +11,13 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          DEFAULT: '#0B1220',
-          soft: '#172033',
+          DEFAULT: 'var(--ink)',
+          soft: 'var(--ink-soft)',
         },
         blue: {
-          DEFAULT: '#1677FF',
-          dark: '#0D5ED7',
-          light: '#EAF3FF',
+          DEFAULT: 'var(--blue)',
+          dark: 'var(--blue-dark)',
+          light: 'var(--blue-light)',
           50: '#F2F7FF',
           100: '#EAF3FF',
           200: '#BAE0FF',
@@ -29,21 +30,27 @@ module.exports = {
           900: '#002C8C',
         },
         bg: {
-          primary: '#FFFFFF',
-          soft: '#F7F9FC',
-          'blue-soft': '#F2F7FF',
-          dark: '#080B10',
-          'dark-soft': '#10151D',
+          primary: 'var(--bg-primary)',
+          soft: 'var(--bg-soft)',
+          'blue-soft': 'var(--bg-blue-soft)',
+          dark: 'var(--bg-dark)',
+          'dark-soft': 'var(--bg-dark-soft)',
         },
         text: {
-          primary: '#0B1220',
-          secondary: '#536078',
-          muted: '#8993A5',
-          'on-dark': '#F7F9FC',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
+          'on-dark': 'var(--text-on-dark)',
         },
         border: {
-          DEFAULT: '#E4E9F1',
-          dark: '#27303C',
+          DEFAULT: 'var(--border)',
+          dark: 'var(--border-dark)',
+        },
+        surface: {
+          feature: 'var(--surface-feature)',
+          elevated: 'var(--surface-elevated)',
+          overlay: 'var(--surface-overlay)',
+          well: 'var(--surface-well)',
         },
       },
       fontFamily: {
@@ -70,5 +77,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

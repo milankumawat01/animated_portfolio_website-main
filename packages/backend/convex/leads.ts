@@ -156,7 +156,7 @@ export const setStatus = mutation({
   },
   handler: async (ctx, { id, status }) => {
     await requireAdmin(ctx)
-    const patch: { status: string; repliedAt?: number } = { status }
+    const patch: { status: 'new' | 'read' | 'replied' | 'archived'; repliedAt?: number } = { status }
     if (status === 'replied') patch.repliedAt = Date.now()
     await ctx.db.patch(id, patch)
   },

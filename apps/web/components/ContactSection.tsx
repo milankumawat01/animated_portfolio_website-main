@@ -90,7 +90,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 <div
                   key={card.id}
                   onClick={() => handleCardClick(card)}
-                  className="p-4 sm:p-5 rounded-2xl bg-white border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex items-center justify-between group cursor-pointer"
+                  className="p-4 sm:p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex items-center justify-between group cursor-pointer"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
@@ -148,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
           {/* Right Column: Desk Photo Card with High-Res Asset & Quote Card (5.5 cols) */}
           <div className="lg:col-span-5 relative flex items-center justify-center">
-            <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-3xl overflow-hidden shadow-card border-4 border-white bg-[#080B10] group">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-3xl overflow-hidden shadow-card border-4 border-surface-elevated bg-surface-feature group">
               <Image
                 src="/images/contact-clean.png"
                 alt="Milan Kumawat developer setup"

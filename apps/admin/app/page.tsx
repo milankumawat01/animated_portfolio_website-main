@@ -1,8 +1,30 @@
-export default function AdminPage() {
+'use client'
+import { useConvexAuth } from 'convex/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+
+export default function IndexPage() {
+  const { isAuthenticated, isLoading } = useConvexAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading) {
+      router.replace(isAuthenticated ? '/dashboard' : '/login')
+    }
+  }, [isAuthenticated, isLoading, router])
+
   return (
-    <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>Portfolio Admin</h1>
-      <p>Admin panel — authentication and screens coming in P6A.</p>
-    </main>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'system-ui, sans-serif',
+        color: '#6b7280',
+      }}
+    >
+      Loading…
+    </div>
   )
 }

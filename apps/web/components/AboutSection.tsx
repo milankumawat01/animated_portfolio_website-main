@@ -82,14 +82,14 @@ export const AboutSection: React.FC = () => {
             {/* Top-Left Doodle: "_Same Curiosity Different Problems" + curved arrow */}
             <div className="absolute -top-10 -left-8 sm:-top-14 sm:-left-12 z-20 hidden sm:block pointer-events-none">
               <div className="relative flex flex-col items-end">
-                <div className="font-handwriting text-slate-500 text-lg sm:text-xl leading-tight text-right -rotate-[4deg] select-none">
+                <div               className="font-handwriting text-text-muted text-lg sm:text-xl leading-tight text-right -rotate-[4deg] select-none">
                   <div>_Same</div>
                   <div>Curiosity</div>
                   <div>Different</div>
                   <div>Problems</div>
                 </div>
                 <svg
-                  className="w-12 h-8 -mr-3 text-slate-700 mt-1 select-none"
+                  className="w-12 h-8 -mr-3 text-text-secondary mt-1 select-none"
                   viewBox="0 0 60 36"
                   fill="none"
                 >
@@ -105,7 +105,7 @@ export const AboutSection: React.FC = () => {
             </div>
 
             {/* Outer Light-Blue Backdrop */}
-            <div className="relative w-full max-w-[380px] bg-[#EBF3FE] rounded-[32px] p-3 pb-6 shadow-sm">
+            <div className="relative w-full max-w-[380px] bg-blue-light rounded-[32px] p-3 pb-6 shadow-sm">
               {/* Photo Image Frame */}
               <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
                 <Image
@@ -124,7 +124,7 @@ export const AboutSection: React.FC = () => {
               </div>
 
               {/* Bottom-Right Sticky Note (Good Code Better Products) */}
-              <div className="absolute -bottom-4 -right-3 sm:-right-4 z-20 bg-[#161F2E] text-white p-3.5 sm:p-4 rounded-xl shadow-2xl border border-white/10 rotate-6 select-none max-w-[130px]">
+              <div className="absolute -bottom-4 -right-3 sm:-right-4 z-20 bg-surface-well text-white p-3.5 sm:p-4 rounded-xl shadow-2xl border border-white/10 rotate-6 select-none max-w-[130px]">
                 <div className="font-handwriting text-slate-100 text-lg sm:text-xl leading-tight">
                   <div>Good</div>
                   <div>Code</div>
@@ -151,7 +151,7 @@ export const AboutSection: React.FC = () => {
                 {personal.whatIWorkOn.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-3.5 p-3.5 rounded-xl bg-white border border-border shadow-soft hover:border-blue/30 hover:translate-x-1 transition-all duration-300 group cursor-default"
+                    className="flex items-center gap-3.5 p-3.5 rounded-xl bg-surface-elevated border border-border shadow-soft hover:border-blue/30 hover:translate-x-1 transition-all duration-300 group cursor-default"
                   >
                     <div className="w-10 h-10 rounded-xl bg-blue-light/80 border border-blue/15 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-blue/40 transition-all duration-200">
                       {getWorkIcon(item.icon)}

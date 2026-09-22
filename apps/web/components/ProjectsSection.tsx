@@ -53,7 +53,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
               </span>
               <button
                 onClick={() => handleScroll('left')}
-                className="w-10 h-10 rounded-full bg-white border border-border hover:bg-slate-100 flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
+                className="w-10 h-10 rounded-full bg-surface-elevated border border-border hover:bg-bg-soft flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
                 aria-label="Previous project"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -78,10 +78,10 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
             <div
               key={project.id}
               onClick={() => onSelectProject(project)}
-              className="bg-white rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer overflow-hidden"
+              className="bg-surface-elevated rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer overflow-hidden"
             >
               {/* Preview Mockup */}
-              <div className="relative w-full h-48 sm:h-52 bg-slate-950 overflow-hidden border-b border-border/60">
+              <div className="relative w-full h-48 sm:h-52 bg-surface-well overflow-hidden border-b border-border/60">
                 <Image
                   src={project.image}
                   alt={project.title}

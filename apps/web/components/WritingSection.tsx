@@ -77,7 +77,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
               <div className="flex items-center gap-2 pl-2">
                 <button
                   onClick={() => handleScroll('left')}
-                  className="w-10 h-10 rounded-full bg-white border border-border hover:bg-slate-100 flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
+                  className="w-10 h-10 rounded-full bg-surface-elevated border border-border hover:bg-bg-soft flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
                   aria-label="Scroll articles left"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -103,10 +103,10 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
             <div
               key={article.id}
               onClick={() => onSelectArticle(article)}
-              className="bg-white rounded-2xl border border-border overflow-hidden shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer"
+              className="bg-surface-elevated rounded-2xl border border-border overflow-hidden shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer"
             >
               {/* Image */}
-              <div className="relative w-full h-44 bg-slate-900 overflow-hidden border-b border-border/60">
+              <div className="relative w-full h-44 bg-surface-well overflow-hidden border-b border-border/60">
                 <Image
                   src={article.image}
                   alt={article.title}
