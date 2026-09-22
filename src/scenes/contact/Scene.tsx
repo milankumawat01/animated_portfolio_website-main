@@ -26,6 +26,7 @@ import { createDeskGroup, getDeskHandle } from '@/scenes/about/desk'
 // ---------------------------------------------------------------------------
 import { LampCone } from './LampCone'
 import { GlassPanels } from './GlassPanels'
+import { StationLights } from '@/engine/StationLights'
 
 /**
  * 08 — CONTACT · "Back to the room"
@@ -328,25 +329,29 @@ export function ContactScene({ progress, active, quality, reducedMotion }: Scene
 
   return (
     <group ref={root} name="contact-station">
-      {/* Two local lights on top of the global three, well inside the six ceiling. */}
-      {/* The key: the bulb at the top of the shaft. The global warm lamp sits at
-          the hero's anchor 300 units away, so this station has to bring its own. */}
-      <pointLight
-        position={[LAMP_TIP[0], LAMP_TIP[1] - LAMP_HEIGHT * 0.55, LAMP_TIP[2]]}
-        intensity={low ? 34 : 58}
-        distance={24}
-        decay={2}
-        color="#F5A524"
-      />
-      {/* A cold counter-fill from the camera side, so the desk has an edge and the
-          right-hand bleed is not a black hole. */}
-      <pointLight
-        position={[1.5, 3.2, 7]}
-        intensity={14}
-        distance={34}
-        decay={2}
-        color="#3B82F6"
-      />
+      {/* Two local lights on top of the global three, well inside the six ceiling.
+          Portalled out of this group so the scene's light count stays constant
+          whether or not this station is visible — see engine/StationLights.tsx. */}
+      <StationLights>
+        {/* The key: the bulb at the top of the shaft. The global warm lamp sits at
+            the hero's anchor 300 units away, so this station has to bring its own. */}
+        <pointLight
+          position={[LAMP_TIP[0], LAMP_TIP[1] - LAMP_HEIGHT * 0.55, LAMP_TIP[2]]}
+          intensity={low ? 34 : 58}
+          distance={24}
+          decay={2}
+          color="#F5A524"
+        />
+        {/* A cold counter-fill from the camera side, so the desk has an edge and the
+            right-hand bleed is not a black hole. */}
+        <pointLight
+          position={[1.5, 3.2, 7]}
+          intensity={14}
+          distance={34}
+          decay={2}
+          color="#3B82F6"
+        />
+      </StationLights>
 
       {/* The dark gradient. Present at every tier. */}
       <GlowPlane

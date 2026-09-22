@@ -3,7 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const ContactScene = lazy(() => import('./Scene').then((m) => ({ default: m.ContactScene })))
+const loadContactScene = () => import('./Scene').then((m) => ({ default: m.ContactScene }))
+const ContactScene = lazy(loadContactScene)
 
 /**
  * 08 — CONTACT. The bookend: dark again, warm lamp, quiet.
@@ -37,6 +38,7 @@ export const contactManifest: SceneManifest = {
     theme: 'dark',
   },
   Scene: ContactScene,
+  preload: loadContactScene,
   mountPadding: 0.05,
   budget: { drawCalls: 20, triangles: 70_000 },
 }

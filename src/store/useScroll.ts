@@ -3,8 +3,6 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
 import Lenis from 'lenis'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { StationId } from '@/engine/types'
 import { isDebug } from '@/engine/quality'
 import {
@@ -52,7 +50,6 @@ interface ScrollStore {
 }
 
 let lenis: Lenis | null = null
-let gsapWired = false
 
 export const useScroll = create<ScrollStore>(() => ({
   progress: 0,
@@ -88,32 +85,32 @@ export const unlockScroll = (): void => lenis?.start()
 export const getLenis = (): Lenis | null => lenis
 
 /**
- * Boots Lenis and drives it from GSAP's ticker so ScrollTrigger and Lenis agree on
- * what "now" is. Mount exactly once, at the top of the page.
+ * Boots Lenis and derives the frame state from it. Mount exactly once, at the top
+ * of the page.
+ *
+ * ## One clock, and only one
+ *
+ * This used to run Lenis off `gsap.ticker` and call `ScrollTrigger.update()` on
+ * every Lenis scroll event — but nothing on this site has ever registered a
+ * ScrollTrigger. That bought a second animation loop, a third-party scheduler and
+ * ~70 kB of JavaScript to run a trigger list that is always empty, and every one of
+ * those `update()` calls read scroll geometry back out of the document. A plain
+ * `requestAnimationFrame` is the whole requirement.
+ *
+ * The loop is registered when this hook mounts, which is before the canvas exists,
+ * so it runs ahead of R3F's own loop every frame: scroll state is always current by
+ * the time anything reads it, with no one-frame lag between the DOM and the world.
  */
 export const useScrollController = (reducedMotion: boolean): void => {
   useEffect(() => {
-    if (!gsapWired) {
-      gsap.registerPlugin(ScrollTrigger)
-      gsapWired = true
-    }
-
     const instance = new Lenis({
-      lerp: reducedMotion ? 1 : 0.085,
+      lerp: reducedMotion ? 1 : 0.095,
       wheelMultiplier: 1,
       smoothWheel: !reducedMotion,
       touchMultiplier: 1.6,
       infinite: false,
     })
     lenis = instance
-
-    const onScroll = () => ScrollTrigger.update()
-    instance.on('scroll', onScroll)
-
-    // One clock for Lenis, GSAP and ScrollTrigger.
-    const raf = (time: number) => instance.raf(time * 1000)
-    gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
 
     // --- per-frame state derivation -----------------------------------------
     let lastTime = performance.now()
@@ -165,7 +162,14 @@ export const useScrollController = (reducedMotion: boolean): void => {
       }
     }
 
-    gsap.ticker.add(update)
+    let raf = 0
+    const frame = (time: number) => {
+      raf = requestAnimationFrame(frame)
+      instance.raf(time)
+      update()
+    }
+    raf = requestAnimationFrame(frame)
+
     useScroll.setState({ ready: true })
 
     if (isDebug()) {
@@ -180,29 +184,56 @@ export const useScrollController = (reducedMotion: boolean): void => {
       w.__scrollState = scrollState
     }
 
-    // Measure once the DOM has settled, then again whenever it can have changed.
+    /**
+     * Measure once the DOM has settled, then again whenever it can have changed.
+     *
+     * `instance.resize()` plus `measureStationLayout()` is eight
+     * `getBoundingClientRect` calls and a forced layout, and the ResizeObserver on
+     * `<body>` fires for any content reflow at all — a font swapping in, a reveal
+     * finishing, a card growing on hover. Unthrottled that was ~40 forced layouts a
+     * second during a scroll. So: coalesce to at most one per frame, and skip
+     * entirely when nothing that the measurement depends on actually moved.
+     */
+    let queued = false
+    let lastW = 0
+    let lastH = 0
+    let lastDocH = 0
+
     const remeasure = () => {
       instance.resize()
       measureStationLayout()
     }
+
+    const queueRemeasure = () => {
+      if (queued) return
+      queued = true
+      requestAnimationFrame(() => {
+        queued = false
+        const w = window.innerWidth
+        const h = window.innerHeight
+        const docH = document.documentElement.scrollHeight
+        if (w === lastW && h === lastH && docH === lastDocH) return
+        lastW = w
+        lastH = h
+        lastDocH = docH
+        remeasure()
+      })
+    }
+
     const firstMeasure = window.setTimeout(remeasure, 120)
     const secondMeasure = window.setTimeout(remeasure, 900)
-    window.addEventListener('resize', remeasure)
+    window.addEventListener('resize', queueRemeasure)
 
     const ro =
-      typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => remeasure())
-        : null
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(queueRemeasure) : null
     ro?.observe(document.body)
 
     return () => {
       window.clearTimeout(firstMeasure)
       window.clearTimeout(secondMeasure)
-      window.removeEventListener('resize', remeasure)
+      window.removeEventListener('resize', queueRemeasure)
       ro?.disconnect()
-      gsap.ticker.remove(raf)
-      gsap.ticker.remove(update)
-      instance.off('scroll', onScroll)
+      cancelAnimationFrame(raf)
       instance.destroy()
       lenis = null
       useScroll.setState({ ready: false })

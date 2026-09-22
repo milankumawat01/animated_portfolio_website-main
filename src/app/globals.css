@@ -1,5 +1,26 @@
 @import 'tailwindcss';
 
+/**
+ * `--page-bg` is the one token written from JavaScript while the page is moving:
+ * `SceneDirector` (or `StaticBackdrop`, with no WebGL) blends it across every
+ * station boundary.
+ *
+ * An UNREGISTERED custom property inherits, so setting one on the root element
+ * tells the style engine that every node in the document might have changed — and
+ * with `.theme-fade *` giving most of them transitions, the recalculation is not
+ * cheap. A profiled scroll spent 2.5 SECONDS in style recalculation, over ~2500
+ * separate passes, for a value exactly one rule reads.
+ *
+ * Declaring it here with `inherits: false` scopes the invalidation to the element
+ * it is set on. That is why the page background is painted on `html` below and not
+ * on `body`: a non-inheriting property is not visible to a descendant.
+ */
+@property --page-bg {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #05080e;
+}
+
 /* ===========================================================================
    TOKENS — docs/01-DESIGN-SYSTEM.md §1
    Raw values live here once. Components never reference them directly; they use
@@ -58,7 +79,7 @@
   --gutter: clamp(24px, 5vw, 96px);
   --content-max: 1440px;
 
-  /* the SceneDirector animates this every frame */
+  /* the SceneDirector animates this across every station boundary; see @property below */
   --page-bg: #05080e;
 
   /* ---- semantic aliases: LIGHT ---- */
@@ -145,11 +166,12 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto; /* Lenis owns scrolling */
+  /* On `html`, not `body` — `--page-bg` does not inherit. See @property above. */
+  background: var(--page-bg);
 }
 
 body {
   margin: 0;
-  background: var(--page-bg);
   color: var(--fg-body);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.9375rem;

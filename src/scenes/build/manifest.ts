@@ -3,7 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const BuildScene = lazy(() => import('./Scene').then((m) => ({ default: m.BuildScene })))
+const loadBuildScene = () => import('./Scene').then((m) => ({ default: m.BuildScene }))
+const BuildScene = lazy(loadBuildScene)
 
 /**
  * 06 — HOW I BUILD.
@@ -37,5 +38,6 @@ export const buildManifest: SceneManifest = {
   // so a generous padding keeps the blueprint floor on screen well into Writing.
   mountPadding: 0.035,
   Scene: BuildScene,
+  preload: loadBuildScene,
   budget: { drawCalls: 16, triangles: 30_000 },
 }

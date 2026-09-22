@@ -24,6 +24,7 @@ import { postState } from '@/engine/PostFX'
 import { Caustics } from './Caustics'
 import { Slab, type SlabActivity } from './Slab'
 import { hoveredIdIn } from '@/store/useInteraction'
+import { StationLights } from '@/engine/StationLights'
 
 /**
  * PROJECTS — "four things that shipped".
@@ -280,23 +281,28 @@ export function ProjectsScene({ quality, reducedMotion }: SceneProps) {
 
   return (
     <group name="projects-station">
-      {/* Two local lights. Global Lighting already provides three. */}
-      <pointLight
-        ref={rimRef}
-        position={[1.5, 1.6, 2]}
-        intensity={9}
-        distance={16}
-        decay={2}
-        color="#EAF3FF"
-      />
-      <pointLight
-        ref={backRef}
-        position={[-1.2, 0.6, -2.4]}
-        intensity={6}
-        distance={14}
-        decay={2}
-        color="#2F6BD8"
-      />
+      {/* Two local lights. Global Lighting already provides three.
+
+          Portalled out of this group so the scene's light count stays constant
+          whether or not this station is visible — see engine/StationLights.tsx. */}
+      <StationLights>
+        <pointLight
+          ref={rimRef}
+          position={[1.5, 1.6, 2]}
+          intensity={9}
+          distance={16}
+          decay={2}
+          color="#EAF3FF"
+        />
+        <pointLight
+          ref={backRef}
+          position={[-1.2, 0.6, -2.4]}
+          intensity={6}
+          distance={14}
+          decay={2}
+          color="#2F6BD8"
+        />
+      </StationLights>
 
       {projects.map((project, i) => {
         const hostsGlass = !low && i === 0

@@ -3,9 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const ExperienceScene = lazy(() =>
-  import('./Scene').then((m) => ({ default: m.ExperienceScene })),
-)
+const loadExperienceScene = () => import('./Scene').then((m) => ({ default: m.ExperienceScene }))
+const ExperienceScene = lazy(loadExperienceScene)
 
 /**
  * 04 — EXPERIENCE. The camera block comes from `lib/curves` and is never
@@ -36,6 +35,7 @@ export const experienceManifest: SceneManifest = {
     theme: 'light',
   },
   Scene: ExperienceScene,
+  preload: loadExperienceScene,
   // Five shader programs to compile (the tube's core and sheath differ by a
   // define, so they are two), two of them on 240-segment tubes. A little under
   // the 0.08 default is still ~19vh of warning before the camera arrives.

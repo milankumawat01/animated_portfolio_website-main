@@ -3,7 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const SkillsScene = lazy(() => import('./Scene').then((m) => ({ default: m.SkillsScene })))
+const loadSkillsScene = () => import('./Scene').then((m) => ({ default: m.SkillsScene }))
+const SkillsScene = lazy(loadSkillsScene)
 
 /**
  * 05 — SKILLS. The camera block is derived from `lib/curves`, never hand-written.
@@ -26,6 +27,7 @@ export const skillsManifest: SceneManifest = {
     theme: 'light',
   },
   Scene: SkillsScene,
+  preload: loadSkillsScene,
   // Three draw calls of shader that has to compile before the station is on screen;
   // a touch under the 0.08 default is still ~13vh of warning.
   mountPadding: 0.06,

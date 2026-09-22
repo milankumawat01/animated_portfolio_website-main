@@ -3,7 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const WritingScene = lazy(() => import('./Scene').then((m) => ({ default: m.WritingScene })))
+const loadWritingScene = () => import('./Scene').then((m) => ({ default: m.WritingScene }))
+const WritingScene = lazy(loadWritingScene)
 
 /**
  * 07 — WRITING.
@@ -45,6 +46,7 @@ export const writingManifest: SceneManifest = {
     theme: 'light',
   },
   Scene: WritingScene,
+  preload: loadWritingScene,
   mountPadding: 0.045,
   budget: { drawCalls: 10, triangles: 20_000 },
 }

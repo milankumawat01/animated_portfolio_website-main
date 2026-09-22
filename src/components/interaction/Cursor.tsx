@@ -49,6 +49,8 @@ export function Cursor() {
   const dot = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
+  /** Mirrors `visible` for the listeners, so the effect never depends on it. */
+  const visibleRef = useRef(false)
 
   const enabled = ready && !reducedMotion && !isTouch
 
@@ -60,27 +62,57 @@ export function Cursor() {
     const r = { ...target }
     let raf = 0
     let last = performance.now()
+    /**
+     * The last element the pointer was over, resolved to a variant once per FRAME
+     * rather than once per event.
+     *
+     * `pointermove` fires per hardware report — 125 Hz on an ordinary mouse, 1000 Hz
+     * on a gaming one — and `readVariant` walks the ancestor chain with `closest()`
+     * on a five-selector list. Doing that per event, then writing the result into a
+     * store, ran an ancestor walk and a React notification up to eight times per
+     * displayed frame for a value that can only be drawn once.
+     */
+    let pending: Element | null = null
+    let lastVariant: CursorVariant | null = null
+
+    const show = (next: boolean) => {
+      if (visibleRef.current === next) return
+      visibleRef.current = next
+      setVisible(next)
+    }
 
     const onMove = (e: PointerEvent) => {
       target.x = e.clientX
       target.y = e.clientY
       pointerState.x = (e.clientX / window.innerWidth) * 2 - 1
       pointerState.y = -((e.clientY / window.innerHeight) * 2 - 1)
-      if (!visible) setVisible(true)
-      setCursorVariant(readVariant(e.target as Element))
+      pending = e.target as Element
+      show(true)
     }
-    const onLeave = () => setVisible(false)
-    const onEnter = () => setVisible(true)
+    const onLeave = () => show(false)
+    const onEnter = () => show(true)
 
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1)
       last = now
+
+      if (pending) {
+        const next = readVariant(pending)
+        pending = null
+        if (next !== lastVariant) {
+          lastVariant = next
+          setCursorVariant(next)
+        }
+      }
+
       d.x = damp(d.x, target.x, DOT_LAMBDA, dt)
       d.y = damp(d.y, target.y, DOT_LAMBDA, dt)
       r.x = damp(r.x, target.x, RING_LAMBDA, dt)
       r.y = damp(r.y, target.y, RING_LAMBDA, dt)
-      if (dot.current) dot.current.style.transform = `translate3d(${d.x}px, ${d.y}px, 0) translate(-50%, -50%)`
-      if (ring.current) ring.current.style.transform = `translate3d(${r.x}px, ${r.y}px, 0) translate(-50%, -50%)`
+      if (dot.current)
+        dot.current.style.transform = `translate3d(${d.x}px, ${d.y}px, 0) translate(-50%, -50%)`
+      if (ring.current)
+        ring.current.style.transform = `translate3d(${r.x}px, ${r.y}px, 0) translate(-50%, -50%)`
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -97,7 +129,7 @@ export function Cursor() {
       document.removeEventListener('pointerenter', onEnter)
       document.documentElement.classList.remove('has-custom-cursor')
     }
-  }, [enabled, setCursorVariant, visible])
+  }, [enabled, setCursorVariant])
 
   if (!enabled) return null
 

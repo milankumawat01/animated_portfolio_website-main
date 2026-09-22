@@ -21,6 +21,7 @@ import { createDeskGroup, getDeskHandle } from './desk'
 import { createScreenTexture } from './ScreenTexture'
 import { Plant } from './Plant'
 import { Portrait } from './Portrait'
+import { StationLights } from '@/engine/StationLights'
 
 /**
  * 02 — ABOUT · "The idea gets a desk"
@@ -267,22 +268,28 @@ export function AboutScene({ quality, reducedMotion }: SceneProps) {
       ) : null}
 
       {/* Two local lights on top of the global three — inside the six-light
-          ceiling in docs/02-ARCHITECTURE.md. */}
-      <pointLight
-        ref={lampLight}
-        position={[-3.4, 1.42, -0.9]}
-        intensity={0}
-        distance={7.5}
-        decay={2}
-        color="#F5A524"
-      />
-      <pointLight
-        position={[4.5, 3.4, 6.5]}
-        intensity={quality === 'low' ? 5 : 8}
-        distance={28}
-        decay={2}
-        color="#EAF3FF"
-      />
+          ceiling in docs/02-ARCHITECTURE.md.
+
+          Portalled out of this group. A light that disappears when the station is
+          hidden changes the scene's light count, and three.js rebuilds every
+          shader in the scene when that happens. See engine/StationLights.tsx. */}
+      <StationLights>
+        <pointLight
+          ref={lampLight}
+          position={[-3.4, 1.42, -0.9]}
+          intensity={0}
+          distance={7.5}
+          decay={2}
+          color="#F5A524"
+        />
+        <pointLight
+          position={[4.5, 3.4, 6.5]}
+          intensity={quality === 'low' ? 5 : 8}
+          distance={28}
+          decay={2}
+          color="#EAF3FF"
+        />
+      </StationLights>
     </group>
   )
 }

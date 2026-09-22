@@ -37,27 +37,25 @@ export function Magnetic({
     const current = { x: 0, y: 0 }
     let raf = 0
     let last = performance.now()
+    /**
+     * The pointer is recorded here and the geometry is resolved once per FRAME.
+     *
+     * `getBoundingClientRect` on an element the browser has not laid out since the
+     * last mutation forces a synchronous layout, and doing it straight from
+     * `pointermove` meant one forced layout per hardware report — while the page is
+     * scrolling, and therefore while the layout is dirty every single time.
+     */
+    let pointer: { x: number; y: number } | null = null
+    let inside = false
 
     const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect()
-      const cx = r.left + r.width / 2
-      const cy = r.top + r.height / 2
-      const dx = e.clientX - cx
-      const dy = e.clientY - cy
-      const reach = Math.max(r.width, r.height) / 2 + radius
-      const dist = Math.hypot(dx, dy)
-      if (dist > reach) {
-        target.x = 0
-        target.y = 0
-        return
-      }
-      // Falls off toward the edge of reach, so there is no jump on entry.
-      const falloff = 1 - dist / reach
-      target.x = dx * strength * falloff
-      target.y = dy * strength * falloff
+      pointer = { x: e.clientX, y: e.clientY }
+      inside = true
     }
 
     const onLeaveWindow = () => {
+      pointer = null
+      inside = false
       target.x = 0
       target.y = 0
     }
@@ -65,6 +63,26 @@ export function Magnetic({
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1)
       last = now
+
+      if (inside && pointer) {
+        const r = el.getBoundingClientRect()
+        const dx = pointer.x - (r.left + r.width / 2)
+        const dy = pointer.y - (r.top + r.height / 2)
+        const reach = Math.max(r.width, r.height) / 2 + radius
+        const dist = Math.hypot(dx, dy)
+        if (dist > reach) {
+          target.x = 0
+          target.y = 0
+          // Out of reach and nothing moved: stop reading layout until it does.
+          inside = false
+        } else {
+          // Falls off toward the edge of reach, so there is no jump on entry.
+          const falloff = 1 - dist / reach
+          target.x = dx * strength * falloff
+          target.y = dy * strength * falloff
+        }
+      }
+
       current.x = damp(current.x, target.x, 9, dt)
       current.y = damp(current.y, target.y, 9, dt)
       el.style.transform = `translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`

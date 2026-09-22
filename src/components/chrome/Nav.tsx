@@ -23,7 +23,12 @@ const MOBILE_BREAKPOINT = 900
 export function Nav() {
   const activeStation = useScroll((s) => s.activeStation)
   const scrollTo = useScroll((s) => s.scrollTo)
-  const [scrolled, setScrolled] = useState(false)
+  /**
+   * A selector, not a `subscribe` + `setState`. The bare subscription ran its
+   * callback on every store write — up to sixty times a second, for a boolean that
+   * changes twice in the life of the page.
+   */
+  const scrolled = useScroll((s) => s.progress > 0.01)
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -34,11 +39,6 @@ export function Nav() {
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
-
-  useEffect(
-    () => useScroll.subscribe((s) => setScrolled(s.progress > 0.01)),
-    [],
-  )
 
   /**
    * While the overlay is open it owns the keyboard: Escape closes it and returns

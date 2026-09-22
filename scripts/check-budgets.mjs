@@ -218,6 +218,31 @@ const stopServer = () => {
  * vacuously. Instead, wait until two consecutive polls agree on a non-zero draw
  * count, or give up after `TIMEOUT` and let the sample be recorded as a miss.
  */
+/**
+ * Block until the engine's warm-up pass has finished.
+ *
+ * `SceneDirector` prefetches every station's chunk, mounts it hidden and links its
+ * shaders during idle time after the first frame, and only then is the scene in its
+ * steady state. Sampling before that point measures the warm-up: the first lap of
+ * the leak check used to come back with a dozen fewer geometries than every lap
+ * after it, purely because half the stations had not been built yet.
+ *
+ * `window.__warmup` only exists with `?debug=1` and WebGL, so this degrades to the
+ * old fixed dwell rather than hanging when the probe is absent.
+ */
+const WARMUP_TIMEOUT = 90000
+
+const waitForWarm = async (page) => {
+  try {
+    await page.waitForFunction(() => window.__warmup?.done === true, null, {
+      timeout: WARMUP_TIMEOUT,
+    })
+  } catch {
+    // No probe (no WebGL, or the low tier, which does not warm). The fixed dwell
+    // at the call site is the fallback, exactly as before.
+  }
+}
+
 const SETTLE_TIMEOUT = 8000
 
 const scrollTo = async (page, frac, settle = true) => {
@@ -334,6 +359,7 @@ async function main() {
 
       await page.goto(`${base}/?debug=1&q=${tier}`, { waitUntil: 'networkidle', timeout: 60000 })
       await page.waitForTimeout(3500)
+      await waitForWarm(page)
 
       /** Worst sample per station, so the printout names the offender. */
       const worst = new Map()
@@ -405,6 +431,7 @@ async function main() {
     const page = await ctx.newPage()
     await page.goto(`${base}/?debug=1&q=high`, { waitUntil: 'networkidle', timeout: 60000 })
     await page.waitForTimeout(3500)
+    await waitForWarm(page)
 
     /**
      * One full lap, then settle at the top where only hero is mounted — the only
@@ -460,7 +487,29 @@ async function main() {
       return restingCounters()
     }
 
-    const warm = await lap()
+    /**
+     * Lap until the counters stop moving, THEN start counting.
+     *
+     * One warm-up lap was enough when a station was torn down the moment it left
+     * the window: everything it owned was disposed, so the resting count was the
+     * same on lap one as on lap ten. Stations are now retained and toggled with
+     * `visible`, which means the resting count CLIMBS to a ceiling as each station
+     * builds its canvas textures and buffers for the first time, and then stops.
+     * Under a software rasteriser a single lap is nowhere near enough to reach
+     * that ceiling, so the counted laps were measuring the climb.
+     *
+     * The leak assertion below is unchanged. This only makes sure it is comparing
+     * two readings taken at the steady state, which is what it always meant to do.
+     */
+    const MAX_WARM_LAPS = 5
+    let warm = await lap()
+    for (let i = 1; i < MAX_WARM_LAPS; i++) {
+      const next = await lap()
+      const settled =
+        next.geometries === warm.geometries && next.textures === warm.textures
+      warm = next
+      if (settled) break
+    }
     console.log(
       `        warm-up: geometries ${warm.geometries}  textures ${warm.textures}  programs ${warm.programs}   ${'(not counted)'}`,
     )

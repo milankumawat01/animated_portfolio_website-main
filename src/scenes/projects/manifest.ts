@@ -3,9 +3,8 @@ import { stationCamera } from '@/lib/curves'
 import { lazy } from 'react'
 
 /** CODE SPLIT (P5) — see the note in `scenes/about/manifest.ts`. */
-const ProjectsScene = lazy(() =>
-  import('./Scene').then((m) => ({ default: m.ProjectsScene })),
-)
+const loadProjectsScene = () => import('./Scene').then((m) => ({ default: m.ProjectsScene }))
+const ProjectsScene = lazy(loadProjectsScene)
 
 /**
  * 03 · PROJECTS — the lightest and most specular station.
@@ -35,6 +34,7 @@ export const projectsManifest: SceneManifest = {
     theme: 'light',
   },
   Scene: ProjectsScene,
+  preload: loadProjectsScene,
   mountPadding: 0.05,
   budget: { drawCalls: 28, triangles: 40_000 },
 }

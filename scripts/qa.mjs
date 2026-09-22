@@ -279,6 +279,17 @@ try {
     const t = await newPage({ viewport: { width: 1280, height: 720 } })
     await t.page.goto(`${BASE}/?debug=1&q=${q}`, { waitUntil: 'networkidle', timeout: 60000 })
     await t.page.waitForTimeout(3000)
+    /**
+     * Wait for the engine's warm-up before counting programs.
+     *
+     * `SceneDirector` links every station's shaders during idle time after first
+     * paint, so the program count at a fixed 3s dwell is a measure of how far that
+     * got, not of the tier — medium out-counted high on a slow run purely by
+     * winning the race. At the steady state the comparison means what it says.
+     */
+    await t.page
+      .waitForFunction(() => window.__warmup?.done === true, null, { timeout: 90000 })
+      .catch(() => {})
     await scrollTo(t.page, 0.3)
     const hud = await t.page.locator('[data-debug-hud]').innerText().catch(() => '')
     programs[q] = Number(/programs\s+(\d+)/.exec(hud)?.[1] ?? 0)

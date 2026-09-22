@@ -9,8 +9,14 @@ import { lazy } from 'react'
  * mounts the station well before the camera arrives — that lead time is the
  * download window. Hero is the one station left as a static import, because it
  * renders at progress 0 and must not wait on a second round trip.
+ *
+ * The loader is named rather than inlined so the manifest can expose it as
+ * `preload`. `SceneDirector` warms every station's chunk during idle time after
+ * first paint, so mounting never waits on a round trip — the download window is
+ * the whole time the visitor spends reading the hero, not `mountPadding`.
  */
-const AboutScene = lazy(() => import('./Scene').then((m) => ({ default: m.AboutScene })))
+const loadAboutScene = () => import('./Scene').then((m) => ({ default: m.AboutScene }))
+const AboutScene = lazy(loadAboutScene)
 
 /**
  * 02 · ABOUT — the first light station, and the first object on the site with a
@@ -39,6 +45,7 @@ export const aboutManifest: SceneManifest = {
     theme: 'light',
   },
   Scene: AboutScene,
+  preload: loadAboutScene,
   /**
    * A touch under the 0.08 default. Four merged meshes and one canvas atlas is a
    * cheap station to warm up, and the two neighbours are the two most expensive
