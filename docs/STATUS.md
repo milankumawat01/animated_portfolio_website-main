@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-22 — P0 complete. Monorepo converted, both apps build, Convex scaffolded.
-**Next action:** `/portfolio p1` — schema & API contract freeze.
+**Last updated:** 2026-09-22 — P1 complete. Schema frozen, all function contracts written, seed ready.
+**Next action:** P2 (content migration & seed) + P6A (admin shell) can start in parallel — both need only P1.
 
 ---
 
@@ -14,7 +14,7 @@
 | Phase | Name | Status | Wave | Notes |
 |---|---|---|---|---|
 | P0 | Monorepo & Convex foundation | ✅ Done | 1 | Solo. Own branch. Moves every file. |
-| P1 | Schema & API contract freeze | ⬜ Not started | 1 | Solo. **Contract freeze.** |
+| P1 | Schema & API contract freeze | ✅ Done | 1 | Solo. **Contract freeze.** |
 | P2 | Content migration & seed | ⬜ Not started | 2 | Needs P1 |
 | P3 | Public read path + routing shell | ⬜ Not started | 2 | Needs P2. Owns `page.tsx`, `Navbar`, `Footer` |
 | P4A | Projects pages | ⬜ Not started | 3 | Parallel-safe with P4B, P4C |
@@ -102,12 +102,12 @@ Append one line per session. Never rewrite.
             integration, confirmed four decisions with Milan, wrote the full docs set
             (00–08, STATUS, 13 phase briefs) and the /portfolio driver skill.
             No application code touched. Next: P0.
-2026-09-22  P0 complete. Converted repo to npm workspaces (apps/web, apps/admin,
-            packages/backend). Moved all source files via git mv preserving history.
-            Fixed: next lint→eslint, images.unoptimized removed + remotePatterns for
-            convex.cloud added, NEXT_PUBLIC_SITE_URL for metadataBase, ConvexClientProvider
-            wired into layout. Both apps build and typecheck clean. cacheComponents: false
-            recorded. Scaffold _generated/ stubs committed. Next: P1.
+2026-09-22  P1 complete. All 8 tables + auth tables in schema.ts (frozen). Every
+            function in 02-DATA-MODEL.md implemented: projects, blog, leads, experience,
+            skills, siteSettings, media + internal/{notify,revalidate,seed}. requireAdmin()
+            written as single auth primitive. leads.submit has full validation, honeypot,
+            rate limiting. Seed has all portfolioData.ts content. Backend typechecks clean.
+            Root npm run build passes. Next: P2 + P6A can run in parallel.
 ```
 
 ---

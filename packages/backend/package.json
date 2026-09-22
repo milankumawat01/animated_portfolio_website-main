@@ -7,6 +7,11 @@
     "deploy": "convex deploy"
   },
   "dependencies": {
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.95",
     "convex": "^1.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2"
   }
 }
