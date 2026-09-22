@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r temp-scaffold/* .)",
+      "Bash(cp temp-scaffold/.gitignore .)",
+      "Bash(cp temp-scaffold/.eslintrc.cjs .)",
+      "Bash(rm -rf temp-scaffold)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}
