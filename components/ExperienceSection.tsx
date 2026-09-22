@@ -75,10 +75,9 @@ export const ExperienceSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Middle Column (6 cols): Vertical Timeline with SCROLLABLE company cards */}
+          {/* Middle Column (6 cols): Vertical Timeline with company cards */}
           <div className="lg:col-span-6 relative">
-            {/* Scrollable Container with custom clean scrollbar */}
-            <div className="max-h-[520px] overflow-y-auto pr-3 space-y-6 scroll-smooth">
+            <div className="space-y-6">
               <div className="relative border-l-2 border-blue-200/70 ml-4 sm:ml-16 pl-6 sm:pl-8 space-y-7 pb-2">
                 {experience.map((item, idx) => (
                   <div key={item.id} className="relative group">
