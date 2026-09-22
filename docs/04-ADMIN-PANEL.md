@@ -244,6 +244,7 @@ Fields:
 | `readTimeMinutes` | **Auto-derived** — see below |
 | `featured`, `status` | Toggles |
 | `seo.title`, `seo.description` | Optional, with placeholders showing the fallbacks |
+| `publishedAt` | **Editable date picker** — see Backdating below |
 | `views` | Read-only |
 
 **Read time.** Derived from `body` on every keystroke (debounced) at ~200 words per minute,
@@ -252,6 +253,23 @@ link; clicking it makes the number editable and pins it. A pinned override survi
 edits, and a **Reset to auto** link puts it back. The migration seeds this from the legacy
 `readTime` string (`06-CONTENT-MIGRATION.md`), so existing posts start pinned to their
 original value.
+
+**Backdating.** `publishedAt` is an editable date-time field on posts, not a read-only
+stamp. It defaults to "now" on first publish and Milan can set it to any date. This is a
+requirement, not a convenience: posts written elsewhere, or drafted long before they ship,
+carry their real date. `by_status_publishedAt` sorts on the stored value, so a backdated post
+lands in the right place on `/blog` and in `/feed.xml` with no extra work, and `datePublished`
+in the `BlogPosting` JSON-LD uses it directly.
+
+Two rules the editor enforces:
+
+- **A future date is allowed but warned about.** There is no scheduler
+  (§Deliberately not built), so a future-dated post publishes immediately and simply displays
+  a future date. The queries deliberately do **not** filter `publishedAt > now` — a filtered
+  post would silently vanish with nothing to bring it back, which is worse than a visibly odd
+  date.
+- **Editing `publishedAt` fires revalidation**, because it reorders `/blog` and changes the
+  rendered date on the post itself.
 
 **Deleting a post** removes the `blogPosts` row. Its uploaded images stay in the media
 library — media is a shared pool, not a per-post attachment.
@@ -475,7 +493,8 @@ asks.
 
 Toggling `status` from `draft` to `published` opens a dialog naming the exact public URL
 (`milankumawat.in/blog/<slug>`), warning that it becomes indexable, and, for a first
-publish, noting that `publishedAt` is being stamped now and will not move on later edits.
+publish, noting that `publishedAt` defaults to now — and that it can be changed at any time
+in the editor, since backdating is supported.
 Confirm calls `setStatus`.
 
 **Publishing triggers public-site revalidation.** The mutation schedules
@@ -569,7 +588,7 @@ gets a phase and a line in `STATUS.md` first.
 | **Roles and permissions** | There is one role. `requireAdmin()` returns a yes or throws. No `isEditor`, no permission matrix, no per-table grants. |
 | **Audit log** | Nothing records who changed what and when beyond `updatedAt`. With one user the answer is always "Milan". The dashboard's recent-activity list is an `updatedAt` sort, not a log — it cannot show history and must not be extended into one. |
 | **Content versioning / revisions / rollback** | No `revisions` table, no diffs, no "restore previous version". An edit overwrites. Publishing is a status flip on the same row, not a draft copy promoted over a live one. |
-| **Scheduled publishing** | `publishedAt` is stamped when Milan publishes. No future-dated queue, no cron. |
+| **Scheduled publishing** | No queue, no cron, no "publish at 9am Tuesday". `publishedAt` is freely editable — including into the future — but setting a future date publishes the post **now** with a future date on it. Backdating is supported; scheduling is not. |
 | **Preview of unpublished content on the public site** | No draft mode, no preview tokens, no `draftMode()`. The blog editor's live preview is the preview. |
 | **Rich-text WYSIWYG** | Markdown is the format (`00-MASTER-PLAN.md §3`) because it is portable, diff-able and chunks cleanly for the P8 bot. A WYSIWYG that emits HTML breaks all three. |
 | **Comments, reactions, or any visitor-generated content** | No moderation queue exists because no such content exists. |

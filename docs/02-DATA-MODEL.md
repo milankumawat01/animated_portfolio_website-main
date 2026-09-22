@@ -82,7 +82,7 @@ blogPosts: defineTable({
                      title:       v.optional(v.string()),
                      description: v.optional(v.string()),
                    })),
-  publishedAt:     v.optional(v.number()),
+  publishedAt:     v.optional(v.number()),   // admin-editable — backdating is supported
   updatedAt:       v.number(),
 })
   .index("by_slug",                ["slug"])
@@ -303,7 +303,7 @@ first. `[internal]` is not reachable from any client.
 | `listTags` | query `[public]` | `{}` | distinct tags with counts |
 | `listAll` | query `[admin]` | `{}` | drafts included |
 | `create` · `update` · `remove` | mutation `[admin]` | — | — |
-| `setStatus` | mutation `[admin]` | `{ id, status }` | sets `publishedAt` on first publish |
+| `setStatus` | mutation `[admin]` | `{ id, status, publishedAt? }` | defaults `publishedAt` to now on first publish; an explicit value overrides it (backdating) |
 | `incrementViews` | mutation `[public]` | `{ slug }` | fire-and-forget |
 
 ### `leads.ts`

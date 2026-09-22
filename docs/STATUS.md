@@ -50,6 +50,7 @@ does not re-litigate it.
 | 2026-09-22 | **Convex Auth, no middleware** | convex-auth is 0.0.x beta and [#271](https://github.com/get-convex/convex-auth/issues/271) breaks `isAuthenticated()` on Next 16. We use neither `middleware.ts` nor `proxy.ts`; `requireAdmin()` inside every mutation is the real boundary. Clerk is the escape hatch. |
 | 2026-09-22 | **Markdown for blog bodies** | Portable, code-block friendly, chunks cleanly for the future bot. |
 | | **`cacheComponents` on/off** | ⬅ **P0 must decide and record this.** It changes how every later phase writes pages. |
+| 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | | **Markdown rendering stack** | ⬅ **P4B must decide and record this.** P6B's preview has to match it. |
 | | **Footer in light mode** | ⬅ **P5 must decide and record this.** The footer is dark by design today. |
 
@@ -64,8 +65,9 @@ Answer before the content becomes published database rows (P2).
       hidden until they exist?
 - [ ] **Do the GitHub URLs resolve?** `github.com/milankumawat/*` — the earlier 3D build
       recorded that the profile 404s.
-- [ ] **Article dates are in the future** (`12 Sep 2026`, `05 Sep 2026`, …). Intentional, or
-      placeholder?
+- [ ] **Are the existing article dates real?** `12 Sep 2026`, `05 Sep 2026`, `28 Aug 2026`,
+      `18 Aug 2026` — all within the last five weeks. Real publication dates, or placeholders
+      to overwrite? Milan has said he will backdate posts, so these become editable on import.
 - [ ] **The footer has a SECOND fake form.** `components/Footer.tsx:27-33` — the newsletter
       subscribe box sets `status: 'subscribed'`, clears the field after 4s and **discards the
       email**, exactly like the contact modal did. Do you want a real newsletter (needs a

@@ -53,7 +53,9 @@ writing in a modal cannot be linked, indexed or comfortably read.
 
 ## Acceptance criteria
 
-- [ ] `/blog` lists all 4 published posts, newest first
+- [ ] `/blog` lists all 4 published posts, newest first — ordered by `publishedAt`, which is
+      admin-editable, so a backdated post must sort by its stored date rather than by
+      creation order
 - [ ] All four slugs render: `building-ai-powered-fastapi`,
       `designing-scalable-backend-systems`, `lessons-from-autoresumebot`,
       `from-idea-to-production`

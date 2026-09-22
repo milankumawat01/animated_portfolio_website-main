@@ -50,6 +50,10 @@ touching a repo.
       highlighting. Compare side by side.
 - [ ] Read time auto-derives and the manual override sticks
 - [ ] Draft posts are invisible on the public site and in `/feed.xml`
+- [ ] **A backdated post works end to end**: set `publishedAt` to a date months ago, and the
+      post sorts into the right place on `/blog`, shows that date on the page, carries it as
+      `datePublished` in the JSON-LD, and appears in the right position in `/feed.xml`
+- [ ] A future date is accepted, warns, and publishes immediately rather than disappearing
 - [ ] Uploading an image stores it, records width/height, and it renders through
       `next/image` on the public site with no layout shift
 - [ ] Alt text cannot be left empty
