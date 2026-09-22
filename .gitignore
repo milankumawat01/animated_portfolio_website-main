@@ -1,24 +1,45 @@
-# Logs
-logs
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+dist/
+
+# production / deploy
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# env
+.env
+.env*.local
+
+# testing
+coverage/
+test-results/
+playwright-report/
+
+# logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# editors
+.vscode/
+.idea/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# os
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# local working files (not needed to build or deploy the site)
+.chrome_profile/
+my_assets/
