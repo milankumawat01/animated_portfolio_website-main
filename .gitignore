@@ -14,7 +14,9 @@ dist/
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+# next-env.d.ts is generated per app, gitignored at the root but committed in apps/
+apps/web/next-env.d.ts
+apps/admin/next-env.d.ts
 
 # env
 .env
@@ -43,3 +45,4 @@ Thumbs.db
 # local working files (not needed to build or deploy the site)
 .chrome_profile/
 my_assets/
+

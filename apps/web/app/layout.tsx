@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ConvexClientProvider } from '@/lib/convex-client-provider';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://milankumawat.in'),
+  metadataBase: new URL(siteUrl),
   title: 'Milan Kumawat | AI Engineer & Backend Developer',
   description: 'Portfolio of Milan Kumawat - AI Engineer and Backend Developer building AI-powered products and scalable systems for a better tomorrow.',
   keywords: [
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://milankumawat.in',
+    url: siteUrl,
     title: 'Milan Kumawat | AI Engineer & Backend Developer',
     description: 'Building AI-powered products and scalable systems for a better tomorrow.',
     siteName: 'Milan Kumawat Portfolio',
@@ -58,7 +61,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-white text-slate-900 antialiased selection:bg-blue-600 selection:text-white">
-        {children}
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
       </body>
     </html>
   );

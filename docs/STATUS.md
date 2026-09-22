@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-22 — planning complete, docs written, **no code written yet**.
-**Next action:** `/portfolio p0` — monorepo conversion and Convex scaffold.
+**Last updated:** 2026-09-22 — P0 complete. Monorepo converted, both apps build, Convex scaffolded.
+**Next action:** `/portfolio p1` — schema & API contract freeze.
 
 ---
 
@@ -13,7 +13,7 @@
 
 | Phase | Name | Status | Wave | Notes |
 |---|---|---|---|---|
-| P0 | Monorepo & Convex foundation | ⬜ Not started | 1 | Solo. Own branch. Moves every file. |
+| P0 | Monorepo & Convex foundation | ✅ Done | 1 | Solo. Own branch. Moves every file. |
 | P1 | Schema & API contract freeze | ⬜ Not started | 1 | Solo. **Contract freeze.** |
 | P2 | Content migration & seed | ⬜ Not started | 2 | Needs P1 |
 | P3 | Public read path + routing shell | ⬜ Not started | 2 | Needs P2. Owns `page.tsx`, `Navbar`, `Footer` |
@@ -49,7 +49,7 @@ does not re-litigate it.
 | 2026-09-22 | **All content in Convex from day one** | Including experience, skills and every line of site copy. One migration, not two. |
 | 2026-09-22 | **Convex Auth, no middleware** | convex-auth is 0.0.x beta and [#271](https://github.com/get-convex/convex-auth/issues/271) breaks `isAuthenticated()` on Next 16. We use neither `middleware.ts` nor `proxy.ts`; `requireAdmin()` inside every mutation is the real boundary. Clerk is the escape hatch. |
 | 2026-09-22 | **Markdown for blog bodies** | Portable, code-block friendly, chunks cleanly for the future bot. |
-| | **`cacheComponents` on/off** | ⬅ **P0 must decide and record this.** It changes how every later phase writes pages. |
+| 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | | **Markdown rendering stack** | ⬅ **P4B must decide and record this.** P6B's preview has to match it. |
 | | **Footer in light mode** | ⬅ **P5 must decide and record this.** The footer is dark by design today. |
@@ -102,6 +102,12 @@ Append one line per session. Never rewrite.
             integration, confirmed four decisions with Milan, wrote the full docs set
             (00–08, STATUS, 13 phase briefs) and the /portfolio driver skill.
             No application code touched. Next: P0.
+2026-09-22  P0 complete. Converted repo to npm workspaces (apps/web, apps/admin,
+            packages/backend). Moved all source files via git mv preserving history.
+            Fixed: next lint→eslint, images.unoptimized removed + remotePatterns for
+            convex.cloud added, NEXT_PUBLIC_SITE_URL for metadataBase, ConvexClientProvider
+            wired into layout. Both apps build and typecheck clean. cacheComponents: false
+            recorded. Scaffold _generated/ stubs committed. Next: P1.
 ```
 
 ---
