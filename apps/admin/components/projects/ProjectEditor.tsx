@@ -5,6 +5,7 @@ import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/slugify'
+import { errorMessage } from '@/lib/errors'
 
 type ProjectDoc = {
   _id: Id<'projects'>
@@ -108,7 +109,7 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         return
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'An error occurred'
+      const msg = errorMessage(err, 'An error occurred')
       setError(msg)
     } finally {
       setSaving(false)

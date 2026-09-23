@@ -85,7 +85,7 @@ export function ogCard({
           }}
         >
           <span>Milan Kumawat</span>
-          <span>{footer ?? 'milankumawat.in'}</span>
+          <span>{footer ?? 'milankumawat.is-a.dev'}</span>
         </div>
       </div>
     ),

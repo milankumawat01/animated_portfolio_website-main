@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
+import { errorMessage } from '@/lib/errors'
 
 // Valid icon keys from apps/web/components/icons/TechIcons.tsx
 // The TechIcon component maps name.toLowerCase().replace(/[^a-z0-9]/g, '') to the switch cases
@@ -146,7 +147,7 @@ function SkillCategoryRow({
       })
       onSaved()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Save failed')
+      setError(errorMessage(err, 'Save failed'))
     } finally {
       setSaving(false)
     }

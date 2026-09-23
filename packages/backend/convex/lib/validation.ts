@@ -1,3 +1,5 @@
+import { ConvexError } from 'convex/values'
+
 /**
  * Validation rules for data entering Convex.
  * Enforced server-side; the browser form is not a validator.
@@ -8,7 +10,7 @@ export const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 export function validateSlug(slug: string): void {
   if (!SLUG_REGEX.test(slug)) {
-    throw new Error(`Invalid slug: "${slug}". Must match ^[a-z0-9]+(?:-[a-z0-9]+)*$`)
+    throw new ConvexError(`Invalid slug: "${slug}". Must match ^[a-z0-9]+(?:-[a-z0-9]+)*$`)
   }
 }
 
@@ -33,16 +35,16 @@ export function validateLead(args: {
 }) {
   const name = args.name.trim()
   if (name.length < LEAD_NAME_MIN || name.length > LEAD_NAME_MAX) {
-    throw new Error(`Name must be between ${LEAD_NAME_MIN} and ${LEAD_NAME_MAX} characters.`)
+    throw new ConvexError(`Name must be between ${LEAD_NAME_MIN} and ${LEAD_NAME_MAX} characters.`)
   }
 
   const email = args.email.toLowerCase().trim()
   if (email.length < LEAD_EMAIL_MIN || email.length > LEAD_EMAIL_MAX || !email.includes('@')) {
-    throw new Error('Please enter a valid email address.')
+    throw new ConvexError('Please enter a valid email address.')
   }
 
   if (args.message.length < LEAD_MESSAGE_MIN || args.message.length > LEAD_MESSAGE_MAX) {
-    throw new Error(`Message must be between ${LEAD_MESSAGE_MIN} and ${LEAD_MESSAGE_MAX} characters.`)
+    throw new ConvexError(`Message must be between ${LEAD_MESSAGE_MIN} and ${LEAD_MESSAGE_MAX} characters.`)
   }
 
   return { name, email }

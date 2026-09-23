@@ -5,7 +5,7 @@ import { getProjects, getPosts } from '@/lib/convex'
 // so we accept but don't use it. The function signature must NOT destructure
 // it synchronously (Next 16 trap — see docs/01-ARCHITECTURE.md §7).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
   const [projects, posts] = await Promise.all([
     getProjects().catch(() => [] as Awaited<ReturnType<typeof getProjects>>),

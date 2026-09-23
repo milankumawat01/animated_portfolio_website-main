@@ -140,24 +140,28 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-text-on-dark font-semibold text-sm transition shadow-sm shadow-blue/20"
-            >
-              <span>Live Preview</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border text-text-primary font-semibold text-sm transition"
-            >
-              <GithubIcon className="w-4 h-4" />
-              <span>Source Repository</span>
-            </a>
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-text-on-dark font-semibold text-sm transition shadow-sm shadow-blue/20"
+              >
+                <span>Live Preview</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border text-text-primary font-semibold text-sm transition"
+              >
+                <GithubIcon className="w-4 h-4" />
+                <span>Source Repository</span>
+              </a>
+            )}
             <Link
               href={`/projects/${project.slug}`}
               className="flex items-center gap-1 px-4 py-2.5 rounded-xl border border-border hover:border-blue/40 text-text-secondary hover:text-blue font-semibold text-sm transition"

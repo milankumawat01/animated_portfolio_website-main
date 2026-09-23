@@ -3,6 +3,7 @@ import { useState, useRef } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
+import { errorMessage } from '@/lib/errors'
 
 const MEDIA_SIZE_MAX = 10 * 1024 * 1024 // 10 MB
 
@@ -249,7 +250,7 @@ export function MediaLibrary() {
       setAltText('')
       if (fileRef.current) fileRef.current.value = ''
     } catch (err: unknown) {
-      setUploadError(err instanceof Error ? err.message : 'Upload failed')
+      setUploadError(errorMessage(err, 'Upload failed'))
     } finally {
       setUploading(false)
     }

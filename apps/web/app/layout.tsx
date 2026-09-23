@@ -3,7 +3,7 @@ import './globals.css';
 import { ConvexClientProvider } from '@/lib/convex-client-provider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -1,6 +1,6 @@
 import type { PostDoc, ProjectDoc, SiteSettingsDoc } from '@/lib/convex'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
 // Structured data as a <script> in the page, per the Next.js JSON-LD guide.
 // `<` is escaped so content from the CMS can never close the script tag.

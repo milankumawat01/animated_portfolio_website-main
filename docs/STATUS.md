@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-23 — All code phases done (P0–P6C, P7 code). Sub-pages rebuilt on the real Navbar/Footer and fully themed. Admin login switched to email + password, locked to `ADMIN_EMAIL`; admin account created on dev. Both apps build clean.
-**Next action:** Milan follows `docs/DEPLOY.md` — prod Convex env vars, two Vercel projects, domains, create the prod admin account — then runs its §5 checklist. That closes P7.
+**Last updated:** 2026-09-23 — **Live.** Public site on `https://milankumawat.is-a.dev`, admin on `https://milan-portfolio-admin.vercel.app`, Convex prod `polite-hornet-484` seeded. Pre-launch review fixed 5 bugs (contact form lost every lead, media covers invisible, new-post create failed, lead notes wiped, error text masked). See `docs/DEPLOY.md`.
+**Next action:** Milan — (1) fix the contact email: `hey@milankumawat.in` bounces, the domain doesn't exist; (2) Resend key + `LEAD_NOTIFY_TO` for lead emails; (3) real `liveUrl`s. Then Lighthouse + social-preview checks close P7.
 
 ---
 
@@ -52,6 +52,7 @@ does not re-litigate it.
 | 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | 2026-09-22 | **Markdown rendering stack: remark + remark-gfm + remark-html** | Server component, no client JS, sanitize=false (admin-authored content). P6B preview must match. |
+| 2026-09-23 | **Production domain is `milankumawat.is-a.dev`** | `milankumawat.in` has no DNS. Code fallbacks switched. Admin lives on `milan-portfolio-admin.vercel.app`. Convex is deployed from the CLI, not by Vercel. |
 | 2026-09-23 | **Admin auth: email + password, not GitHub** | Milan's call. Convex Auth `Password` provider; `profile()` refuses any email but `ADMIN_EMAIL`, so no second account can exist. `requireAdmin` now loads the user and compares email to `ADMIN_EMAIL` and **fails closed** — replaces `ADMIN_IDENTITY`, which failed open. Docs 01/04/P01 still mention GitHub/`ADMIN_IDENTITY`; this row supersedes them. |
 | 2026-09-23 | **Home-only data uses the `home` cache tag** | `getSiteSettings`/`getExperience`/`getSkillCategories` were tagged `siteSettings`/`experience`/`skills`, which `/api/revalidate` rejects. Now `home`, per the 5-tag taxonomy in `03-ROUTES §6.1`. |
 | 2026-09-23 | **OG images are generated cards, not cover photos** | `opengraph-image.tsx` at `/`, `/projects/[slug]`, `/blog/[slug]`. Post `generateMetadata` no longer passes `imageUrl`, so every share shows title + excerpt consistently. |
@@ -82,6 +83,11 @@ Answer before the content becomes published database rows (P2).
       drifted from the annotations actually on the page. Wire it up, or delete it?
 - [ ] **Admin domain** — is `admin.milankumawat.in` the intended hostname?
 - [ ] **Lead notification address** — `hey@milankumawat.in`, or somewhere else?
+      ⚠️ `milankumawat.in` does not exist, so `hey@milankumawat.in` bounces — and it is the
+      email shown on the live site (ContactSection, ContactModal, ResumeModal, contact card
+      in siteSettings). Needs a working address from Milan; site copy fixable in admin Settings.
+- [ ] **Rate limit keys on submitted email** (`leads.ts`) — spammers rotate addresses; anyone
+      can lock a real address out for an hour. Proper fix hashes the IP via an httpAction.
 - [x] **Admin login** — answered: email + password, `milankumawat01@gmail.com`. See Decisions.
 - [ ] **Analytics** — add Vercel Analytics (P7 step 7 default), or nothing?
 
@@ -243,6 +249,23 @@ Append one line per session. Never rewrite.
               created on dev. Verified: correct password → token; wrong password and
               another email → refused; users table has exactly 1 row.
             Build: ✅ both apps. tsc --noEmit: ✅ web, admin, backend.
+2026-09-23  Pre-launch review + production deploy.
+            Review (subagent, verified by hand) fixed: (1) leads.submit scheduled a
+              nonexistent path (`internal` cast to any) → every contact submit threw and
+              rolled back — reproduced on dev, fixed, re-tested: lead stored. notify.ts
+              called an admin-gated query from a scheduled action and a missing
+              _markNotified → added internal _get/_markNotified; sender now
+              LEAD_NOTIFY_FROM ?? onboarding@resend.dev. (2) media-library covers
+              (imageStorageId) never resolved → lib/images.ts in public queries.
+              (3) blog.create rejected imageStorageId/seo/publishedAt → args added (schema
+              unchanged). (4) LeadDetail notes box could save '' over notes. (5) user-facing
+              errors now ConvexError + errorMessage() helper (prod masks plain Error).
+              Also: ProjectModal hides Live/GitHub buttons without URLs; site-URL fallbacks
+              → milankumawat.is-a.dev.
+            Deploy: Convex prod env set (ADMIN_EMAIL, JWT keys, SITE_URL, REVALIDATE_SECRET),
+              functions deployed, seeded, parity clean, admin account created on prod.
+              Vercel: existing project re-rooted to apps/web + 3 env vars; new project
+              milan-portfolio-admin (apps/admin). Pushed main → both build from GitHub.
 ```
 
 ---

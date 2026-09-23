@@ -1,7 +1,8 @@
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
 import { scheduleRevalidate } from './lib/revalidate'
+import { withImageUrl } from './lib/images'
 import { validateSlug } from './lib/validation'
 
 // ── Public read queries ────────────────────────────────────────────────────
@@ -9,11 +10,12 @@ import { validateSlug } from './lib/validation'
 export const listPublished = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    const results = await ctx.db
       .query('projects')
       .withIndex('by_status_order', (q) => q.eq('status', 'published'))
       .order('asc')
       .collect()
+    return await Promise.all(results.map((p) => withImageUrl(ctx, p)))
   },
 })
 
@@ -26,7 +28,8 @@ export const listFeatured = query({
         q.eq('status', 'published').eq('featured', true),
       )
       .collect()
-    return limit ? results.slice(0, limit) : results
+    const sliced = limit ? results.slice(0, limit) : results
+    return await Promise.all(sliced.map((p) => withImageUrl(ctx, p)))
   },
 })
 
@@ -38,7 +41,7 @@ export const bySlug = query({
       .withIndex('by_slug', (q) => q.eq('slug', slug))
       .unique()
     if (!project || project.status !== 'published') return null
-    return project
+    return await withImageUrl(ctx, project)
   },
 })
 
@@ -78,7 +81,7 @@ export const create = mutation({
       .query('projects')
       .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique()
-    if (existing) throw new Error(`Slug "${args.slug}" is already taken.`)
+    if (existing) throw new ConvexError(`Slug "${args.slug}" is already taken.`)
     const id = await ctx.db.insert('projects', {
       ...args,
       status: 'draft',
@@ -120,10 +123,10 @@ export const update = mutation({
         .query('projects')
         .withIndex('by_slug', (q) => q.eq('slug', patch.slug!))
         .unique()
-      if (existing && existing._id !== id) throw new Error(`Slug "${patch.slug}" is already taken.`)
+      if (existing && existing._id !== id) throw new ConvexError(`Slug "${patch.slug}" is already taken.`)
     }
     const before = await ctx.db.get(id)
-    if (!before) throw new Error('Project not found.')
+    if (!before) throw new ConvexError('Project not found.')
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
     await scheduleRevalidate(ctx, [
       'projects', 'home', `project:${before.slug}`, `project:${patch.slug ?? before.slug}`,
@@ -162,7 +165,7 @@ export const setStatus = mutation({
   handler: async (ctx, { id, status }) => {
     await requireAdmin(ctx)
     const project = await ctx.db.get(id)
-    if (!project) throw new Error('Project not found.')
+    if (!project) throw new ConvexError('Project not found.')
     const patch: { status: 'draft' | 'published'; publishedAt?: number; updatedAt: number } = {
       status,
       updatedAt: Date.now(),

@@ -216,7 +216,9 @@ export function LeadDetail({ id }: { id: Id<'leads'> }) {
   const setStatus = useMutation(api.leads.setStatus)
   const setNotes = useMutation(api.leads.setNotes)
   const remove = useMutation(api.leads.remove)
-  const [notes, setNotes2] = useState(lead?.notes ?? '')
+  // null until the user types: the lead loads after first render, so seeding
+  // useState from it would start empty and a blur would save '' over real notes.
+  const [draftNotes, setNotes2] = useState<string | null>(null)
   const [noteSaved, setNoteSaved] = useState(false)
   const router = typeof window !== 'undefined' ? null : null // use Link back
 
@@ -239,8 +241,11 @@ export function LeadDetail({ id }: { id: Id<'leads'> }) {
     void setStatus({ id, status: 'read' })
   }
 
+  const notes = draftNotes ?? lead.notes ?? ''
+
   const handleNoteBlur = async () => {
-    await setNotes({ id, notes: notes ?? '' })
+    if (draftNotes === null) return
+    await setNotes({ id, notes: draftNotes })
     setNoteSaved(true)
     setTimeout(() => setNoteSaved(false), 2000)
   }

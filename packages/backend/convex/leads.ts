@@ -1,17 +1,12 @@
-import { v } from 'convex/values'
-import { mutation, query } from './_generated/server'
-import { internal as _internal } from './_generated/api'
+import { ConvexError, v } from 'convex/values'
+import { internalMutation, internalQuery, mutation, query } from './_generated/server'
+import { internal } from './_generated/api'
 import { requireAdmin } from './lib/auth'
 import {
   validateLead,
   RATE_LIMIT_MAX,
   RATE_LIMIT_WINDOW_MS,
 } from './lib/validation'
-
-// Cast to any because the stub _generated/api doesn't have typed internal refs yet.
-// After npx convex dev this cast is removed.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const internal: any = _internal
 
 // ── Public mutation ────────────────────────────────────────────────────────
 
@@ -56,7 +51,7 @@ export const submit = mutation({
       if (rateRow.windowStart > windowStart) {
         // Still in the current window
         if (rateRow.count >= RATE_LIMIT_MAX) {
-          throw new Error(
+          throw new ConvexError(
             'Too many messages. Please try again in an hour.',
           )
         }
@@ -86,7 +81,7 @@ export const submit = mutation({
     })
 
     // Schedule the email notification — if this fails, the lead is already saved
-    await ctx.scheduler.runAfter(0, internal.notify.newLead, { leadId })
+    await ctx.scheduler.runAfter(0, internal.internal.notify.newLead, { leadId })
 
     return { success: true }
   },
@@ -139,6 +134,20 @@ export const unreadCount = query({
       .withIndex('by_status_createdAt', (q) => q.eq('status', 'new'))
       .collect()
     return rows.length
+  },
+})
+
+// ── Internal (used by internal/notify.ts — no user session there) ──────────
+
+export const _get = internalQuery({
+  args: { id: v.id('leads') },
+  handler: async (ctx, { id }) => ctx.db.get(id),
+})
+
+export const _markNotified = internalMutation({
+  args: { id: v.id('leads') },
+  handler: async (ctx, { id }) => {
+    await ctx.db.patch(id, { notified: true })
   },
 })
 

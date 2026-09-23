@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import { VALID_ICON_KEYS } from './SkillsEditor'
+import { errorMessage } from '@/lib/errors'
 
 type SiteSettings = {
   _id: string
@@ -855,7 +856,7 @@ export function SettingsEditor() {
       setSuccessMsg('Saved!')
       setTimeout(() => setSuccessMsg(''), 2500)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Save failed')
+      setError(errorMessage(err, 'Save failed'))
     } finally {
       setSaving(false)
     }

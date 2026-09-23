@@ -1,5 +1,6 @@
 import { v } from 'convex/values'
 import { internalAction } from '../_generated/server'
+import { internal } from '../_generated/api'
 
 export const newLead = internalAction({
   args: { leadId: v.id('leads') },
@@ -14,11 +15,7 @@ export const newLead = internalAction({
       return
     }
 
-    const lead = await ctx.runQuery(
-      // @ts-ignore — internal query reference; typed after schema freeze
-      'leads:get' as any,
-      { id: leadId },
-    )
+    const lead = await ctx.runQuery(internal.leads._get, { id: leadId })
 
     if (!lead) {
       console.warn(`Lead ${leadId} not found — skipping notification.`)
@@ -33,7 +30,10 @@ export const newLead = internalAction({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Portfolio <no-reply@milankumawat.in>',
+          // Resend only sends from verified domains; onboarding@resend.dev works
+          // without one (to the Resend account owner's address).
+          from: process.env.LEAD_NOTIFY_FROM ?? 'Portfolio <onboarding@resend.dev>',
+          reply_to: lead.email,
           to: [notifyTo],
           subject: `New message from ${lead.name}`,
           text: [
@@ -47,11 +47,7 @@ export const newLead = internalAction({
       })
 
       if (response.ok) {
-        await ctx.runMutation(
-          // @ts-ignore
-          'leads:_markNotified' as any,
-          { id: leadId },
-        )
+        await ctx.runMutation(internal.leads._markNotified, { id: leadId })
       } else {
         const body = await response.text()
         console.error(`Resend error ${response.status}: ${body}`)

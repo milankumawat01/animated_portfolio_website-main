@@ -1,7 +1,8 @@
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
 import { scheduleRevalidate } from './lib/revalidate'
+import { withImageUrl } from './lib/images'
 import { validateSlug, BLOG_BODY_MAX } from './lib/validation'
 
 // ── Public read queries ────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ export const listPublished = query({
     if (limit) {
       results = results.slice(0, limit)
     }
-    return results
+    return await Promise.all(results.map((p) => withImageUrl(ctx, p)))
   },
 })
 
@@ -37,7 +38,7 @@ export const bySlug = query({
       .withIndex('by_slug', (q) => q.eq('slug', slug))
       .unique()
     if (!post || post.status !== 'published') return null
-    return post
+    return await withImageUrl(ctx, post)
   },
 })
 
@@ -83,19 +84,25 @@ export const create = mutation({
     excerpt:         v.string(),
     body:            v.string(),
     imageUrl:        v.optional(v.string()),
+    imageStorageId:  v.optional(v.id('_storage')),
     tags:            v.array(v.string()),
     readTimeMinutes: v.number(),
     featured:        v.boolean(),
+    seo:             v.optional(v.object({
+                       title: v.optional(v.string()),
+                       description: v.optional(v.string()),
+                     })),
+    publishedAt:     v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx)
     validateSlug(args.slug)
-    if (args.body.length > BLOG_BODY_MAX) throw new Error('Blog body too long.')
+    if (args.body.length > BLOG_BODY_MAX) throw new ConvexError('Blog body too long.')
     const existing = await ctx.db
       .query('blogPosts')
       .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique()
-    if (existing) throw new Error(`Slug "${args.slug}" is already taken.`)
+    if (existing) throw new ConvexError(`Slug "${args.slug}" is already taken.`)
     const id = await ctx.db.insert('blogPosts', {
       ...args,
       status: 'draft',
@@ -133,11 +140,11 @@ export const update = mutation({
         .query('blogPosts')
         .withIndex('by_slug', (q) => q.eq('slug', patch.slug!))
         .unique()
-      if (existing && existing._id !== id) throw new Error(`Slug "${patch.slug}" is already taken.`)
+      if (existing && existing._id !== id) throw new ConvexError(`Slug "${patch.slug}" is already taken.`)
     }
-    if (patch.body && patch.body.length > BLOG_BODY_MAX) throw new Error('Blog body too long.')
+    if (patch.body && patch.body.length > BLOG_BODY_MAX) throw new ConvexError('Blog body too long.')
     const before = await ctx.db.get(id)
-    if (!before) throw new Error('Post not found.')
+    if (!before) throw new ConvexError('Post not found.')
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
     await scheduleRevalidate(ctx, [
       'blog', 'home', `post:${before.slug}`, `post:${patch.slug ?? before.slug}`,
@@ -166,7 +173,7 @@ export const setStatus = mutation({
   handler: async (ctx, { id, status, publishedAt }) => {
     await requireAdmin(ctx)
     const post = await ctx.db.get(id)
-    if (!post) throw new Error('Post not found.')
+    if (!post) throw new ConvexError('Post not found.')
     const patch: {
       status: 'draft' | 'published'
       publishedAt?: number

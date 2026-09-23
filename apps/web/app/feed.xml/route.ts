@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getPosts, type PostDoc } from '@/lib/convex'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
 function escapeXml(str: string): string {
   return str

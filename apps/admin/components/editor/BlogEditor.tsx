@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/slugify'
 import { MarkdownPreview } from './MarkdownPreview'
 import { MediaPicker } from './MediaPicker'
+import { errorMessage } from '@/lib/errors'
 
 const BODY_MAX = 200_000
 
@@ -189,7 +190,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
       setSaveLabel('saved')
       setTimeout(() => setSaveLabel('save'), 2000)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Save failed')
+      setError(errorMessage(err, 'Save failed'))
       setSaveLabel('save')
     } finally {
       setSaving(false)
@@ -215,7 +216,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
           : undefined,
       })
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Status change failed')
+      setError(errorMessage(err, 'Status change failed'))
     } finally {
       setSaving(false)
     }
@@ -225,7 +226,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
   const slugChanged = post && slug !== post.slug
   const isFutureDate = publishedAtStr ? new Date(publishedAtStr).getTime() > Date.now() : false
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.in'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>

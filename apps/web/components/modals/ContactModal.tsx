@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { useMutation } from 'convex/react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { api as _api } from '@portfolio/backend/convex/_generated/api';
+import { errorMessage } from '@/lib/errors';
 const api = _api as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 interface ContactModalProps {
@@ -74,11 +75,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
       }
     } catch (err: unknown) {
       setSubmitState('error');
-      if (err instanceof Error) {
-        setErrorMsg(err.message);
-      } else {
-        setErrorMsg('Something went wrong. Please try again or email me directly.');
-      }
+      setErrorMsg(errorMessage(err, 'Something went wrong. Please try again or email me directly.'));
     }
   };
 
