@@ -147,3 +147,16 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Below-the-fold home sections: the browser skips their layout and paint until
+   they near the viewport, so their fonts and images don't compete with the hero
+   on first load. `auto` remembers the real height once rendered. */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1000px;
+}
+/* Set by <DeferRenderGuard> before any in-page jump, so anchor targets are
+   measured against real section heights instead of the estimates above. */
+.render-all .defer-render {
+  content-visibility: visible;
+}

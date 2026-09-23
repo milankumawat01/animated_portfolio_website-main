@@ -1,10 +1,9 @@
-'use client';
-
-import React, { useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Handwriting } from './ui/Handwriting';
+import { ScrollButtons } from './ui/ScrollButtons';
 import type { PostDoc, SiteSettingsDoc } from '@/lib/convex';
 import { formatLegacyDate } from '@/lib/convex';
 
@@ -15,20 +14,9 @@ interface WritingSectionProps {
 
 export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings }) => {
   const quoteWriting = settings?.quotes?.writing ?? '';
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = scrollRef.current.clientWidth * 0.75;
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   return (
-    <section id="writing" className="py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
+    <section id="writing" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 space-y-12">
         {/* Top Header & Navigation */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
@@ -78,20 +66,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings 
               </Link>
 
               <div className="flex items-center gap-2 pl-2">
-                <button
-                  onClick={() => handleScroll('left')}
-                  className="w-10 h-10 rounded-full bg-surface-elevated border border-border hover:bg-bg-soft flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
-                  aria-label="Scroll articles left"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleScroll('right')}
-                    className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-text-on-dark transition shadow-sm active:scale-95"
-                  aria-label="Scroll articles right"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <ScrollButtons targetId="writing-row" prevLabel="Scroll articles left" nextLabel="Scroll articles right" />
               </div>
             </div>
           </div>
@@ -99,7 +74,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings 
 
         {/* 4 Article Cards Grid */}
         <div
-          ref={scrollRef}
+          id="writing-row"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar"
         >
           {posts.map((post) => (

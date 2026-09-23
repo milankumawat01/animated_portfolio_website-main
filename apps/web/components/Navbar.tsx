@@ -5,17 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight, Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useModals } from './modals/ModalProvider';
 
-interface NavbarProps {
-  onOpenContact: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
+export const Navbar: React.FC = () => {
+  const { openContact } = useModals();
   const [spySection, setSpySection] = useState('home');
   const [pastHero, setPastHero] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === '/';
 
@@ -126,18 +124,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
           {/* Theme Toggle */}
           {mounted && (
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
               className={`p-2 rounded-lg transition-colors ${
                 scrolled ? 'text-text-secondary hover:text-text-primary hover:bg-bg-soft' : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           )}
 
           <button
-            onClick={onOpenContact}
+            onClick={openContact}
             className={`hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 group ${
               scrolled
                 ? 'bg-ink text-bg-primary hover:bg-blue hover:text-white shadow-xs'
@@ -183,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenContact();
+                openContact();
               }}
               className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm"
             >

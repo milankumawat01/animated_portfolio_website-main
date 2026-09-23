@@ -446,6 +446,11 @@ section and all of `portfolioData.ts` ships to the browser.
 
 ### Target
 
+> **Superseded 2026-09-23.** `HomeClient` made the whole home page hydrate (mobile TBT
+> 720ms). The sections are now server components inside `components/modals/ModalProvider.tsx`
+> (a context, with the modals lazy-loaded), and only small triggers are client islands. See
+> the STATUS log. The plan below is kept as history.
+
 ```
 app/page.tsx                    async Server Component
   ├─ getHomeData()              cached, tag: home

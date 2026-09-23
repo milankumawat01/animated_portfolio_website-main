@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Rocket, Users, Zap, GraduationCap } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
@@ -23,7 +21,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
   const quoteExperience = settings?.quotes?.experience ?? '';
 
   return (
-    <section id="experience" className="py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
+    <section id="experience" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 space-y-10">
         {/* Section Header */}
         <SectionHeader

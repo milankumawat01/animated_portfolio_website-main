@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Image from 'next/image';
 import { Code2, Lightbulb, Users, Brain, Database, Box, BarChart3 } from 'lucide-react';
@@ -46,7 +44,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
   };
 
   return (
-    <section id="about" className="py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
+    <section id="about" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
         {/* Main Grid: 3 columns (Left 5 cols, Center 4 cols, Right 3 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-start">
@@ -119,7 +117,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
                   src="/images/milan-profile.jpg"
                   alt="Milan Kumawat - AI Engineer & Backend Developer"
                   fill
-                  priority
+                  sizes="380px"
                   className="object-cover object-center"
                 />
 

@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import {
   Lightbulb,
@@ -56,7 +54,7 @@ export const HowIBuildSection: React.FC<HowIBuildSectionProps> = ({ settings }) 
   };
 
   return (
-    <section id="how-i-build" className="py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
+    <section id="how-i-build" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 space-y-12">
         {/* Top Header & Quote Row */}
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">

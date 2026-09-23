@@ -1,23 +1,16 @@
-'use client';
-
-import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { ArrowRight, ArrowUp } from 'lucide-react';
+import React from 'react';
 import { GithubIcon, LinkedinIcon, XIcon, MailIcon, ResumeIcon } from './icons/SocialIcons';
+import { OpenContactButton, OpenResumeButton } from './modals/ModalTriggers';
+import { BackToTopButton, NewsletterForm } from './FooterIslands';
 import type { SiteSettingsDoc } from '@/lib/convex';
 
 interface FooterProps {
   settings: SiteSettingsDoc | null;
-  onOpenContact: () => void;
-  onOpenResume?: () => void;
+  // On `/` the nav links are in-page anchors; elsewhere they go back to `/`.
+  isHome: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ settings, onOpenContact, onOpenResume }) => {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'subscribed'>('idle');
-  const pathname = usePathname();
-  const isHome = pathname === '/';
-
+export const Footer: React.FC<FooterProps> = ({ settings, isHome }) => {
   const navLinks = [
     { label: 'Home', href: isHome ? '#home' : '/#home' },
     { label: 'About', href: isHome ? '#about' : '/#about' },
@@ -30,21 +23,6 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenContact, onOpenR
   const githubUrl = settings?.personal?.githubUrl ?? 'https://github.com/milankumawat';
   const linkedinUrl = settings?.personal?.linkedinUrl ?? 'https://linkedin.com/in/milankumawat';
   const twitterUrl = settings?.personal?.twitterUrl ?? 'https://x.com/milankumawat';
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setStatus('subscribed');
-      setTimeout(() => {
-        setEmail('');
-        setStatus('idle');
-      }, 4000);
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <footer className="bg-surface-feature text-text-on-dark border-t border-border-dark pt-10 pb-6 relative overflow-hidden">
@@ -144,25 +122,21 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenContact, onOpenR
                 </a>
               </li>
               <li>
-                <button
-                  onClick={onOpenContact}
+                <OpenContactButton
                   className="flex items-center gap-2.5 hover:text-text-on-dark transition-colors duration-200 text-left group"
                 >
                   <MailIcon className="w-4 h-4 text-text-on-dark/40 group-hover:text-text-on-dark transition-colors" />
                   <span>Email</span>
-                </button>
+                </OpenContactButton>
               </li>
-              {onOpenResume && (
-                <li>
-                  <button
-                    onClick={onOpenResume}
-                    className="flex items-center gap-2.5 hover:text-text-on-dark transition-colors duration-200 text-left group"
-                  >
-                    <ResumeIcon className="w-4 h-4 text-text-on-dark/40 group-hover:text-text-on-dark transition-colors" />
-                    <span>Resume</span>
-                  </button>
-                </li>
-              )}
+              <li>
+                <OpenResumeButton
+                  className="flex items-center gap-2.5 hover:text-text-on-dark transition-colors duration-200 text-left group"
+                >
+                  <ResumeIcon className="w-4 h-4 text-text-on-dark/40 group-hover:text-text-on-dark transition-colors" />
+                  <span>Resume</span>
+                </OpenResumeButton>
+              </li>
             </ul>
           </div>
 
@@ -174,31 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenContact, onOpenR
             <p className="text-xs sm:text-sm text-text-on-dark/80 leading-relaxed">
               Ideas, updates and things I&apos;m building straight to your inbox.
             </p>
-            <form onSubmit={handleSubscribe} className="pt-1">
-              <div className="relative flex items-center bg-surface-well border border-text-on-dark/15 rounded-full p-1.5 focus-within:border-blue transition-colors max-w-md shadow-inner">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="bg-transparent text-sm text-text-on-dark placeholder-text-on-dark/40 px-3.5 py-1.5 focus:outline-none flex-1 min-w-0"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={status === 'subscribed'}
-                  className="px-5 py-2.5 rounded-full bg-blue hover:bg-blue/90 text-text-on-dark font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-blue/25 transition-all shrink-0 active:scale-95 disabled:opacity-90"
-                >
-                  <span>{status === 'subscribed' ? 'Subscribed!' : 'Subscribe'}</span>
-                  {status !== 'subscribed' && <ArrowRight className="w-3.5 h-3.5" />}
-                </button>
-              </div>
-              {status === 'subscribed' && (
-                <p className="text-xs text-emerald-400 mt-2 font-medium">
-                  Thanks for subscribing! Check your inbox soon.
-                </p>
-              )}
-            </form>
+            <NewsletterForm />
           </div>
         </div>
 
@@ -210,15 +160,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenContact, onOpenR
           <div className="text-text-on-dark/40 text-center">
             Built with Next.js, Three.js and a lot of ☕
           </div>
-          <button
-            onClick={scrollToTop}
-            className="flex items-center gap-2 text-text-on-dark/80 hover:text-text-on-dark transition-colors group cursor-pointer"
-          >
-              <div className="w-7 h-7 rounded-full bg-surface-well border border-text-on-dark/15 flex items-center justify-center group-hover:border-text-on-dark/40 transition-colors">
-                <ArrowUp className="w-3.5 h-3.5 text-text-on-dark/80 group-hover:text-text-on-dark group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-            <span className="text-xs font-medium">Back to top</span>
-          </button>
+          <BackToTopButton />
         </div>
       </div>
     </footer>

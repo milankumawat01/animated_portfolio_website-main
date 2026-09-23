@@ -27,7 +27,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-blue" />
             <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
-              Curriculum Vitae Ã¢â‚¬Â¢ Milan Kumawat
+              Curriculum Vitae • Milan Kumawat
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -145,9 +145,9 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
             <div className="flex justify-between items-start text-xs sm:text-sm">
               <div>
                 <div className="font-bold text-text-primary">Bachelor of Computer Applications / CS</div>
-                <div className="text-text-muted">University of Rajasthan Ã¢â‚¬Â¢ Jaipur, India</div>
+                <div className="text-text-muted">University of Rajasthan • Jaipur, India</div>
               </div>
-              <span className="text-xs text-text-muted font-medium">2021 Ã¢â‚¬â€œ 2024</span>
+              <span className="text-xs text-text-muted font-medium">2021 – 2024</span>
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@
 > **appends** to the log — never rewrites someone else's line.
 
 **Last updated:** 2026-09-23 — **Live.** Public site on `https://milankumawat.is-a.dev`, admin on `https://milan-portfolio-admin.vercel.app`, Convex prod `polite-hornet-484` seeded. Pre-launch review fixed 5 bugs (contact form lost every lead, media covers invisible, new-post create failed, lead notes wiped, error text masked). See `docs/DEPLOY.md`.
-**Next action:** (1) Milan: working contact email (`hey@milankumawat.in` bounces) + Resend key/`LEAD_NOTIFY_TO`; real `liveUrl`s. (2) Perf: home is 74 on mobile — `HomeClient` makes the whole page a client tree (TBT 720ms). Move static sections to server components, keep modals/cursor as client islands. (3) Delete the two test leads (`launch-check@example.com` on prod, `reviewtest@example.com` on dev) from the admin inbox.
+**Next action:** (1) Milan: working contact email (`hey@milankumawat.in` bounces) + Resend key/`LEAD_NOTIFY_TO`; real `liveUrl`s. (2) Perf: home refactor + deferred section rendering done (2026-09-23, local mobile Lighthouse 83–85 → 92); deploy, then re-run PageSpeed on the live site. (3) Delete the two test leads (`launch-check@example.com` on prod, `reviewtest@example.com` on dev) from the admin inbox.
 
 ---
 
@@ -277,6 +277,27 @@ Append one line per session. Never rewrite.
             Lighthouse home perf 68 (LCP 5.1s) — Google Fonts @import was render-
               blocking → next/font. Now 74 home / 98 project / 99 post. Also title
               template, removed dead /favicon.ico link.
+2026-09-23  Perf: home off the client tree. HomeClient deleted; page.tsx renders the
+              sections as server components inside <ModalProvider> (context, modals
+              loaded via next/dynamic on first open). Client islands: Navbar, CustomCursor,
+              ModalTriggers, ScrollButtons, ContactCards, FooterIslands. Footer and
+              SubPageShell are server components now. ConvexProvider removed from the
+              root layout: ContactModal and the blog ViewCounter (dynamic, ssr:false)
+              wrap themselves, so no Convex client/WebSocket on page load. About/Contact
+              images lost `priority` (below the fold). Startup JS (gz): home 241→188KB,
+              sub-pages 218→186KB. Local Lighthouse mobile, 3 runs each: before 83–85
+              (TBT 40–170ms), after 85–88 (TBT 50–60ms); LCP ~3.7–4.1s on both.
+              experimental.inlineCss tried: no LCP change, not kept.
+2026-09-23  Perf pass 2 + fixes. LCP was Lighthouse-simulated (observed LCP = FCP
+              ≈ 0.6s): offscreen fonts/images requested before first paint counted
+              against it. Below-hero sections get `.defer-render`
+              (content-visibility:auto); <DeferRenderGuard> adds `.render-all` before
+              any in-page #jump or on /#hash arrival — without it mobile anchor jumps
+              landed up to 5000px off. Caveat pinned to weight 400 (73→48KB). Local
+              mobile Lighthouse: 92/92/92 (FCP 1.7s, LCP 3.2s, TBT 50ms, CLS 0.001).
+              Anchors verified desktop + mobile, incl. deep links. Theme toggle used
+              `theme` ('system') → first click was a no-op in dark OS mode; now
+              `resolvedTheme`. ResumeModal mojibake (•, –) fixed.
 ```
 
 ---

@@ -1,32 +1,19 @@
-'use client';
-
-import React, { useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
+import { ScrollButtons } from './ui/ScrollButtons';
+import { ProjectCardTrigger } from './modals/ModalTriggers';
 import type { ProjectDoc } from '@/lib/convex';
 
 interface ProjectsSectionProps {
   projects: ProjectDoc[];
-  onSelectProject: (project: ProjectDoc) => void;
 }
 
-export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, onSelectProject }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = scrollRef.current.clientWidth * 0.75;
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-  };
-
+export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) => {
   return (
-    <section id="projects" className="py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
+    <section id="projects" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 space-y-12">
         {/* Top Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -51,33 +38,20 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, onSe
               <span className="text-xs font-semibold text-text-muted">
                 Featured Work
               </span>
-              <button
-                onClick={() => handleScroll('left')}
-                className="w-10 h-10 rounded-full bg-surface-elevated border border-border hover:bg-bg-soft flex items-center justify-center text-text-primary transition shadow-xs active:scale-95"
-                aria-label="Previous project"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleScroll('right')}
-                className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-text-on-dark transition shadow-sm active:scale-95"
-                aria-label="Next project"
-              >
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <ScrollButtons targetId="projects-row" prevLabel="Previous project" nextLabel="Next project" />
             </div>
           </div>
         </div>
 
         {/* 4 Cards in 4-column layout */}
         <div
-          ref={scrollRef}
+          id="projects-row"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto pb-4 snap-x no-scrollbar"
         >
           {projects.map((project) => (
-            <div
+            <ProjectCardTrigger
               key={project.slug}
-              onClick={() => onSelectProject(project)}
+              project={project}
               className="bg-surface-elevated rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer overflow-hidden"
             >
               {/* Preview Mockup */}
@@ -125,7 +99,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, onSe
                   </div>
                 </div>
               </div>
-            </div>
+            </ProjectCardTrigger>
           ))}
         </div>
 

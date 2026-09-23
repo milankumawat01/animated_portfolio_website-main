@@ -1,18 +1,15 @@
-'use client';
-
 import React from 'react';
 import Image from 'next/image';
 import { ArrowRight, Download } from 'lucide-react';
 import { TechIcon } from './icons/TechIcons';
+import { OpenResumeButton } from './modals/ModalTriggers';
 import type { SiteSettingsDoc } from '@/lib/convex';
 
 interface HeroSectionProps {
   settings: SiteSettingsDoc | null;
-  onOpenResume: () => void;
-  onOpenContact: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ settings, onOpenResume }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
   const stats = settings?.stats ?? [];
   const heroTechStack = settings?.heroTechStack ?? [];
 
@@ -73,13 +70,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings, onOpenResume
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
 
-              <button
-                onClick={onOpenResume}
+              <OpenResumeButton
                 className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-surface-feature/60 hover:bg-text-on-dark/10 border border-text-on-dark/25 text-text-on-dark font-semibold text-sm sm:text-base transition-all duration-200 backdrop-blur-md active:scale-95 group"
               >
                 <span>Download Resume</span>
                 <Download className="w-4 h-4 text-text-on-dark/60 group-hover:translate-y-0.5 transition-transform" />
-              </button>
+              </OpenResumeButton>
             </div>
 
             {/* Stats Bar with subtle dividers */}

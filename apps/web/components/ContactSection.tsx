@@ -1,57 +1,22 @@
-'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { Mail, FileText, ArrowRight, Check } from 'lucide-react';
-import { GithubIcon, LinkedinIcon } from './icons/SocialIcons';
+import { ArrowRight } from 'lucide-react';
 import { Handwriting } from './ui/Handwriting';
+import { ContactCards } from './ContactCards';
+import { OpenContactButton } from './modals/ModalTriggers';
 import type { SiteSettingsDoc } from '@/lib/convex';
 
 interface ContactSectionProps {
   settings: SiteSettingsDoc | null;
-  onOpenContact: () => void;
-  onOpenResume: () => void;
 }
 
-export const ContactSection: React.FC<ContactSectionProps> = ({
-  settings,
-  onOpenContact,
-  onOpenResume,
-}) => {
+export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
   const contactCards = settings?.contactCards ?? [];
   const email = settings?.personal?.email ?? 'hey@milankumawat.in';
   const linkedinUrl = settings?.personal?.linkedinUrl ?? 'https://linkedin.com/in/milankumawat';
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const getContactIcon = (icon: string) => {
-    switch (icon) {
-      case 'mail':
-        return <Mail className="w-5 h-5 text-blue" />;
-      case 'linkedin':
-        return <LinkedinIcon className="w-5 h-5 text-blue" />;
-      case 'github':
-        return <GithubIcon className="w-5 h-5 text-blue" />;
-      case 'fileText':
-        return <FileText className="w-5 h-5 text-blue" />;
-      default:
-        return <Mail className="w-5 h-5 text-blue" />;
-    }
-  };
-
-  const handleCardClick = (card: typeof contactCards[0]) => {
-    if (card.id === 'email') {
-      navigator.clipboard.writeText(email);
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2500);
-    } else if (card.id === 'resume') {
-      onOpenResume();
-    } else {
-      window.open(card.action, '_blank', 'noopener,noreferrer');
-    }
-  };
 
   return (
-    <section id="contact" className="relative bg-bg-primary pt-20 sm:pt-28 pb-16 overflow-hidden">
+    <section id="contact" className="defer-render relative bg-bg-primary pt-20 sm:pt-28 pb-16 overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Column: Form & Info (6.5 cols) */}
@@ -89,52 +54,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             </div>
 
             {/* 4 Contact Cards (2x2 Grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-              {contactCards.map((card) => (
-                <div
-                  key={card.id}
-                  onClick={() => handleCardClick(card)}
-                  className="p-4 sm:p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex items-center justify-between group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                      {getContactIcon(card.icon)}
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-text-primary group-hover:text-blue transition-colors">
-                        {card.title}
-                      </h4>
-                      <p className="text-xs text-text-secondary font-medium truncate mt-0.5">
-                        {card.value}
-                      </p>
-                      <p className="text-[11px] text-text-muted truncate">
-                        {card.id === 'email' && copiedEmail ? (
-                          <span className="text-emerald-600 font-bold flex items-center gap-1">
-                            <Check className="w-3 h-3" /> Copied to clipboard!
-                          </span>
-                        ) : (
-                          card.hint
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted group-hover:text-blue group-hover:bg-blue-50 transition-colors shrink-0 ml-2">
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ContactCards cards={contactCards} email={email} />
 
             {/* CTA Button & Quick Chat text */}
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-4">
-              <button
-                onClick={onOpenContact}
+              <OpenContactButton
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-blue hover:bg-blue-dark text-text-on-dark font-bold text-sm transition-all duration-200 shadow-md shadow-blue/25 active:scale-95 group shrink-0"
               >
                 <span>Let's Talk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </OpenContactButton>
 
               <p className="text-xs sm:text-sm text-text-secondary">
                 Prefer a quick chat? I'm usually active on{' '}
@@ -157,7 +86,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 src="/images/contact-clean.png"
                 alt="Milan Kumawat developer setup"
                 fill
-                priority
+                sizes="(min-width: 1024px) 40vw, 100vw"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
               />
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Caveat, Instrument_Serif, JetBrains_Mono, Manrope } from 'next/font/google';
 import './globals.css';
-import { ConvexClientProvider } from '@/lib/convex-client-provider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
@@ -14,7 +13,9 @@ const instrumentSerif = Instrument_Serif({
   subsets: ['latin'], weight: '400', style: ['normal', 'italic'],
   display: 'swap', preload: false, variable: '--nf-instrument-serif',
 });
-const caveat = Caveat({ subsets: ['latin'], display: 'swap', preload: false, variable: '--nf-caveat' });
+// Handwriting notes only use the regular weight; one static weight is a much
+// smaller file than the 400–700 variable font.
+const caveat = Caveat({ subsets: ['latin'], weight: '400', display: 'swap', preload: false, variable: '--nf-caveat' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], display: 'swap', preload: false, variable: '--nf-mono' });
 const fontVars = [manrope, instrumentSerif, caveat, jetbrainsMono].map((f) => f.variable).join(' ');
 
@@ -62,10 +63,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${fontVars}`} suppressHydrationWarning>
       <body className="bg-bg-primary text-text-primary antialiased selection:bg-blue selection:text-white">
+        {/* No ConvexProvider here: only the contact form and the blog view
+            counter talk to Convex, and each wraps itself so the client (and
+            its WebSocket) loads on demand instead of on every page. */}
         <ThemeProvider>
-          <ConvexClientProvider>
-            {children}
-          </ConvexClientProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

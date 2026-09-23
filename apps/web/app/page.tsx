@@ -1,6 +1,20 @@
 // apps/web/app/page.tsx — async Server Component, NO 'use client'
+// The sections render on the server; only the Navbar, cursor, modal triggers
+// and carousel arrows hydrate as client islands.
 import { getProjects, getPosts, getSiteSettings, getExperience, getSkillCategories } from '@/lib/convex'
-import { HomeClient } from '@/components/HomeClient'
+import { Navbar } from '@/components/Navbar'
+import { HeroSection } from '@/components/HeroSection'
+import { AboutSection } from '@/components/AboutSection'
+import { ProjectsSection } from '@/components/ProjectsSection'
+import { ExperienceSection } from '@/components/ExperienceSection'
+import { SkillsSection } from '@/components/SkillsSection'
+import { HowIBuildSection } from '@/components/HowIBuildSection'
+import { WritingSection } from '@/components/WritingSection'
+import { ContactSection } from '@/components/ContactSection'
+import { Footer } from '@/components/Footer'
+import { CustomCursor } from '@/components/ui/CustomCursor'
+import { DeferRenderGuard } from '@/components/ui/DeferRenderGuard'
+import { ModalProvider } from '@/components/modals/ModalProvider'
 import { JsonLd, personSchema } from '@/components/seo/JsonLd'
 
 export default async function Home() {
@@ -15,13 +29,24 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={personSchema(settings)} />
-      <HomeClient
-        settings={settings}
-        projects={projects ?? []}
-        posts={posts ?? []}
-        experience={experience ?? []}
-        skills={skills ?? []}
-      />
+      <ModalProvider>
+        <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans selection:bg-blue selection:text-white">
+          <CustomCursor />
+          <DeferRenderGuard />
+          <Navbar />
+          <main className="flex-1">
+            <HeroSection settings={settings} />
+            <AboutSection settings={settings} />
+            <ProjectsSection projects={projects ?? []} />
+            <ExperienceSection experience={experience ?? []} settings={settings} />
+            <SkillsSection skills={skills ?? []} settings={settings} />
+            <HowIBuildSection settings={settings} />
+            <WritingSection posts={posts ?? []} settings={settings} />
+            <ContactSection settings={settings} />
+          </main>
+          <Footer settings={settings} isHome />
+        </div>
+      </ModalProvider>
     </>
   )
 }

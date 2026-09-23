@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Image from 'next/image';
 import { Server, Brain, Monitor, Database, Cloud, Wrench, Activity } from 'lucide-react';
@@ -36,7 +34,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, settings }
   };
 
   return (
-    <section id="skills" className="py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
+    <section id="skills" className="defer-render py-20 sm:py-28 lg:py-32 bg-bg-soft relative overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 space-y-12">
         {/* Section Header */}
         <SectionHeader

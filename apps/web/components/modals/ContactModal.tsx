@@ -7,6 +7,7 @@ import { useMutation } from 'convex/react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { api as _api } from '@portfolio/backend/convex/_generated/api';
 import { errorMessage } from '@/lib/errors';
+import { ConvexClientProvider } from '@/lib/convex-client-provider';
 const api = _api as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 interface ContactModalProps {
@@ -238,7 +239,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
 
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
   // isMounted prevents ContactFormInner (which calls useMutation) from rendering
-  // during SSR / static prerender — where there is no live ConvexProvider.
+  // during SSR / static prerender — where there is no live Convex client.
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => { setIsMounted(true); }, []);
 
@@ -269,7 +270,11 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
 
         {/* Body — ContactFormInner mounts only after hydration */}
         <div className="p-6 sm:p-8">
-          {isMounted && <ContactFormInner onClose={onClose} />}
+          {isMounted && (
+            <ConvexClientProvider>
+              <ContactFormInner onClose={onClose} />
+            </ConvexClientProvider>
+          )}
         </div>
       </div>
     </div>
