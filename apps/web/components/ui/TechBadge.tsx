@@ -12,9 +12,9 @@ export const TechBadge: React.FC<TechBadgeProps> = ({
   className = '',
 }) => {
   const variantStyles = {
-    light: 'bg-bg-soft text-text-secondary border-border hover:bg-slate-200/60',
-    dark: 'bg-white/10 text-slate-200 border-white/10 hover:bg-white/15',
-    outline: 'bg-white text-text-primary border-border hover:border-blue hover:text-blue',
+    light: 'bg-bg-soft text-text-secondary border-border hover:bg-border',
+    dark: 'bg-text-on-dark/10 text-text-on-dark/80 border-text-on-dark/10 hover:bg-text-on-dark/15',
+    outline: 'bg-surface-elevated text-text-primary border-border hover:border-blue hover:text-blue',
     blue: 'bg-blue-light text-blue border-blue/20 hover:bg-blue-light/80',
   };
 

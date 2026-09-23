@@ -4,18 +4,23 @@ import React from 'react';
 import { Rocket, Users, Zap, GraduationCap } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import type { ExperienceDoc, SiteSettingsDoc } from '@/lib/convex';
 
 const logoVariantMap: Record<string, string> = {
-  'bg-slate-900 text-white': 'bg-ink text-white',
-  'bg-blue-600 text-white': 'bg-blue text-white',
+  'bg-slate-900 text-white': 'bg-ink text-text-on-dark',
+  'bg-blue-600 text-white': 'bg-blue text-text-on-dark',
   'bg-blue-50 text-blue-600 border border-blue-200': 'bg-blue-light text-blue border border-blue/20',
 };
 
 const resolveLogoBg = (logoBg: string) => logoVariantMap[logoBg] ?? logoBg;
 
-export const ExperienceSection: React.FC = () => {
-  const { experience, personal } = PORTFOLIO_DATA;
+interface ExperienceSectionProps {
+  experience: ExperienceDoc[];
+  settings: SiteSettingsDoc | null;
+}
+
+export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience, settings }) => {
+  const quoteExperience = settings?.quotes?.experience ?? '';
 
   return (
     <section id="experience" className="py-20 sm:py-28 lg:py-32 bg-bg-primary relative overflow-hidden">
@@ -88,7 +93,7 @@ export const ExperienceSection: React.FC = () => {
             <div className="space-y-6">
               <div className="relative border-l-2 border-blue-200/70 ml-4 sm:ml-16 pl-6 sm:pl-8 space-y-7 pb-2">
                 {experience.map((item, idx) => (
-                  <div key={item.id} className="relative group">
+                  <div key={item._id} className="relative group">
                     {/* Node Dot with timeframe */}
                     <div className="absolute -left-[31px] sm:-left-[39px] top-4 flex items-center">
                       <span className="hidden sm:block absolute right-7 text-xs font-bold text-text-muted whitespace-nowrap text-right w-20 leading-tight">
@@ -104,7 +109,7 @@ export const ExperienceSection: React.FC = () => {
                         className={`w-4 h-4 rounded-full border-2 transition-transform group-hover:scale-125 ${
                           idx === 0
                             ? 'bg-blue border-blue-200 ring-4 ring-blue-100'
-                            : 'bg-surface-elevated border-blue-300'
+                            : 'bg-surface-elevated border-blue/30'
                         }`}
                       />
                     </div>
@@ -186,7 +191,7 @@ export const ExperienceSection: React.FC = () => {
                 "
               </span>
               <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
-                {personal.quotes.experience}
+                {quoteExperience}
               </p>
               <p className="text-[11px] font-bold text-text-muted">
                 — Milan Kumawat

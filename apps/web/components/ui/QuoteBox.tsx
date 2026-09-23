@@ -28,7 +28,7 @@ export const QuoteBox: React.FC<QuoteBoxProps> = ({
       <div className="space-y-1">
         <p
           className={`text-base sm:text-lg font-medium italic leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-text-primary'
+            isDark ? 'text-text-on-dark/80' : 'text-text-primary'
           }`}
         >
           {quote}
@@ -36,7 +36,7 @@ export const QuoteBox: React.FC<QuoteBoxProps> = ({
         {author && (
           <p
             className={`text-xs font-bold tracking-wide ${
-              isDark ? 'text-slate-400' : 'text-text-muted'
+              isDark ? 'text-text-on-dark/60' : 'text-text-muted'
             }`}
           >
             — {author}

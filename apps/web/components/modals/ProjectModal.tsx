@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { X, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2 } from 'lucide-react';
 import { GithubIcon } from '../icons/SocialIcons';
-import { ProjectItem } from '@/data/portfolioData';
+import type { ProjectDoc } from '@/lib/convex';
 import { TechBadge } from '../ui/TechBadge';
 
 interface ProjectModalProps {
-  project: ProjectItem | null;
+  project: ProjectDoc | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -18,7 +18,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
   if (!isOpen || !project) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 dark:bg-black/85 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-surface-overlay backdrop-blur-sm animate-fadeIn overflow-y-auto">
       <div
         className="relative w-full max-w-3xl bg-surface-elevated rounded-2xl shadow-2xl border border-border overflow-hidden transform transition-all my-8 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
@@ -45,17 +45,17 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
           {/* Banner Image Preview */}
           <div className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-border bg-surface-well shadow-inner group">
             <Image
-              src={project.image}
+              src={project.imageUrl ?? '/images/placeholder.png'}
               alt={project.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-feature/80 via-transparent to-transparent flex items-end p-6">
               <div>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-text-on-dark tracking-tight">
                   {project.title}
                 </h3>
-                <p className="text-blue-300 font-medium text-sm sm:text-base">
+                <p className="text-blue-light font-medium text-sm sm:text-base">
                   {project.subtitle}
                 </p>
               </div>
@@ -144,7 +144,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm shadow-blue/20"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-text-on-dark font-semibold text-sm transition shadow-sm shadow-blue/20"
             >
               <span>Live Preview</span>
               <ExternalLink className="w-4 h-4" />
@@ -159,7 +159,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
               <span>Source Repository</span>
             </a>
             <Link
-              href={`/projects/${'slug' in project && project.slug ? project.slug : project.id}`}
+              href={`/projects/${project.slug}`}
               className="flex items-center gap-1 px-4 py-2.5 rounded-xl border border-border hover:border-blue/40 text-text-secondary hover:text-blue font-semibold text-sm transition"
               onClick={onClose}
             >

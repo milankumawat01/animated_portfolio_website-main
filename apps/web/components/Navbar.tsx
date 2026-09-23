@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ArrowRight, Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -15,20 +16,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+  const isHome = pathname === '/';
 
   const navLinks = [
-    { label: 'Home', href: '#home', id: 'home' },
-    { label: 'About', href: '#about', id: 'about' },
-    { label: 'Projects', href: '#projects', id: 'projects' },
-    { label: 'Writing', href: '#writing', id: 'writing' },
-    { label: 'Contact', href: '#contact', id: 'contact' },
+    { label: 'Home', hash: 'home', id: 'home' },
+    { label: 'About', hash: 'about', id: 'about' },
+    { label: 'Projects', hash: 'projects', id: 'projects' },
+    { label: 'Writing', hash: 'writing', id: 'writing' },
+    { label: 'Contact', hash: 'contact', id: 'contact' },
   ];
+
+  const linkHref = (hash: string) => isHome ? `#${hash}` : `/#${hash}`;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!isHome) return;
+
     const handleScroll = () => {
       // Threshold for when scrolled past hero
       const heroEl = document.getElementById('home');
@@ -56,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHome]);
 
   return (
     <header
@@ -68,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="#home" className="flex items-center gap-2.5 group select-none">
+        <Link href={isHome ? '#home' : '/'} className="flex items-center gap-2.5 group select-none">
           <div className="flex items-center font-extrabold text-2xl tracking-tighter">
             <span className={`transition-colors ${scrolled ? 'text-text-primary group-hover:text-blue' : 'text-white group-hover:text-blue-300'}`}>
               M
@@ -89,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
             return (
               <a
                 key={link.id}
-                href={link.href}
+                href={linkHref(link.hash)}
                 className={`relative flex flex-col items-center text-[13px] font-semibold transition-colors py-1 ${
                   scrolled
                     ? isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
@@ -152,7 +159,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
             {navLinks.map((link) => (
               <a
                 key={link.id}
-                href={link.href}
+                href={linkHref(link.hash)}
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-base font-semibold text-text-primary hover:text-blue py-1.5 flex items-center justify-between"
               >

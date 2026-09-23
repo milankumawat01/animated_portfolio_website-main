@@ -91,11 +91,11 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
   if (submitState === 'success') {
     return (
       <div className="text-center py-8 space-y-4">
-        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-blue-50/50">
+        <div className="w-16 h-16 bg-blue-light text-blue rounded-full flex items-center justify-center mx-auto ring-8 ring-blue-light/50">
           <Check className="w-8 h-8 stroke-[2.5]" />
         </div>
-        <h3 className="text-2xl font-bold text-slate-900">Message Sent!</h3>
-        <p className="text-slate-600 max-w-sm mx-auto text-sm leading-relaxed">
+        <h3 className="text-2xl font-bold text-text-primary">Message Sent!</h3>
+        <p className="text-text-secondary max-w-sm mx-auto text-sm leading-relaxed">
           Thanks for reaching out! I typically reply within 24 hours. You can also connect directly on LinkedIn.
         </p>
         <button
@@ -107,7 +107,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             setErrorMsg('');
             onClose();
           }}
-          className="mt-4 inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition shadow-sm"
+          className="mt-4 inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-blue text-text-on-dark font-medium hover:bg-blue-dark transition shadow-sm"
         >
           Close Window
         </button>
@@ -118,23 +118,23 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
   return (
     <div>
       <div className="mb-6">
-        <h3 className="text-2xl font-extrabold text-slate-900">
-          Let&apos;s build something <span className="text-blue-600">great.</span>
+        <h3 className="text-2xl font-extrabold text-text-primary">
+          Let&apos;s build something <span className="text-blue">great.</span>
         </h3>
-        <p className="text-sm text-slate-600 mt-1.5">
+        <p className="text-sm text-text-secondary mt-1.5">
           Fill in the details below or copy my direct email.
         </p>
 
         {/* Direct email pill */}
-        <div className="mt-3 flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs sm:text-sm">
-          <div className="flex items-center gap-2 text-slate-700 font-medium truncate">
-            <Mail className="w-4 h-4 text-blue-600 shrink-0" />
+        <div className="mt-3 flex items-center justify-between p-2.5 bg-bg-soft rounded-xl border border-border text-xs sm:text-sm">
+          <div className="flex items-center gap-2 text-text-secondary font-medium truncate">
+            <Mail className="w-4 h-4 text-blue shrink-0" />
             <span className="truncate">hey@milankumawat.in</span>
           </div>
           <button
             type="button"
             onClick={handleCopyEmail}
-            className="flex items-center gap-1 px-3 py-1 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-blue-600 hover:border-blue-300 transition text-xs font-semibold shrink-0 shadow-2xs"
+            className="flex items-center gap-1 px-3 py-1 bg-surface-elevated border border-border rounded-lg text-text-secondary hover:text-blue hover:border-blue/50 transition text-xs font-semibold shrink-0 shadow-2xs"
           >
             {copied ? (
               <>
@@ -165,7 +165,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
         />
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
             Your Name
           </label>
           <input
@@ -174,12 +174,12 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Alex Developer"
-            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition bg-slate-50/50"
+            className="w-full px-4 py-2.5 text-sm rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-blue/20 focus:border-blue transition bg-bg-soft"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
             Email Address
           </label>
           <input
@@ -188,12 +188,12 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="alex@company.com"
-            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition bg-slate-50/50"
+            className="w-full px-4 py-2.5 text-sm rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-blue/20 focus:border-blue transition bg-bg-soft"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
             What would you like to discuss?
           </label>
           <textarea
@@ -202,7 +202,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Tell me about your project, idea or question..."
-            className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition bg-slate-50/50 resize-none"
+            className="w-full px-4 py-2.5 text-sm rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-blue/20 focus:border-blue transition bg-bg-soft resize-none"
           />
         </div>
 
@@ -217,11 +217,11 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={submitState === 'submitting'}
-          className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors shadow-md shadow-blue-600/20 disabled:opacity-70"
+          className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-blue hover:bg-blue-dark text-text-on-dark font-semibold text-sm transition-colors shadow-md shadow-blue/20 disabled:opacity-70"
         >
           {submitState === 'submitting' ? (
             <span className="inline-flex items-center gap-2">
-              <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+              <svg className="animate-spin h-4 w-4 text-text-on-dark" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
@@ -248,22 +248,22 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-overlay backdrop-blur-sm animate-fadeIn">
       <div
-        className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all animate-scaleUp"
+        className="relative w-full max-w-lg bg-surface-elevated rounded-2xl shadow-2xl border border-border overflow-hidden transform transition-all animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/70">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-soft/70">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse"></div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <div className="w-3 h-3 rounded-full bg-blue animate-pulse"></div>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
               Get In Touch
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            className="p-1.5 rounded-full text-text-muted hover:text-text-primary hover:bg-bg-soft transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />

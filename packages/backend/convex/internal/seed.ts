@@ -7,9 +7,22 @@ import { internalMutation } from '../_generated/server'
  * Run with:
  *   npx convex run internal/seed:importLegacy
  */
+
+// Parse a legacy display date like '12 Sep 2026' to UTC midnight epoch ms.
+// Do NOT use new Date(str) — it interprets bare dates in local timezone.
+const MONTHS: Record<string, number> = {
+  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+}
+function parseLegacyDate(s: string): number {
+  const [d, m, y] = s.split(' ')
+  return Date.UTC(Number(y), MONTHS[m], Number(d))
+}
+
 export const importLegacy = internalMutation({
   args: {},
   handler: async (ctx) => {
+    // One constant for all seed timestamps — never Date.now() per row.
     const now = Date.now()
 
     // ── siteSettings ─────────────────────────────────────────────────────
@@ -260,7 +273,7 @@ export const importLegacy = internalMutation({
         ],
         liveUrl: 'https://tools.example.com',
         githubUrl: 'https://github.com/milankumawat/internal-tools-suite',
-        featured: false, order: 40,
+        featured: true, order: 40,
       },
     ]
 
@@ -396,88 +409,73 @@ export const importLegacy = internalMutation({
     }
 
     // ── Blog Posts ────────────────────────────────────────────────────────
+    // Blog bodies: paragraphs joined with blank lines — NO headings injected.
+    // The title column holds the h1; adding one in body would double it on the post page.
+    // featured: false for all four per 06-CONTENT-MIGRATION.md §3.6.
+    // publishedAt: parsed from '12 Sep 2026' at UTC midnight via parseLegacyDate().
     const articlesData = [
       {
         slug: 'building-ai-powered-fastapi', legacyId: 'building-ai-powered-fastapi',
         title: 'Building AI-Powered Applications with FastAPI',
         excerpt: 'A practical guide to integrating LLMs into real-world applications using FastAPI, with patterns, examples and lessons learned.',
         body: [
-          '# Building AI-Powered Applications with FastAPI',
-          '',
           'When integrating Large Language Models into user-facing production systems, the primary challenges are rarely about prompting alone—they center around latency, streaming performance, fault tolerance, and API reliability.',
-          '',
           'FastAPI provides native asynchronous support (asyncio), robust Pydantic data validation, and built-in dependency injection, making it the premier choice for AI backend services.',
-          '',
           'Key architectural patterns include Server-Sent Events (SSE) for zero-latency streaming responses, background Celery workers for heavy document parsing, and Redis caching for recurring semantic queries.',
-          '',
           'By decoupling user request cycles from AI completion generation, we maintain under-200ms TTFB while delivering rich, continuous completions to clients.',
-        ].join('\n'),
+        ].join('\n\n'),
         imageUrl: '/images/blog-fastapi.png',
         tags: ['AI / LLMs'],
         readTimeMinutes: 6,
-        featured: true,
-        publishedAt: new Date('2026-09-12').getTime(),
+        featured: false,
+        publishedAt: parseLegacyDate('12 Sep 2026'), // 1789171200000
       },
       {
         slug: 'designing-scalable-backend-systems', legacyId: 'designing-scalable-backend-systems',
         title: 'Designing Scalable Backend Systems',
         excerpt: 'Key principles and architecture patterns I follow while building scalable, maintainable and production-ready backend systems.',
         body: [
-          '# Designing Scalable Backend Systems',
-          '',
           'Designing systems that gracefully handle 10x traffic spikes requires disciplined adherence to stateless services, database partitioning, and intelligent caching layers.',
-          '',
           'In this deep dive, I explore the anatomy of high-throughput API design: from connection pool sizing in PostgreSQL to caching hot keys in Redis with cache stampede prevention.',
-          '',
           'We examine rate limiting strategies using token bucket algorithms, idempotent API endpoints, and asynchronous worker queues for long-running batch operations.',
-          '',
           'Scalability is not about over-engineering on day one; it is about establishing clean boundaries that can be distributed horizontally when the load demands it.',
-        ].join('\n'),
+        ].join('\n\n'),
         imageUrl: '/images/blog-scalability.png',
         tags: ['Engineering'],
         readTimeMinutes: 8,
         featured: false,
-        publishedAt: new Date('2026-09-05').getTime(),
+        publishedAt: parseLegacyDate('05 Sep 2026'), // 1788566400000
       },
       {
         slug: 'lessons-from-autoresumebot', legacyId: 'lessons-from-autoresumebot',
         title: 'Lessons from Building AutoResumeBot',
         excerpt: 'How I built an AI-powered job application platform, the challenges I faced, and what I learned about automation, resume parsing and real user needs.',
         body: [
-          '# Lessons from Building AutoResumeBot',
-          '',
           'AutoResumeBot was born out of personal frustration with repetitive job application workflows. The dream was simple: upload your resume once, and let an intelligent agent handle the tailoring and submission.',
-          '',
           'However, real-world resumes are notoriously messy. Tables, multi-column designs, arbitrary date formats, and obscure fonts cause traditional regex and rule-based parsers to fail catastrophically.',
-          '',
           'I built a hybrid two-stage parsing pipeline: OCR bounding-box reconstruction followed by targeted LLM schema extraction with strict JSON validation.',
-          '',
           'The core lesson was that users value transparency above automation: giving applicants an interactive preview to verify extracted data before submission dramatically boosted user trust.',
-        ].join('\n'),
+        ].join('\n\n'),
         imageUrl: '/images/blog-autoresume.png',
         tags: ['Projects'],
         readTimeMinutes: 5,
         featured: false,
-        publishedAt: new Date('2026-08-28').getTime(),
+        publishedAt: parseLegacyDate('28 Aug 2026'), // 1787875200000
       },
       {
         slug: 'from-idea-to-production', legacyId: 'from-idea-to-production',
         title: 'From Idea to Production',
         excerpt: 'My end-to-end process of turning an idea into a real product — from research and design to development, deployment and user feedback.',
         body: [
-          '# From Idea to Production',
-          '',
           'Shipping software is a craft that extends far beyond writing code. The greatest ideas mean nothing without relentless execution, tight feedback loops, and empathetic user research.',
-          '',
           'My playbook follows five clear milestones: Discover the real friction point, Wireframe the minimal path to delight, Build with robust core architecture, Deploy to production immediately with automated telemetry, and Iterate based on real metrics.',
-          '',
           'By avoiding premature optimization and focusing on delivering immediate user value, you create products that people genuinely love to use.',
-        ].join('\n'),
+        ].join('\n\n'),
         imageUrl: '/images/blog-production.png',
         tags: ['Product'],
         readTimeMinutes: 7,
         featured: false,
-        publishedAt: new Date('2026-08-18').getTime(),
+        publishedAt: parseLegacyDate('18 Aug 2026'), // 1787011200000
       },
     ]
 

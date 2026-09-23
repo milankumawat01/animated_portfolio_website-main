@@ -2,16 +2,19 @@
 
 import React, { useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA, ArticleItem } from '@/data/portfolioData';
+import type { PostDoc, SiteSettingsDoc } from '@/lib/convex';
+import { formatLegacyDate } from '@/lib/convex';
 
 interface WritingSectionProps {
-  onSelectArticle: (article: ArticleItem) => void;
+  posts: PostDoc[];
+  settings: SiteSettingsDoc | null;
 }
 
-export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle }) => {
-  const { articles, personal } = PORTFOLIO_DATA;
+export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings }) => {
+  const quoteWriting = settings?.quotes?.writing ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -34,7 +37,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
             <div className="flex items-center gap-2.5 text-[12px] font-bold tracking-label uppercase">
               <span className="w-6 h-[2px] bg-blue rounded-full inline-block" />
               <span className="text-blue">07</span>
-              <span className="text-text-muted">WRITING & INSIGHTS</span>
+              <span className="text-text-muted">WRITING &amp; INSIGHTS</span>
             </div>
 
             {/* Exact Title from reference */}
@@ -66,13 +69,13 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
             </p>
 
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => onSelectArticle(articles[0])}
+              <Link
+                href="/blog"
                 className="px-4 py-2 rounded-full bg-blue-50 text-blue hover:bg-blue-100 transition-colors text-xs font-bold flex items-center gap-1.5"
               >
                 <span>View all articles</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              </Link>
 
               <div className="flex items-center gap-2 pl-2">
                 <button
@@ -84,7 +87,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
                 </button>
                 <button
                   onClick={() => handleScroll('right')}
-                  className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-white transition shadow-sm active:scale-95"
+                    className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-text-on-dark transition shadow-sm active:scale-95"
                   aria-label="Scroll articles right"
                 >
                   <ArrowRight className="w-4 h-4" />
@@ -99,20 +102,22 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
           ref={scrollRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar"
         >
-          {articles.map((article) => (
-            <div
-              key={article.id}
-              onClick={() => onSelectArticle(article)}
-              className="bg-surface-elevated rounded-2xl border border-border overflow-hidden shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer"
+          {posts.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="bg-surface-elevated rounded-2xl border border-border overflow-hidden shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start"
             >
               {/* Image */}
               <div className="relative w-full h-44 bg-surface-well overflow-hidden border-b border-border/60">
-                <Image
-                  src={article.image}
-                  alt={article.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {post.imageUrl && (
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
               </div>
 
               {/* Content */}
@@ -121,19 +126,21 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
                   {/* Category + Date */}
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="px-2.5 py-0.5 rounded-full font-bold bg-blue-50 text-blue">
-                      {article.tag}
+                      {post.tags?.[0] ?? ''}
                     </span>
-                    <span className="font-medium text-text-muted">{article.date}</span>
+                    <span className="font-medium text-text-muted">
+                      {post.publishedAt ? formatLegacyDate(post.publishedAt) : ''}
+                    </span>
                   </div>
 
                   {/* Title */}
                   <h3 className="text-base font-bold text-text-primary leading-snug group-hover:text-blue transition-colors line-clamp-2">
-                    {article.title}
+                    {post.title}
                   </h3>
 
                   {/* Summary */}
                   <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed">
-                    {article.excerpt}
+                    {post.excerpt}
                   </p>
                 </div>
 
@@ -145,7 +152,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -153,11 +160,11 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ onSelectArticle 
         <div className="pt-8 border-t border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-4xl font-serif text-blue select-none leading-none -mt-1">
-              “
+              "
             </span>
             <div className="w-[1px] h-6 bg-border hidden sm:block" />
             <p className="text-sm sm:text-base font-medium italic text-text-primary">
-              {personal.quotes.writing}
+              {quoteWriting}
             </p>
           </div>
 

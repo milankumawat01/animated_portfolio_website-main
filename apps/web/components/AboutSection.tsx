@@ -5,10 +5,17 @@ import Image from 'next/image';
 import { Code2, Lightbulb, Users, Brain, Database, Box, BarChart3 } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import type { SiteSettingsDoc } from '@/lib/convex';
 
-export const AboutSection: React.FC = () => {
-  const { personal } = PORTFOLIO_DATA;
+interface AboutSectionProps {
+  settings: SiteSettingsDoc | null;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
+  const bio = settings?.personal?.bio ?? '';
+  const aboutPillars = settings?.aboutPillars ?? [];
+  const whatIWorkOn = settings?.whatIWorkOn ?? [];
+  const quoteAbout = settings?.quotes?.about ?? '';
 
   const getPillarIcon = (icon: string) => {
     switch (icon) {
@@ -51,12 +58,12 @@ export const AboutSection: React.FC = () => {
               title="Turning ideas"
               highlight="into real solutions."
               breakBeforeHighlight={true}
-              description={personal.bio}
+              description={bio}
             />
 
             {/* 3 Pillars */}
             <div className="grid grid-cols-3 gap-3 pt-3">
-              {personal.aboutPillars.map((pillar, idx) => (
+              {aboutPillars.map((pillar, idx) => (
                 <div
                   key={idx}
                   className="p-4 rounded-xl bg-bg-soft border border-border flex flex-col justify-between hover:shadow-soft hover:border-blue/30 transition-all duration-300 group"
@@ -117,19 +124,19 @@ export const AboutSection: React.FC = () => {
                 />
 
                 {/* Location Badge (bottom-left) */}
-                <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-white text-xs font-semibold shadow-lg border border-white/10 select-none">
+                <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-feature/80 backdrop-blur-md text-text-on-dark text-xs font-semibold shadow-lg border border-text-on-dark/10 select-none">
                   <span className="text-red-400 text-sm leading-none">📍</span>
                   <span>Jaipur, India</span>
                 </div>
               </div>
 
               {/* Bottom-Right Sticky Note (Good Code Better Products) */}
-              <div className="absolute -bottom-4 -right-3 sm:-right-4 z-20 bg-surface-well text-white p-3.5 sm:p-4 rounded-xl shadow-2xl border border-white/10 rotate-6 select-none max-w-[130px]">
-                <div className="font-handwriting text-slate-100 text-lg sm:text-xl leading-tight">
+              <div className="absolute -bottom-4 -right-3 sm:-right-4 z-20 bg-surface-well text-text-on-dark p-3.5 sm:p-4 rounded-xl shadow-2xl border border-text-on-dark/10 rotate-6 select-none max-w-[130px]">
+                <div className="font-handwriting text-text-on-dark/90 text-lg sm:text-xl leading-tight">
                   <div>Good</div>
                   <div>Code</div>
                   <div>Better</div>
-                  <div className="relative inline-block text-white font-bold">
+                  <div className="relative inline-block text-text-on-dark font-bold">
                     Products
                     <svg className="w-full h-2 mt-0.5 text-blue" viewBox="0 0 70 8" fill="none">
                       <path d="M2 5 C 20 2, 45 6, 68 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -148,7 +155,7 @@ export const AboutSection: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                {personal.whatIWorkOn.map((item, idx) => (
+                {whatIWorkOn.map((item, idx) => (
                   <div
                     key={idx}
                     className="flex items-center gap-3.5 p-3.5 rounded-xl bg-surface-elevated border border-border shadow-soft hover:border-blue/30 hover:translate-x-1 transition-all duration-300 group cursor-default"
@@ -173,11 +180,11 @@ export const AboutSection: React.FC = () => {
             <div className="pt-4 border-t border-border/80 space-y-4">
               <div className="flex items-start gap-3">
                 <span className="text-3xl font-serif text-blue select-none leading-none shrink-0 mt-0.5">
-                  “
+                  "
                 </span>
                 <div>
                   <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
-                    {personal.quotes.about}
+                    {quoteAbout}
                   </p>
                   <p className="text-[11px] font-bold text-text-muted mt-1.5">
                     — Milan Kumawat

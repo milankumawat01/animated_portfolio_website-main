@@ -13,10 +13,15 @@ import {
 } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import type { SiteSettingsDoc } from '@/lib/convex';
 
-export const HowIBuildSection: React.FC = () => {
-  const { howIBuildSteps, howIBuildPillars, personal } = PORTFOLIO_DATA;
+interface HowIBuildSectionProps {
+  settings: SiteSettingsDoc | null;
+}
+
+export const HowIBuildSection: React.FC<HowIBuildSectionProps> = ({ settings }) => {
+  const howIBuildSteps = settings?.howIBuildSteps ?? [];
+  const howIBuildPillars = settings?.howIBuildPillars ?? [];
 
   const getStepIcon = (icon: string) => {
     switch (icon) {
@@ -78,7 +83,7 @@ export const HowIBuildSection: React.FC = () => {
             <div className="p-4 sm:p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft max-w-sm w-full">
               <div className="flex items-start gap-3">
                 <span className="text-3xl font-serif text-blue select-none leading-none shrink-0 mt-0.5">
-                  “
+                  "
                 </span>
                 <div>
                   <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
@@ -97,7 +102,7 @@ export const HowIBuildSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           {/* Terminal Window on Left (~4 cols) */}
           <div className="lg:col-span-4 relative flex flex-col justify-between">
-            <div className="rounded-2xl bg-surface-well border border-border-dark p-5 sm:p-6 shadow-card font-mono-code text-xs text-slate-300 relative overflow-hidden flex-1 flex flex-col justify-between min-h-[350px]">
+            <div className="rounded-2xl bg-surface-well border border-border-dark p-5 sm:p-6 shadow-card font-mono-code text-xs text-text-on-dark/80 relative overflow-hidden flex-1 flex flex-col justify-between min-h-[350px]">
               <div>
                   <div className="flex items-center justify-between border-b border-border-dark pb-3 mb-4">
                   <div className="flex items-center gap-2">
@@ -105,30 +110,30 @@ export const HowIBuildSection: React.FC = () => {
                     <div className="w-3 h-3 rounded-full bg-amber-500" />
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
                   </div>
-                  <span className="text-slate-400 text-[11px] font-semibold">build.sh</span>
+                  <span className="text-text-on-dark/40 text-[11px] font-semibold">build.sh</span>
                   <div className="w-10" />
                 </div>
 
                 {/* Code snippet */}
                 <div className="space-y-2 py-1 leading-relaxed">
-                  <p className="text-slate-500"># turn ideas into products</p>
+                  <p className="text-text-on-dark/30"># turn ideas into products</p>
                   <p className="pt-2">
                     <span className="text-blue-400 font-bold">while</span> (
                     <span className="text-emerald-400">curiosity</span>) &#123;
                   </p>
-                  <div className="pl-5 space-y-1 text-slate-200">
+                  <div className="pl-5 space-y-1 text-text-on-dark/90">
                     <p className="text-cyan-400">learn();</p>
                     <p className="text-blue-400">build();</p>
                     <p className="text-emerald-400">ship();</p>
                     <p className="text-purple-400">improve();</p>
                   </div>
                   <p>&#125;</p>
-                  <p className="text-slate-500 pt-3">// better products, brighter tomorrow</p>
+                  <p className="text-text-on-dark/30 pt-3">// better products, brighter tomorrow</p>
                 </div>
               </div>
 
               {/* Floating Pill Badge */}
-              <div className="mt-6 p-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center gap-2.5 text-white max-w-[200px]">
+              <div className="mt-6 p-3 rounded-xl bg-text-on-dark/10 backdrop-blur-md border border-text-on-dark/10 flex items-center gap-2.5 text-text-on-dark max-w-[200px]">
                 <Zap className="w-4 h-4 text-blue fill-blue shrink-0" />
                 <div className="text-xs font-bold leading-tight">
                   Small steps.<br />Big products.
@@ -150,7 +155,7 @@ export const HowIBuildSection: React.FC = () => {
                       {getStepIcon(step.icon)}
                     </div>
                     {idx < howIBuildSteps.length - 1 && (
-                      <span className="hidden lg:inline-block text-xs font-bold text-slate-400 select-none">
+                      <span className="hidden lg:inline-block text-xs font-bold text-text-muted select-none">
                         →
                       </span>
                     )}

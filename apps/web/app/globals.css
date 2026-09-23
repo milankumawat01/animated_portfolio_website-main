@@ -100,12 +100,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--text-muted);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8993A5;
+  background: var(--text-secondary);
 }
 
 /* Reduced-motion accessibility rule from Design System */

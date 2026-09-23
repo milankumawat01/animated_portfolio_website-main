@@ -31,13 +31,13 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       <div className="flex items-center gap-2.5 text-[12px] font-bold tracking-label uppercase">
         <span className="w-6 h-[2px] bg-blue rounded-full inline-block" />
         <span className="text-blue">{number}</span>
-        <span className={isDark ? 'text-slate-400' : 'text-text-muted'}>{badge}</span>
+        <span className={isDark ? 'text-text-on-dark/60' : 'text-text-muted'}>{badge}</span>
       </div>
 
       {/* Main Heading: weight 800-900, comfortable leading to prevent ascender clipping */}
       <h2
         className={`text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black tracking-heading leading-[1.12] pt-1 pb-1 ${
-          isDark ? 'text-white' : 'text-text-primary'
+          isDark ? 'text-text-on-dark' : 'text-text-primary'
         }`}
       >
         {title}{' '}
@@ -50,7 +50,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {description && (
         <p
           className={`text-base sm:text-lg max-w-2xl leading-[1.6] ${
-            isDark ? 'text-slate-400' : 'text-text-secondary'
+            isDark ? 'text-text-on-dark/60' : 'text-text-secondary'
           }`}
         >
           {description}

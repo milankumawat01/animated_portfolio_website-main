@@ -20,10 +20,10 @@ export const Handwriting: React.FC<HandwritingProps> = ({
   className = '',
 }) => {
   const colorMap = {
-    blue: 'text-blue-600',
-    charcoal: 'text-slate-800',
-    white: 'text-white/90',
-    slate: 'text-slate-500',
+    blue: 'text-blue',
+    charcoal: 'text-text-primary',
+    white: 'text-text-on-dark',
+    slate: 'text-text-secondary',
   };
 
   const rotationMap: Record<string, string> = {

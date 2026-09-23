@@ -6,10 +6,15 @@ import { Server, Brain, Monitor, Database, Cloud, Wrench, Activity } from 'lucid
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
 import { TechIcon } from './icons/TechIcons';
-import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import type { SkillCategoryDoc, SiteSettingsDoc } from '@/lib/convex';
 
-export const SkillsSection: React.FC = () => {
-  const { skillCategories, personal } = PORTFOLIO_DATA;
+interface SkillsSectionProps {
+  skills: SkillCategoryDoc[];
+  settings: SiteSettingsDoc | null;
+}
+
+export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, settings }) => {
+  const quoteSkills = settings?.quotes?.skills ?? '';
 
   const getCategoryIcon = (icon: string) => {
     switch (icon) {
@@ -79,13 +84,13 @@ export const SkillsSection: React.FC = () => {
               />
 
               {/* Floating Badge (Now single, crisp, no ghost text) */}
-              <div className="absolute bottom-5 -right-3 sm:-right-5 p-3 rounded-xl bg-ink/90 backdrop-blur-md border border-white/10 text-white flex items-center gap-2.5 shadow-xl z-10">
+              <div className="absolute bottom-5 -right-3 sm:-right-5 p-3 rounded-xl bg-ink/90 backdrop-blur-md border border-text-on-dark/10 text-text-on-dark flex items-center gap-2.5 shadow-xl z-10">
                 <div className="w-8 h-8 rounded-lg bg-blue/20 border border-blue/40 flex items-center justify-center text-blue shrink-0">
                   <Activity className="w-4 h-4 text-blue animate-pulse" />
                 </div>
                 <div className="leading-tight pr-1">
-                  <div className="text-xs font-bold text-white">Always learning</div>
-                  <div className="text-[10px] text-slate-300 font-medium">Always building</div>
+                  <div className="text-xs font-bold text-text-on-dark">Always learning</div>
+                  <div className="text-[10px] text-text-on-dark/60 font-medium">Always building</div>
                 </div>
               </div>
             </div>
@@ -101,7 +106,7 @@ export const SkillsSection: React.FC = () => {
 
           {/* Right Column: 6 Categorized Skill Cards in 2x3 Grid */}
           <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            {skillCategories.map((cat, idx) => (
+            {skills.map((cat, idx) => (
               <div
                 key={idx}
                 className="p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 space-y-3.5 flex flex-col justify-between group"
@@ -151,10 +156,10 @@ export const SkillsSection: React.FC = () => {
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3 max-w-2xl">
             <span className="text-4xl font-serif text-blue select-none leading-none shrink-0 -mt-1">
-              “
+              "
             </span>
             <p className="text-sm sm:text-base font-medium italic text-text-primary leading-relaxed">
-              {personal.quotes.skills}{' '}
+              {quoteSkills}{' '}
               <span className="not-italic text-xs font-bold text-text-muted ml-2">
                 — Milan Kumawat
               </span>

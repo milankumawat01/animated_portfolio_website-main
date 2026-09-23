@@ -5,18 +5,22 @@ import Image from 'next/image';
 import { Mail, FileText, ArrowRight, Check } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './icons/SocialIcons';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import type { SiteSettingsDoc } from '@/lib/convex';
 
 interface ContactSectionProps {
+  settings: SiteSettingsDoc | null;
   onOpenContact: () => void;
   onOpenResume: () => void;
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
+  settings,
   onOpenContact,
   onOpenResume,
 }) => {
-  const { contactCards, personal } = PORTFOLIO_DATA;
+  const contactCards = settings?.contactCards ?? [];
+  const email = settings?.personal?.email ?? 'hey@milankumawat.in';
+  const linkedinUrl = settings?.personal?.linkedinUrl ?? 'https://linkedin.com/in/milankumawat';
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const getContactIcon = (icon: string) => {
@@ -36,7 +40,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
   const handleCardClick = (card: typeof contactCards[0]) => {
     if (card.id === 'email') {
-      navigator.clipboard.writeText(personal.email);
+      navigator.clipboard.writeText(email);
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2500);
     } else if (card.id === 'resume') {
@@ -126,7 +130,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-4">
               <button
                 onClick={onOpenContact}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-blue hover:bg-blue-dark text-white font-bold text-sm transition-all duration-200 shadow-md shadow-blue/25 active:scale-95 group shrink-0"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-blue hover:bg-blue-dark text-text-on-dark font-bold text-sm transition-all duration-200 shadow-md shadow-blue/25 active:scale-95 group shrink-0"
               >
                 <span>Let's Talk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -135,7 +139,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               <p className="text-xs sm:text-sm text-text-secondary">
                 Prefer a quick chat? I'm usually active on{' '}
                 <a
-                  href={personal.linkedinUrl}
+                  href={linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue font-semibold hover:underline"
@@ -158,9 +162,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               />
 
               {/* Floating Quote Card matching screenshot */}
-              <div className="absolute top-5 right-5 sm:top-6 sm:right-6 p-4 sm:p-5 rounded-2xl bg-black/45 backdrop-blur-md border border-white/15 text-white shadow-2xl max-w-[190px] sm:max-w-[210px] z-10">
-                <span className="text-3xl font-serif text-blue block leading-none select-none">“</span>
-                <p className="text-xs sm:text-[13px] font-semibold text-slate-100 leading-snug mt-1">
+              <div className="absolute top-5 right-5 sm:top-6 sm:right-6 p-4 sm:p-5 rounded-2xl bg-surface-feature/80 backdrop-blur-md border border-text-on-dark/15 text-text-on-dark shadow-2xl max-w-[190px] sm:max-w-[210px] z-10">
+                <span className="text-3xl font-serif text-blue block leading-none select-none">"</span>
+                <p className="text-xs sm:text-[13px] font-semibold text-text-on-dark/90 leading-snug mt-1">
                   Same Developer.<br />Bigger Things Ahead.
                 </p>
                 <div className="w-8 h-0.5 bg-blue mt-2 rounded-full" />

@@ -48,6 +48,68 @@ export const getPost = (slug: string) =>
 // ── Shared document types ────────────────────────────────────────────────────
 // Mirror the Convex schema. Used by page components.
 
+export type SiteSettingsDoc = {
+  _id: string
+  key: 'main'
+  personal: {
+    name: string; role: string; location: string; headline: string
+    subheadline: string; email: string; bio: string
+    linkedin: string; linkedinUrl: string
+    github: string; githubUrl: string
+    twitterUrl: string; resumeUrl: string
+  }
+  stats: { value: string; label: string }[]
+  heroTechStack: { name: string; iconKey: string }[]
+  aboutPillars: { title: string; description: string; icon: string }[]
+  whatIWorkOn: { title: string; description: string; icon: string }[]
+  quotes: { about: string; skills: string; howIBuild: string; experience: string; writing: string; contact: string }
+  handwriting: Record<string, string>
+  howIBuildSteps: { step: string; title: string; icon: string; description: string; items: string[] }[]
+  howIBuildPillars: { title: string; subtitle: string; icon: string }[]
+  contactCards: { id: string; title: string; value: string; hint: string; icon: string; action: string; copyable: boolean }[]
+  updatedAt: number
+}
+
+export type ExperienceDoc = {
+  _id: string; legacyId: string
+  company: string; role: string; period: string; timeframe: string; badge: string
+  logo: string; logoBg: string
+  points: string[]; tags: string[]
+  order: number; visible: boolean; updatedAt: number
+}
+
+export type SkillCategoryDoc = {
+  _id: string; title: string; subtitle: string; icon: string
+  skills: { name: string; iconKey: string }[]
+  order: number; visible: boolean; updatedAt: number
+}
+
+/** Format epoch ms → '12 Sep 2026' in UTC. Must match source display dates exactly. */
+export function formatLegacyDate(epochMs: number): string {
+  const d = new Date(epochMs)
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${day} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+export const getSiteSettings = unstable_cache(
+  async () => fetchQuery(api.siteSettings.get, {}) as Promise<SiteSettingsDoc | null>,
+  ['siteSettings'],
+  { tags: ['siteSettings'], revalidate: 3600 },
+)
+
+export const getExperience = unstable_cache(
+  async () => fetchQuery(api.experience.listVisible, {}) as Promise<ExperienceDoc[]>,
+  ['experience'],
+  { tags: ['experience'], revalidate: 3600 },
+)
+
+export const getSkillCategories = unstable_cache(
+  async () => fetchQuery(api.skills.listVisible, {}) as Promise<SkillCategoryDoc[]>,
+  ['skills'],
+  { tags: ['skills'], revalidate: 3600 },
+)
+
 export type ProjectDoc = {
   _id: string
   slug: string

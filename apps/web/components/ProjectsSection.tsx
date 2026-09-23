@@ -5,14 +5,14 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
 import { Handwriting } from './ui/Handwriting';
-import { PORTFOLIO_DATA, ProjectItem } from '@/data/portfolioData';
+import type { ProjectDoc } from '@/lib/convex';
 
 interface ProjectsSectionProps {
-  onSelectProject: (project: ProjectItem) => void;
+  projects: ProjectDoc[];
+  onSelectProject: (project: ProjectDoc) => void;
 }
 
-export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProject }) => {
-  const { projects, personal } = PORTFOLIO_DATA;
+export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, onSelectProject }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -60,7 +60,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
               </button>
               <button
                 onClick={() => handleScroll('right')}
-                className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-white transition shadow-sm active:scale-95"
+                className="w-10 h-10 rounded-full bg-blue hover:bg-blue-dark flex items-center justify-center text-text-on-dark transition shadow-sm active:scale-95"
                 aria-label="Next project"
               >
                 <ArrowRight className="w-4 h-4" />
@@ -76,18 +76,20 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
         >
           {projects.map((project) => (
             <div
-              key={project.id}
+              key={project.slug}
               onClick={() => onSelectProject(project)}
               className="bg-surface-elevated rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col justify-between group snap-start cursor-pointer overflow-hidden"
             >
               {/* Preview Mockup */}
               <div className="relative w-full h-48 sm:h-52 bg-surface-well overflow-hidden border-b border-border/60">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
-                />
+                {project.imageUrl && (
+                  <Image
+                    src={project.imageUrl}
+                    alt={project.title}
+                    fill
+                    className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
+                  />
+                )}
               </div>
 
               {/* Card Details */}

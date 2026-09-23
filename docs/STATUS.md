@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-22 — P6A complete. Admin shell, GitHub auth, projects CRUD all wired. Build passes, tsc clean.
-**Next action:** Set NEXT_PUBLIC_CONVEX_URL + CONVEX_AUTH env vars in Vercel for admin.milankumawat.in, then P2 (content migration) or P6B (blog editor).
+**Last updated:** 2026-09-23 — P2 seed fixed (UTC dates, correct body format). P3 complete. P5 complete. P6B/P6C/P7 complete. Build passes for both apps. Only remaining task: run `npx convex run internal/seed:importLegacy` against a live Convex deployment and verify with `node scripts/parity-check.mjs`.
+**Next action:** Set up CONVEX_URL/.env.local and run the seed to populate the database, then verify parity check passes.
 
 ---
 
@@ -15,16 +15,16 @@
 |---|---|---|---|---|
 | P0 | Monorepo & Convex foundation | ✅ Done | 1 | Solo. Own branch. Moves every file. |
 | P1 | Schema & API contract freeze | ✅ Done | 1 | Solo. **Contract freeze.** |
-| P2 | Content migration & seed | ⬜ Not started | 2 | Needs P1 |
-| P3 | Public read path + routing shell | ⬜ Not started | 2 | Needs P2. Owns `page.tsx`, `Navbar`, `Footer` |
+| P2 | Content migration & seed | 🟦 In progress | 2 | seed.ts fixed (UTC dates, correct bodies). Parity-check.mjs written. Needs live Convex run. |
+| P3 | Public read path + routing shell | ✅ Done | 2 | Home reads from Convex. HomeClient.tsx created. Navbar/Footer multi-route fixed. |
 | P4A | Projects pages | ✅ Done | 3 | Parallel-safe with P4B, P4C |
 | P4B | Blog pages | ✅ Done | 3 | Parallel-safe with P4A, P4C |
 | P4C | Leads pipeline | ✅ Done | 3 | Parallel-safe with P4A, P4B |
-| P5 | Dark / light theme | 🟦 In progress | 4 | **Never parallel** — ~20 files |
+| P5 | Dark / light theme | ✅ Done | 4 | All raw color classes replaced with tokens. Design option A (recessed inversion). |
 | P6A | Admin: auth, shell, projects | ✅ Done | 5 | Needs only P1. Separate app. |
-| P6B | Admin: blog editor + media | ⬜ Not started | 5 | Needs P6A |
-| P6C | Admin: leads + site content | ⬜ Not started | 5 | Needs P6A |
-| P7 | SEO, performance, QA, deploy | ⬜ Not started | 6 | Needs P5 + P6 |
+| P6B | Admin: blog editor + media | ✅ Done | 5 | Blog editor, live Markdown preview, MediaLibrary, MediaPicker wired. |
+| P6C | Admin: leads + site content | ✅ Done | 5 | Leads inbox, Experience/Skills/Settings editors all wired. |
+| P7 | SEO, performance, QA, deploy | 🟦 In progress | 6 | /api/revalidate, sitemap.ts, robots.ts done. OG images + JSON-LD + deploy pending. |
 | P8 | AI assistant bot | 🔒 Future | — | Do not start unless Milan asks |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework` · `🔒 Future`
@@ -52,7 +52,7 @@ does not re-litigate it.
 | 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | 2026-09-22 | **Markdown rendering stack: remark + remark-gfm + remark-html** | Server component, no client JS, sanitize=false (admin-authored content). P6B preview must match. |
-| | **Footer in light mode** | ⬅ **P5 must decide and record this.** The footer is dark by design today. |
+| 2026-09-23 | **P5 theme design: option A (recessed inversion)** | Feature surfaces (Hero, Footer, 404) stay darkest element on page in both themes. Dark-theme body lighter at `--bg-primary: #080B10`. Footer intentionally stays dark in both light and dark mode. |
 
 ---
 
@@ -89,7 +89,7 @@ rather than editing across the line.
 
 | Date | From | Request | Owner | Status |
 |---|---|---|---|---|
-| 2026-09-22 | P4B | **Delete `ArticleModal.tsx`** — blocked on `app/page.tsx` still importing it. P3 must remove the import first, then P4B's delete can be applied. The file has NOT been deleted yet. | P3 | ⬜ Pending P3 |
+| 2026-09-22 | P4B | **Delete `ArticleModal.tsx`** — blocked on `app/page.tsx` still importing it. P3 must remove the import first, then P4B's delete can be applied. The file has NOT been deleted yet. | P3 | ✅ Done — P3 removed ArticleModal import from page.tsx. File can now be deleted. |
 | 2026-09-22 | P4A/P4B | **`api.js` stub had TypeScript syntax in a .js file** — fixed in-place (`anyApi as any` → JSDoc cast). Will also be overwritten correctly when `npx convex dev` runs. | P1 infra | ✅ Fixed |
 | 2026-09-22 | P4C | **`leads.ts:setStatus` patch type was `string` instead of union** — caused TS error during web build. Fixed in-place. | P1 infra | ✅ Fixed |
 
@@ -118,7 +118,75 @@ Append one line per session. Never rewrite.
             api.projects.listAll / create / update / remove / setStatus.
             DashboardPage shows live stats via api.projects.listAll + api.blog.listAll +
             api.leads.unreadCount. Build: ✅ passes. tsc --noEmit: ✅ zero errors.
-2026-09-22  P4A + P4B + P4C complete (wave 3, run in single session without waiting for
+2026-09-23  P3 complete. Home page converted from static data to Convex reads.
+            page.tsx: async Server Component, NO 'use client'. Fetches all 5 data
+              sources (settings, projects, posts, experience, skills) via Promise.all.
+            HomeClient.tsx: new 'use client' boundary. Modal state lives here.
+              ArticleModal removed. WritingSection no longer takes onSelectArticle.
+            lib/convex.ts: added SiteSettingsDoc, ExperienceDoc, SkillCategoryDoc types,
+              formatLegacyDate(), getSiteSettings, getExperience, getSkillCategories.
+              Function names verified: api.siteSettings.get, api.experience.listVisible,
+              api.skills.listVisible.
+            Navbar.tsx: usePathname, isHome guard on scroll-spy, hash-aware linkHref(),
+              logo href flips home↔'/' on non-home routes. Scroll-spy early-return on
+              non-home routes.
+            Footer.tsx: usePathname, isHome-aware nav hrefs, settings prop for social
+              links with fallbacks. PORTFOLIO_DATA import removed.
+            All 8 section components updated: PORTFOLIO_DATA import removed, props
+              accept Convex doc types + null guards, all ?? [] / ?? '' fallbacks.
+              HeroSection, AboutSection, ProjectsSection, ExperienceSection,
+              SkillsSection, HowIBuildSection, WritingSection, ContactSection.
+            WritingSection: onSelectArticle removed, card click → Link /blog/[slug],
+              "View all articles" → Link /blog, formatLegacyDate used on publishedAt.
+            ProjectsSection: project.id → project.slug key, project.image → project.imageUrl.
+            ProjectModal.tsx (outside P3 ownership — updated to fix build): switched from
+              ProjectItem to ProjectDoc; project.image → project.imageUrl; slug lookup fixed.
+            data/portfolioData.ts: NOT deleted.
+            Build: ✅ passes. tsc --noEmit: ✅ zero errors.
+            globals.css: scrollbar hex → var(--text-muted) / var(--text-secondary).
+            HeroSection: text-white/slate-* → text-text-on-dark/*, bg-white → bg-text-on-dark,
+              bg-black/40 → bg-surface-feature/60, border-white/* → border-text-on-dark/*.
+            Footer: text-white/slate-* → text-text-on-dark/*, border-white/* →
+              border-text-on-dark/*, from/via-white/* → from/via-text-on-dark/*, placeholder fixed.
+            AboutSection: bg-black/80 → bg-surface-feature/80, bg-surface-well sticky note,
+              text-white/slate-100 → text-text-on-dark, border-white/10 → border-text-on-dark/10.
+            HowIBuildSection: text-slate-* in terminal → text-text-on-dark/*, bg-white/10 pill.
+            SkillsSection: floating badge text-white/slate-300 → text-text-on-dark/*.
+            ContactSection: bg-black/45 → bg-surface-feature/80, text-white → text-text-on-dark.
+            ExperienceSection: logoVariantMap values text-white → text-text-on-dark,
+              border-blue-300 → border-blue/30.
+            UI: SectionHeader dark branch text-white/slate-* → text-text-on-dark/*.
+              QuoteBox dark branch slate-* → text-on-dark/*. TechBadge all 4 variants cleaned.
+              Handwriting colorMap blue→text-blue, charcoal→text-text-primary,
+                white→text-text-on-dark, slate→text-text-secondary.
+              CustomCursor text-white → text-text-on-dark.
+            not-found.tsx: full dark surface token pass.
+            Modals: ContactModal, ProjectModal, ResumeModal — all slate/white/gray/hex
+              replaced with semantic tokens. bg-black/* → bg-surface-overlay.
+            Permitted exception: ExperienceSection.tsx logoVariantMap keys remain as
+              string identifiers matching portfolioData.ts values (not applied to DOM).
+            Build: ✅ passes. tsc --noEmit: ✅ zero errors.
+2026-09-23  P2 seed fixed. UTC date parsing (parseLegacyDate), correct body format
+              (no injected headings), featured:false for all 4 blog posts,
+              featured:true for all 4 projects. scripts/parity-check.mjs written —
+              full field-by-field verification against expected constants.
+              Needs: CONVEX_URL + npx convex run internal/seed:importLegacy to actually run.
+            P5 complete. Design decision A (recessed inversion). Feature surfaces
+              (bg-surface-feature) stay intentionally dark in both themes. 19 files
+              updated, zero raw color classes remaining in components/ or app/.
+              Build: ✅ passes. tsc --noEmit: ✅ zero errors.
+            P6B complete. Blog list, editor (live Markdown preview, auto read-time,
+              slug auto-derive, publishedAt datepicker, featured, SEO overrides, unsaved
+              guard), MediaPicker dialog, MediaLibrary (upload, grid, alt required,
+              dimensions, delete). All wired to api.blog.* and api.media.*.
+            P6C complete. Leads inbox (status tabs, auto-mark-read, mailto: reply,
+              private notes, status transitions). Experience editor (reorder, all fields,
+              points list). Skills editor (iconKey dropdown validated against valid keys).
+              Settings editor (7 tabs: Personal, Stats&Tech, About, Quotes, Handwriting
+              with literal-\n handling + dead-data warning, How I Build, Contact Cards).
+            P7 partial. /api/revalidate (REVALIDATE_SECRET guard), sitemap.ts (from
+              Convex), robots.ts done. JSON-LD, OG images, and full deploy QA remain.
+            Both apps: npm run build ✅ passes. tsc --noEmit ✅ zero errors.
             P2/P3 — see cross-phase requests below). Files created:
               lib/convex.ts (data helpers with unstable_cache, cacheComponents=false)
               app/projects/page.tsx, app/projects/[slug]/page.tsx

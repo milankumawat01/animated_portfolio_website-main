@@ -67,7 +67,7 @@ export const CustomCursor: React.FC = () => {
         className={`rounded-full flex items-center justify-center transition-all duration-200 ${
           isClickable
             ? hoverText
-              ? 'w-16 h-16 bg-blue text-white text-3xs font-black tracking-wider shadow-lg shadow-blue/30 scale-100'
+              ? 'w-16 h-16 bg-blue text-text-on-dark text-3xs font-black tracking-wider shadow-lg shadow-blue/30 scale-100'
               : 'w-10 h-10 bg-blue/15 border border-blue text-transparent scale-100 backdrop-blur-2xs'
             : 'w-2 h-2 bg-blue shadow-sm'
         }`}
