@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-23 — P2 seed fixed (UTC dates, correct body format). P3 complete. P5 complete. P6B/P6C/P7 complete. Build passes for both apps. Only remaining task: run `npx convex run internal/seed:importLegacy` against a live Convex deployment and verify with `node scripts/parity-check.mjs`.
-**Next action:** Set up CONVEX_URL/.env.local and run the seed to populate the database, then verify parity check passes.
+**Last updated:** 2026-09-23 — P2 seed fixed (UTC dates, correct body format). P3 complete. P5 complete. P6B/P6C complete. P7 partial. Build passes for both apps.
+**Next action:** Step 1: `npx convex dev` + `npx convex run internal/seed:importLegacy` + verify with `node scripts/parity-check.mjs`. Step 2: Finish P7 (JSON-LD + OG images) then deploy to Vercel.
 
 ---
 
