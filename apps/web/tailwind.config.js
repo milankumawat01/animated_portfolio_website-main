@@ -1,3 +1,8 @@
+// Theme colors are hex CSS variables, which Tailwind can't apply an opacity
+// modifier to (`text-text-on-dark/60` rendered fully opaque). color-mix lets
+// `/NN` work while globals.css keeps plain hex values.
+const v = (name) => `color-mix(in srgb, var(--${name}) calc(<alpha-value> * 100%), transparent)`;
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
@@ -11,13 +16,13 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          DEFAULT: 'var(--ink)',
-          soft: 'var(--ink-soft)',
+          DEFAULT: v('ink'),
+          soft: v('ink-soft'),
         },
         blue: {
-          DEFAULT: 'var(--blue)',
-          dark: 'var(--blue-dark)',
-          light: 'var(--blue-light)',
+          DEFAULT: v('blue'),
+          dark: v('blue-dark'),
+          light: v('blue-light'),
           50: '#F2F7FF',
           100: '#EAF3FF',
           200: '#BAE0FF',
@@ -30,27 +35,27 @@ module.exports = {
           900: '#002C8C',
         },
         bg: {
-          primary: 'var(--bg-primary)',
-          soft: 'var(--bg-soft)',
-          'blue-soft': 'var(--bg-blue-soft)',
-          dark: 'var(--bg-dark)',
-          'dark-soft': 'var(--bg-dark-soft)',
+          primary: v('bg-primary'),
+          soft: v('bg-soft'),
+          'blue-soft': v('bg-blue-soft'),
+          dark: v('bg-dark'),
+          'dark-soft': v('bg-dark-soft'),
         },
         text: {
-          primary: 'var(--text-primary)',
-          secondary: 'var(--text-secondary)',
-          muted: 'var(--text-muted)',
-          'on-dark': 'var(--text-on-dark)',
+          primary: v('text-primary'),
+          secondary: v('text-secondary'),
+          muted: v('text-muted'),
+          'on-dark': v('text-on-dark'),
         },
         border: {
-          DEFAULT: 'var(--border)',
-          dark: 'var(--border-dark)',
+          DEFAULT: v('border'),
+          dark: v('border-dark'),
         },
         surface: {
-          feature: 'var(--surface-feature)',
-          elevated: 'var(--surface-elevated)',
-          overlay: 'var(--surface-overlay)',
-          well: 'var(--surface-well)',
+          feature: v('surface-feature'),
+          elevated: v('surface-elevated'),
+          overlay: v('surface-overlay'),
+          well: v('surface-well'),
         },
       },
       fontFamily: {

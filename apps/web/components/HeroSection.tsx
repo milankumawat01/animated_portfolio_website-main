@@ -64,7 +64,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             <div className="flex flex-wrap items-center gap-4 pt-1">
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-text-on-dark text-ink font-bold text-sm sm:text-base hover:bg-text-on-dark/90 transition-all duration-200 shadow-lg active:scale-95 group"
+                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-text-on-dark text-surface-well font-bold text-sm sm:text-base hover:bg-text-on-dark/90 transition-all duration-200 shadow-lg active:scale-95 group"
               >
                 <span>View My Work</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
