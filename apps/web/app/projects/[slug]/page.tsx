@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2, Home, ChevronRight } from 'lucide-react'
 import { getProject, getProjects } from '@/lib/convex'
+import { JsonLd, creativeWorkSchema } from '@/components/seo/JsonLd'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -47,6 +48,7 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
+      <JsonLd data={creativeWorkSchema(project)} />
       {/* Static sub-page header (P3 will wire the real Navbar) */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E4E9F1] shadow-soft py-3">
         <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">

@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
+import { scheduleRevalidate } from './lib/revalidate'
 
 export const get = query({
   args: {},
@@ -58,6 +59,7 @@ export const update = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, { ...patch, updatedAt: Date.now() })
+      await scheduleRevalidate(ctx, ['home'])
     } else {
       // Should never happen after the seed runs, but guards against a missing row.
       throw new Error('siteSettings not initialised. Run the seed first.')

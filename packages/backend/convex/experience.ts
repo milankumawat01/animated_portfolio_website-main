@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
+import { scheduleRevalidate } from './lib/revalidate'
 
 export const listVisible = query({
   args: {},
@@ -37,10 +38,12 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx)
-    return await ctx.db.insert('experience', {
+    const id = await ctx.db.insert('experience', {
       ...args,
       updatedAt: Date.now(),
     })
+    await scheduleRevalidate(ctx, ['home'])
+    return id
   },
 })
 
@@ -62,6 +65,7 @@ export const update = mutation({
   handler: async (ctx, { id, ...patch }) => {
     await requireAdmin(ctx)
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
+    await scheduleRevalidate(ctx, ['home'])
   },
 })
 
@@ -70,6 +74,7 @@ export const remove = mutation({
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx)
     await ctx.db.delete(id)
+    await scheduleRevalidate(ctx, ['home'])
   },
 })
 
@@ -80,5 +85,6 @@ export const reorder = mutation({
     for (let i = 0; i < ids.length; i++) {
       await ctx.db.patch(ids[i], { order: (i + 1) * 10, updatedAt: Date.now() })
     }
+    await scheduleRevalidate(ctx, ['home'])
   },
 })

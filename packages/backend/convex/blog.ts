@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
+import { scheduleRevalidate } from './lib/revalidate'
 import { validateSlug, BLOG_BODY_MAX } from './lib/validation'
 
 // ── Public read queries ────────────────────────────────────────────────────
@@ -95,12 +96,14 @@ export const create = mutation({
       .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique()
     if (existing) throw new Error(`Slug "${args.slug}" is already taken.`)
-    return await ctx.db.insert('blogPosts', {
+    const id = await ctx.db.insert('blogPosts', {
       ...args,
       status: 'draft',
       views: 0,
       updatedAt: Date.now(),
     })
+    await scheduleRevalidate(ctx, ['blog', 'home'])
+    return id
   },
 })
 
@@ -133,7 +136,12 @@ export const update = mutation({
       if (existing && existing._id !== id) throw new Error(`Slug "${patch.slug}" is already taken.`)
     }
     if (patch.body && patch.body.length > BLOG_BODY_MAX) throw new Error('Blog body too long.')
+    const before = await ctx.db.get(id)
+    if (!before) throw new Error('Post not found.')
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
+    await scheduleRevalidate(ctx, [
+      'blog', 'home', `post:${before.slug}`, `post:${patch.slug ?? before.slug}`,
+    ])
   },
 })
 
@@ -141,7 +149,11 @@ export const remove = mutation({
   args: { id: v.id('blogPosts') },
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx)
+    const post = await ctx.db.get(id)
     await ctx.db.delete(id)
+    await scheduleRevalidate(ctx, post
+      ? ['blog', 'home', `post:${post.slug}`]
+      : ['blog', 'home'])
   },
 })
 
@@ -166,6 +178,7 @@ export const setStatus = mutation({
       patch.publishedAt = publishedAt ?? post.publishedAt ?? Date.now()
     }
     await ctx.db.patch(id, patch)
+    await scheduleRevalidate(ctx, ['blog', 'home', `post:${post.slug}`])
   },
 })
 

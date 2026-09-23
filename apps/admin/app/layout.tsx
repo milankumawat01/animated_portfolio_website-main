@@ -3,6 +3,7 @@ import { ConvexAdminProvider } from '@/components/shell/ConvexAdminProvider'
 
 export const metadata: Metadata = {
   title: 'Portfolio Admin',
+  robots: { index: false, follow: false },
 }
 
 export default function RootLayout({

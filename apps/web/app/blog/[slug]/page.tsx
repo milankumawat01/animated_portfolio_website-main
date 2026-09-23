@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, Clock, Home, ChevronRight } from 'lucide-react'
 import { getPost, getPosts } from '@/lib/convex'
 import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer'
 import { ViewCounter } from './ViewCounter'
+import { JsonLd, blogPostingSchema } from '@/components/seo/JsonLd'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -45,7 +46,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         publishedTime: post.publishedAt
           ? new Date(post.publishedAt).toISOString()
           : undefined,
-        images: post.imageUrl ? [{ url: post.imageUrl }] : undefined,
       },
     }
   } catch {
@@ -67,6 +67,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
+      <JsonLd data={blogPostingSchema(post)} />
       {/* Static sub-page header (P3 will wire the real Navbar) */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E4E9F1] shadow-soft py-3">
         <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">

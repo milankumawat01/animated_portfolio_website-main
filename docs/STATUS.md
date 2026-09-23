@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-23 — P2 seed fixed (UTC dates, correct body format). P3 complete. P5 complete. P6B/P6C complete. P7 partial. Build passes for both apps.
-**Next action:** Step 1: `npx convex dev` + `npx convex run internal/seed:importLegacy` + verify with `node scripts/parity-check.mjs`. Step 2: Finish P7 (JSON-LD + OG images) then deploy to Vercel.
+**Last updated:** 2026-09-23 — P2 done (dev deployment seeded, parity clean). P7 code done: revalidation wired end to end, JSON-LD, OG images, admin noindex. Deploy runbook in `docs/DEPLOY.md`. Found: sub-pages never got the real Navbar or the P5 token pass.
+**Next action:** (a) P5 rework — wire real Navbar/Footer into `/projects`, `/blog` and detail pages and tokenize their colors. (b) Milan follows `docs/DEPLOY.md` (Convex env vars — **set `ADMIN_IDENTITY`** — Vercel projects, domains), then runs its §5 checklist.
 
 ---
 
@@ -15,16 +15,16 @@
 |---|---|---|---|---|
 | P0 | Monorepo & Convex foundation | ✅ Done | 1 | Solo. Own branch. Moves every file. |
 | P1 | Schema & API contract freeze | ✅ Done | 1 | Solo. **Contract freeze.** |
-| P2 | Content migration & seed | 🟦 In progress | 2 | seed.ts fixed (UTC dates, correct bodies). Parity-check.mjs written. Needs live Convex run. |
+| P2 | Content migration & seed | ✅ Done | 2 | Dev deployment `sincere-duck-662` seeded. Parity: zero diffs. Second run: no count change. |
 | P3 | Public read path + routing shell | ✅ Done | 2 | Home reads from Convex. HomeClient.tsx created. Navbar/Footer multi-route fixed. |
 | P4A | Projects pages | ✅ Done | 3 | Parallel-safe with P4B, P4C |
 | P4B | Blog pages | ✅ Done | 3 | Parallel-safe with P4A, P4C |
 | P4C | Leads pipeline | ✅ Done | 3 | Parallel-safe with P4A, P4B |
-| P5 | Dark / light theme | ✅ Done | 4 | All raw color classes replaced with tokens. Design option A (recessed inversion). |
+| P5 | Dark / light theme | 🔁 Needs rework | 4 | Home + components tokenized. **`app/projects/**` and `app/blog/**` still use stub headers + ~50 raw colors (`bg-white/90`, `#E4E9F1`, `text-ink`…) — broken in dark mode.** |
 | P6A | Admin: auth, shell, projects | ✅ Done | 5 | Needs only P1. Separate app. |
 | P6B | Admin: blog editor + media | ✅ Done | 5 | Blog editor, live Markdown preview, MediaLibrary, MediaPicker wired. |
 | P6C | Admin: leads + site content | ✅ Done | 5 | Leads inbox, Experience/Skills/Settings editors all wired. |
-| P7 | SEO, performance, QA, deploy | 🟦 In progress | 6 | /api/revalidate, sitemap.ts, robots.ts done. OG images + JSON-LD + deploy pending. |
+| P7 | SEO, performance, QA, deploy | 🟦 In progress | 6 | Code complete. Remaining is Milan-only: env vars, Vercel, domains, live QA — see `docs/DEPLOY.md`. Analytics not added (Milan's call). |
 | P8 | AI assistant bot | 🔒 Future | — | Do not start unless Milan asks |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework` · `🔒 Future`
@@ -52,6 +52,9 @@ does not re-litigate it.
 | 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | 2026-09-22 | **Markdown rendering stack: remark + remark-gfm + remark-html** | Server component, no client JS, sanitize=false (admin-authored content). P6B preview must match. |
+| 2026-09-23 | **Home-only data uses the `home` cache tag** | `getSiteSettings`/`getExperience`/`getSkillCategories` were tagged `siteSettings`/`experience`/`skills`, which `/api/revalidate` rejects. Now `home`, per the 5-tag taxonomy in `03-ROUTES §6.1`. |
+| 2026-09-23 | **OG images are generated cards, not cover photos** | `opengraph-image.tsx` at `/`, `/projects/[slug]`, `/blog/[slug]`. Post `generateMetadata` no longer passes `imageUrl`, so every share shows title + excerpt consistently. |
+| 2026-09-23 | **`importLegacy` takes `{"overwrite": true}`** | Dev-only repair: patches existing legacy rows back to seed content. Default stays insert-if-missing so admin edits survive. Never use on prod. |
 | 2026-09-23 | **P5 theme design: option A (recessed inversion)** | Feature surfaces (Hero, Footer, 404) stay darkest element on page in both themes. Dark-theme body lighter at `--bg-primary: #080B10`. Footer intentionally stays dark in both light and dark mode. |
 
 ---
@@ -79,6 +82,9 @@ Answer before the content becomes published database rows (P2).
 - [ ] **Admin domain** — is `admin.milankumawat.in` the intended hostname?
 - [ ] **Lead notification address** — `hey@milankumawat.in`, or somewhere else?
 - [ ] **GitHub identity for admin login** — which account is the single admin?
+      ⚠️ `requireAdmin` **fails open** when `ADMIN_IDENTITY` is unset: any GitHub user who
+      signs in is admin. Must be set on prod before the admin URL is live.
+- [ ] **Analytics** — add Vercel Analytics (P7 step 7 default), or nothing?
 
 ---
 
@@ -202,6 +208,27 @@ Append one line per session. Never rewrite.
             NOTE: Navbar/Footer on sub-pages are static stubs — P3 will wire real components.
             NOTE: 'use cache' replaced with unstable_cache because cacheComponents=false.
             Build: ✅ passes. tsc --noEmit: ✅ zero errors.
+2026-09-23  P2 done. Pushed functions to dev (sincere-duck-662) and ran the seed.
+              Rows were stale from a pre-fix seed (bodies had `# Title`, featured flags
+              wrong) and insert-if-missing skipped them — added {"overwrite": true} and
+              repaired in place. parity-check.mjs compared with key-order-sensitive
+              JSON.stringify (Convex sorts keys) → fixed with a stable serializer.
+              Parity: zero diffs. Re-run: counts unchanged. portfolioData.ts untouched.
+            P7 code. Found no mutation ever called internal.revalidate.ping — admin
+              edits only reached the site after the 1h ISR window. Added
+              convex/lib/revalidate.ts and wired every projects/blog/experience/skills/
+              siteSettings mutation per 03-ROUTES §6.2 (old + new slug on rename).
+              Home-only data re-tagged `home`. JSON-LD: Person (home), CreativeWork
+              (projects), BlogPosting (posts), `<` escaped. OG cards via lib/og.tsx at
+              /, /projects/[slug], /blog/[slug] — rendered and eyeballed, 1200×630.
+              Removed static hero-desk og image from layout. Admin: robots.ts Disallow /
+              + noindex meta. docs/DEPLOY.md written.
+              Verified on `next start`: /api/revalidate 401 without / with wrong secret,
+              200 with right one; sitemap 11 URLs; og:image + ld+json present on all 3
+              page types. Not verifiable locally: end-to-end publish→revalidate (Convex
+              cloud can't reach localhost, and no env vars are set on Convex yet).
+            Found: sub-pages never got the real Navbar or P5 tokens → P5 🔁.
+            Build: ✅ passes (both apps). tsc --noEmit: ✅ web, admin, backend.
 ```
 
 ---

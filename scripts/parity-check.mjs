@@ -65,9 +65,17 @@ function fail(path, src, got) {
 function eq(path, src, got) {
   if (src !== got) fail(path, src, got)
 }
+// Convex returns object keys sorted, so compare with a key-order-independent serialization.
+function stable(v) {
+  if (Array.isArray(v)) return v.map(stable)
+  if (v && typeof v === 'object') {
+    return Object.fromEntries(Object.keys(v).sort().map((k) => [k, stable(v[k])]))
+  }
+  return v
+}
 function deepEq(path, src, got) {
-  const s = JSON.stringify(src)
-  const g = JSON.stringify(got)
+  const s = JSON.stringify(stable(src))
+  const g = JSON.stringify(stable(got))
   if (s !== g) fail(path, src, got)
 }
 function checkCount(label, expected, got) {

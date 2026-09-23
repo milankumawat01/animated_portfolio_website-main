@@ -95,19 +95,19 @@ export function formatLegacyDate(epochMs: number): string {
 export const getSiteSettings = unstable_cache(
   async () => fetchQuery(api.siteSettings.get, {}) as Promise<SiteSettingsDoc | null>,
   ['siteSettings'],
-  { tags: ['siteSettings'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 3600 },
 )
 
 export const getExperience = unstable_cache(
   async () => fetchQuery(api.experience.listVisible, {}) as Promise<ExperienceDoc[]>,
   ['experience'],
-  { tags: ['experience'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 3600 },
 )
 
 export const getSkillCategories = unstable_cache(
   async () => fetchQuery(api.skills.listVisible, {}) as Promise<SkillCategoryDoc[]>,
   ['skills'],
-  { tags: ['skills'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 3600 },
 )
 
 export type ProjectDoc = {

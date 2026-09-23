@@ -29,14 +29,6 @@ export const metadata: Metadata = {
     title: 'Milan Kumawat | AI Engineer & Backend Developer',
     description: 'Building AI-powered products and scalable systems for a better tomorrow.',
     siteName: 'Milan Kumawat Portfolio',
-    images: [
-      {
-        url: '/images/hero-desk.png',
-        width: 1200,
-        height: 630,
-        alt: 'Milan Kumawat Portfolio',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',

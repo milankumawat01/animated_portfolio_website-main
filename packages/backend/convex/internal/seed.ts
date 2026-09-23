@@ -1,3 +1,4 @@
+import { v } from 'convex/values'
 import { internalMutation } from '../_generated/server'
 
 /**
@@ -6,6 +7,11 @@ import { internalMutation } from '../_generated/server'
  *
  * Run with:
  *   npx convex run internal/seed:importLegacy
+ *
+ * By default existing rows are left alone, so admin edits survive a re-run.
+ * `{"overwrite": true}` patches existing rows back to the legacy content —
+ * a dev-only repair for rows written by an older version of this seed:
+ *   npx convex run internal/seed:importLegacy '{"overwrite": true}'
  */
 
 // Parse a legacy display date like '12 Sep 2026' to UTC midnight epoch ms.
@@ -20,8 +26,8 @@ function parseLegacyDate(s: string): number {
 }
 
 export const importLegacy = internalMutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { overwrite: v.optional(v.boolean()) },
+  handler: async (ctx, { overwrite = false }) => {
     // One constant for all seed timestamps — never Date.now() per row.
     const now = Date.now()
 
@@ -282,7 +288,9 @@ export const importLegacy = internalMutation({
         .query('projects')
         .withIndex('by_slug', (q) => q.eq('slug', p.slug))
         .unique()
-      if (!existingProject) {
+      if (existingProject && overwrite) {
+        await ctx.db.patch(existingProject._id, { ...p, updatedAt: now })
+      } else if (!existingProject) {
         await ctx.db.insert('projects', {
           ...p,
           status: 'published',
@@ -340,7 +348,9 @@ export const importLegacy = internalMutation({
         .query('experience')
         .filter((q) => q.eq(q.field('legacyId'), e.legacyId))
         .unique()
-      if (!existingExp) {
+      if (existingExp && overwrite) {
+        await ctx.db.patch(existingExp._id, { ...e, updatedAt: now })
+      } else if (!existingExp) {
         await ctx.db.insert('experience', { ...e, updatedAt: now })
       }
     }
@@ -403,7 +413,9 @@ export const importLegacy = internalMutation({
         .query('skillCategories')
         .filter((q) => q.eq(q.field('title'), cat.title))
         .unique()
-      if (!existingCat) {
+      if (existingCat && overwrite) {
+        await ctx.db.patch(existingCat._id, { ...cat, updatedAt: now })
+      } else if (!existingCat) {
         await ctx.db.insert('skillCategories', { ...cat, updatedAt: now })
       }
     }
@@ -484,7 +496,9 @@ export const importLegacy = internalMutation({
         .query('blogPosts')
         .withIndex('by_slug', (q) => q.eq('slug', a.slug))
         .unique()
-      if (!existingPost) {
+      if (existingPost && overwrite) {
+        await ctx.db.patch(existingPost._id, { ...a, updatedAt: now })
+      } else if (!existingPost) {
         await ctx.db.insert('blogPosts', {
           ...a,
           status: 'published',

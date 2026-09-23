@@ -16,6 +16,7 @@ import type * as internal_revalidate from "../internal/revalidate.js";
 import type * as internal_seed from "../internal/seed.js";
 import type * as leads from "../leads.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_revalidate from "../lib/revalidate.js";
 import type * as lib_validation from "../lib/validation.js";
 import type * as media from "../media.js";
 import type * as projects from "../projects.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   "internal/seed": typeof internal_seed;
   leads: typeof leads;
   "lib/auth": typeof lib_auth;
+  "lib/revalidate": typeof lib_revalidate;
   "lib/validation": typeof lib_validation;
   media: typeof media;
   projects: typeof projects;

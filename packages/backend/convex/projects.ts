@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 import { requireAdmin } from './lib/auth'
+import { scheduleRevalidate } from './lib/revalidate'
 import { validateSlug } from './lib/validation'
 
 // ── Public read queries ────────────────────────────────────────────────────
@@ -78,11 +79,13 @@ export const create = mutation({
       .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique()
     if (existing) throw new Error(`Slug "${args.slug}" is already taken.`)
-    return await ctx.db.insert('projects', {
+    const id = await ctx.db.insert('projects', {
       ...args,
       status: 'draft',
       updatedAt: Date.now(),
     })
+    await scheduleRevalidate(ctx, ['projects', 'home'])
+    return id
   },
 })
 
@@ -119,7 +122,12 @@ export const update = mutation({
         .unique()
       if (existing && existing._id !== id) throw new Error(`Slug "${patch.slug}" is already taken.`)
     }
+    const before = await ctx.db.get(id)
+    if (!before) throw new Error('Project not found.')
     await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
+    await scheduleRevalidate(ctx, [
+      'projects', 'home', `project:${before.slug}`, `project:${patch.slug ?? before.slug}`,
+    ])
   },
 })
 
@@ -127,7 +135,11 @@ export const remove = mutation({
   args: { id: v.id('projects') },
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx)
+    const project = await ctx.db.get(id)
     await ctx.db.delete(id)
+    await scheduleRevalidate(ctx, project
+      ? ['projects', 'home', `project:${project.slug}`]
+      : ['projects', 'home'])
   },
 })
 
@@ -138,6 +150,7 @@ export const reorder = mutation({
     for (let i = 0; i < ids.length; i++) {
       await ctx.db.patch(ids[i], { order: (i + 1) * 10, updatedAt: Date.now() })
     }
+    await scheduleRevalidate(ctx, ['projects', 'home'])
   },
 })
 
@@ -158,5 +171,6 @@ export const setStatus = mutation({
       patch.publishedAt = Date.now()
     }
     await ctx.db.patch(id, patch)
+    await scheduleRevalidate(ctx, ['projects', 'home', `project:${project.slug}`])
   },
 })
