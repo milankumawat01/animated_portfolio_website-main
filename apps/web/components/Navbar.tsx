@@ -11,13 +11,22 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
-  const [activeSection, setActiveSection] = useState('home');
-  const [scrolled, setScrolled] = useState(false);
+  const [spySection, setSpySection] = useState('home');
+  const [pastHero, setPastHero] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === '/';
+
+  // Sub-pages have no dark hero behind the header, so it is always solid there,
+  // and the active link follows the route instead of the scroll-spy.
+  const scrolled = isHome ? pastHero : true;
+  const activeSection = isHome
+    ? spySection
+    : pathname.startsWith('/projects') ? 'projects'
+    : pathname.startsWith('/blog') ? 'writing'
+    : '';
 
   const navLinks = [
     { label: 'Home', hash: 'home', id: 'home' },
@@ -41,9 +50,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
       const heroEl = document.getElementById('home');
       if (heroEl) {
         const heroBottom = heroEl.getBoundingClientRect().bottom;
-        setScrolled(heroBottom <= 80);
+        setPastHero(heroBottom <= 80);
       } else {
-        setScrolled(window.scrollY > 100);
+        setPastHero(window.scrollY > 100);
       }
 
       // Section spy
@@ -53,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= 180 && rect.bottom >= 180) {
-            setActiveSection(sectionId);
+            setSpySection(sectionId);
             break;
           }
         }
@@ -131,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
             onClick={onOpenContact}
             className={`hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 group ${
               scrolled
-                ? 'bg-ink text-white hover:bg-blue shadow-xs'
+                ? 'bg-ink text-bg-primary hover:bg-blue hover:text-white shadow-xs'
                 : 'border border-white/20 bg-white/5 hover:bg-white/10 text-white hover:border-blue/50'
             }`}
           >

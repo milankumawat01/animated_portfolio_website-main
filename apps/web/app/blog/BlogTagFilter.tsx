@@ -54,7 +54,7 @@ export function BlogTagFilter({ posts, allTags }: Props) {
               className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors border ${
                 !activeTag
                   ? 'bg-blue text-white border-blue'
-                  : 'bg-white text-text-secondary border-border hover:border-blue/40 hover:text-blue'
+                  : 'bg-surface-elevated text-text-secondary border-border hover:border-blue/40 hover:text-blue'
               }`}
             >
               All
@@ -66,7 +66,7 @@ export function BlogTagFilter({ posts, allTags }: Props) {
                 className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors border ${
                   tag === activeTag
                     ? 'bg-blue text-white border-blue'
-                    : 'bg-white text-text-secondary border-border hover:border-blue/40 hover:text-blue'
+                    : 'bg-surface-elevated text-text-secondary border-border hover:border-blue/40 hover:text-blue'
                 }`}
               >
                 {tag}
@@ -86,10 +86,10 @@ export function BlogTagFilter({ posts, allTags }: Props) {
               <Link
                 key={post._id}
                 href={`/blog/${post.slug}`}
-                className="bg-white rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col group overflow-hidden"
+                className="bg-surface-elevated rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col group overflow-hidden"
               >
                 {/* Cover image */}
-                <div className="relative w-full h-44 bg-slate-950 overflow-hidden border-b border-border/60">
+                <div className="relative w-full h-44 bg-surface-feature overflow-hidden border-b border-border/60">
                   {post.imageUrl ? (
                     <Image
                       src={post.imageUrl}

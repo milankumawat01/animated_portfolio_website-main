@@ -68,6 +68,9 @@
 
   --ink: #F0F4F8;
   --ink-soft: #94A3B8;
+
+  /* Chip/tint background — was missing, so chips stayed pale blue in dark mode */
+  --blue-light: #0F1F3A;
 }
 
 html {

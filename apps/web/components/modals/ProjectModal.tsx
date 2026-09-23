@@ -55,7 +55,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-text-on-dark tracking-tight">
                   {project.title}
                 </h3>
-                <p className="text-blue-light font-medium text-sm sm:text-base">
+                <p className="text-text-on-dark/80 font-medium text-sm sm:text-base">
                   {project.subtitle}
                 </p>
               </div>

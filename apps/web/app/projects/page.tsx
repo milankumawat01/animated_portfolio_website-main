@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { getProjects } from '@/lib/convex'
+import { getProjects, getSiteSettings } from '@/lib/convex'
+import { SubPageShell } from '@/components/SubPageShell'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -10,31 +11,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  const projects = await getProjects()
+  const [projects, settings] = await Promise.all([getProjects(), getSiteSettings()])
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
-      {/* Simple static header for subpages — P3 will replace with wired Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E4E9F1] shadow-soft py-3">
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group select-none">
-            <div className="flex items-center font-extrabold text-2xl tracking-tighter">
-              <span className="text-ink group-hover:text-blue transition-colors">M</span>
-              <span className="text-blue transition-colors group-hover:opacity-80">K</span>
-            </div>
-            <span className="font-bold text-sm tracking-tight text-ink hidden sm:inline-block">
-              Milan Kumawat
-            </span>
-          </Link>
-          <nav className="flex items-center gap-6 text-sm font-semibold text-text-secondary">
-            <Link href="/" className="hover:text-ink transition-colors">Home</Link>
-            <Link href="/projects" className="text-ink">Projects</Link>
-            <Link href="/blog" className="hover:text-ink transition-colors">Blog</Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-1">
+    <SubPageShell settings={settings}>
         {/* Page Header */}
         <section className="py-16 sm:py-20 bg-bg-soft border-b border-border">
           <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
@@ -65,10 +45,10 @@ export default async function ProjectsPage() {
                   <Link
                     key={project._id}
                     href={`/projects/${project.slug}`}
-                    className="bg-white rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col group overflow-hidden"
+                    className="bg-surface-elevated rounded-2xl border border-border shadow-soft hover:shadow-card hover:border-blue/30 transition-all duration-300 flex flex-col group overflow-hidden"
                   >
                     {/* Preview Image */}
-                    <div className="relative w-full h-48 sm:h-52 bg-slate-950 overflow-hidden border-b border-border/60">
+                    <div className="relative w-full h-48 sm:h-52 bg-surface-feature overflow-hidden border-b border-border/60">
                       {project.imageUrl ? (
                         <Image
                           src={project.imageUrl}
@@ -77,7 +57,7 @@ export default async function ProjectsPage() {
                           className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-600 text-xs font-semibold">
+                        <div className="w-full h-full flex items-center justify-center text-text-on-dark/40 text-xs font-semibold">
                           No image
                         </div>
                       )}
@@ -130,15 +110,6 @@ export default async function ProjectsPage() {
             )}
           </div>
         </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-[#070A0F] text-white border-t border-slate-800/80 py-8">
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div>© 2026 Milan Kumawat. All rights reserved.</div>
-          <Link href="/" className="hover:text-white transition-colors">← Back to home</Link>
-        </div>
-      </footer>
-    </div>
+    </SubPageShell>
   )
 }

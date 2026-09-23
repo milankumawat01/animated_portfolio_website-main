@@ -1,31 +1,25 @@
-import { MutationCtx, QueryCtx, ActionCtx } from '../_generated/server'
+import { getAuthUserId } from '@convex-dev/auth/server'
+import { MutationCtx, QueryCtx } from '../_generated/server'
 
 /**
  * The only authorization primitive in the codebase.
  * Every admin mutation and admin query calls this first.
  *
- * Compares the authenticated identity against the ADMIN_IDENTITY env variable.
- * Throws with a generic message so the caller gets no information about what
- * identity would have worked.
+ * Loads the signed-in user and compares their email with the ADMIN_EMAIL env
+ * variable. Fails closed: if ADMIN_EMAIL is unset, nobody is admin.
+ * Throws with a generic message so the caller learns nothing about who would pass.
  */
-export async function requireAdmin(ctx: MutationCtx | QueryCtx | ActionCtx) {
-  const identity = await ctx.auth.getUserIdentity()
-  const adminIdentity = process.env.ADMIN_IDENTITY
-
-  if (!identity) {
+export async function requireAdmin(ctx: MutationCtx | QueryCtx) {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase()
+  const userId = await getAuthUserId(ctx)
+  if (!adminEmail || !userId) {
     throw new Error('Unauthorized')
   }
 
-  if (!adminIdentity) {
-    // In dev without ADMIN_IDENTITY set, allow any authenticated user.
-    // In production this must be set — Convex will surface the missing env.
-    return identity
-  }
-
-  // ADMIN_IDENTITY is the tokenIdentifier, e.g. "https://...github|12345678"
-  if (identity.tokenIdentifier !== adminIdentity) {
+  const user = await ctx.db.get(userId)
+  if (!user?.email || user.email.toLowerCase() !== adminEmail) {
     throw new Error('Unauthorized')
   }
 
-  return identity
+  return user
 }

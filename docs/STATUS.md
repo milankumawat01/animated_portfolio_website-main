@@ -4,8 +4,8 @@
 > session that ends must leave it accurate. A phase updates **only its own row** and
 > **appends** to the log — never rewrites someone else's line.
 
-**Last updated:** 2026-09-23 — P2 done (dev deployment seeded, parity clean). P7 code done: revalidation wired end to end, JSON-LD, OG images, admin noindex. Deploy runbook in `docs/DEPLOY.md`. Found: sub-pages never got the real Navbar or the P5 token pass.
-**Next action:** (a) P5 rework — wire real Navbar/Footer into `/projects`, `/blog` and detail pages and tokenize their colors. (b) Milan follows `docs/DEPLOY.md` (Convex env vars — **set `ADMIN_IDENTITY`** — Vercel projects, domains), then runs its §5 checklist.
+**Last updated:** 2026-09-23 — All code phases done (P0–P6C, P7 code). Sub-pages rebuilt on the real Navbar/Footer and fully themed. Admin login switched to email + password, locked to `ADMIN_EMAIL`; admin account created on dev. Both apps build clean.
+**Next action:** Milan follows `docs/DEPLOY.md` — prod Convex env vars, two Vercel projects, domains, create the prod admin account — then runs its §5 checklist. That closes P7.
 
 ---
 
@@ -20,8 +20,8 @@
 | P4A | Projects pages | ✅ Done | 3 | Parallel-safe with P4B, P4C |
 | P4B | Blog pages | ✅ Done | 3 | Parallel-safe with P4A, P4C |
 | P4C | Leads pipeline | ✅ Done | 3 | Parallel-safe with P4A, P4B |
-| P5 | Dark / light theme | 🔁 Needs rework | 4 | Home + components tokenized. **`app/projects/**` and `app/blog/**` still use stub headers + ~50 raw colors (`bg-white/90`, `#E4E9F1`, `text-ink`…) — broken in dark mode.** |
-| P6A | Admin: auth, shell, projects | ✅ Done | 5 | Needs only P1. Separate app. |
+| P5 | Dark / light theme | ✅ Done | 4 | Reworked 2026-09-23: sub-pages on `SubPageShell` (real Navbar/Footer), raw colors tokenized, `--blue-light` dark value, `dark:prose-invert` on posts. |
+| P6A | Admin: auth, shell, projects | ✅ Done | 5 | Auth reworked 2026-09-23: email + password (was GitHub OAuth, which never worked — `convex/http.ts` was missing). |
 | P6B | Admin: blog editor + media | ✅ Done | 5 | Blog editor, live Markdown preview, MediaLibrary, MediaPicker wired. |
 | P6C | Admin: leads + site content | ✅ Done | 5 | Leads inbox, Experience/Skills/Settings editors all wired. |
 | P7 | SEO, performance, QA, deploy | 🟦 In progress | 6 | Code complete. Remaining is Milan-only: env vars, Vercel, domains, live QA — see `docs/DEPLOY.md`. Analytics not added (Milan's call). |
@@ -52,6 +52,7 @@ does not re-litigate it.
 | 2026-09-22 | **`cacheComponents: false`** | Default (off). `generateStaticParams` returning `[]` is a build error when on, and P4A/P4B need runtime ISR. All content pages use `'use cache'` + `cacheTag()` + `cacheLife()` explicitly. |
 | 2026-09-22 | **Blog `publishedAt` is admin-editable** | Milan backdates posts, so the publish date is a real field he sets, not a stamp. Backdating is supported; scheduled publishing is not — a future date publishes now and just displays a future date. |
 | 2026-09-22 | **Markdown rendering stack: remark + remark-gfm + remark-html** | Server component, no client JS, sanitize=false (admin-authored content). P6B preview must match. |
+| 2026-09-23 | **Admin auth: email + password, not GitHub** | Milan's call. Convex Auth `Password` provider; `profile()` refuses any email but `ADMIN_EMAIL`, so no second account can exist. `requireAdmin` now loads the user and compares email to `ADMIN_EMAIL` and **fails closed** — replaces `ADMIN_IDENTITY`, which failed open. Docs 01/04/P01 still mention GitHub/`ADMIN_IDENTITY`; this row supersedes them. |
 | 2026-09-23 | **Home-only data uses the `home` cache tag** | `getSiteSettings`/`getExperience`/`getSkillCategories` were tagged `siteSettings`/`experience`/`skills`, which `/api/revalidate` rejects. Now `home`, per the 5-tag taxonomy in `03-ROUTES §6.1`. |
 | 2026-09-23 | **OG images are generated cards, not cover photos** | `opengraph-image.tsx` at `/`, `/projects/[slug]`, `/blog/[slug]`. Post `generateMetadata` no longer passes `imageUrl`, so every share shows title + excerpt consistently. |
 | 2026-09-23 | **`importLegacy` takes `{"overwrite": true}`** | Dev-only repair: patches existing legacy rows back to seed content. Default stays insert-if-missing so admin edits survive. Never use on prod. |
@@ -81,9 +82,7 @@ Answer before the content becomes published database rows (P2).
       drifted from the annotations actually on the page. Wire it up, or delete it?
 - [ ] **Admin domain** — is `admin.milankumawat.in` the intended hostname?
 - [ ] **Lead notification address** — `hey@milankumawat.in`, or somewhere else?
-- [ ] **GitHub identity for admin login** — which account is the single admin?
-      ⚠️ `requireAdmin` **fails open** when `ADMIN_IDENTITY` is unset: any GitHub user who
-      signs in is admin. Must be set on prod before the admin URL is live.
+- [x] **Admin login** — answered: email + password, `milankumawat01@gmail.com`. See Decisions.
 - [ ] **Analytics** — add Vercel Analytics (P7 step 7 default), or nothing?
 
 ---
@@ -229,6 +228,21 @@ Append one line per session. Never rewrite.
               cloud can't reach localhost, and no env vars are set on Convex yet).
             Found: sub-pages never got the real Navbar or P5 tokens → P5 🔁.
             Build: ✅ passes (both apps). tsc --noEmit: ✅ web, admin, backend.
+2026-09-23  P5 rework. New components/SubPageShell.tsx (Navbar + Footer + contact/resume
+              modals) wraps /projects, /projects/[slug], /blog, /blog/[slug]; the four
+              copy-pasted stub headers/footers are gone. Navbar: solid on non-home routes
+              (was transparent white-on-white — the P3 fix never landed), active link
+              follows the route, "Let's Talk" no longer white-on-white in dark. Raw colors
+              on those pages → tokens. --blue-light had no dark value (15 chips site-wide
+              stayed pale) → added. Post bodies: dark:prose-invert.
+              Verified via curl on `next start`: all 5 routes 200, real navbar/footer,
+              zero stub classes. Chrome extension not connected — no visual pass.
+            Admin auth → email + password (Milan's request). Added convex/http.ts (was
+              missing, so Convex Auth never had routes). requireAdmin fails closed on
+              ADMIN_EMAIL. Dev env: ADMIN_EMAIL, JWT_PRIVATE_KEY, JWKS set. Admin account
+              created on dev. Verified: correct password → token; wrong password and
+              another email → refused; users table has exactly 1 row.
+            Build: ✅ both apps. tsc --noEmit: ✅ web, admin, backend.
 ```
 
 ---

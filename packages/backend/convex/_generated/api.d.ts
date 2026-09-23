@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as blog from "../blog.js";
 import type * as experience from "../experience.js";
+import type * as http from "../http.js";
 import type * as internal_notify from "../internal/notify.js";
 import type * as internal_revalidate from "../internal/revalidate.js";
 import type * as internal_seed from "../internal/seed.js";
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   blog: typeof blog;
   experience: typeof experience;
+  http: typeof http;
   "internal/notify": typeof internal_notify;
   "internal/revalidate": typeof internal_revalidate;
   "internal/seed": typeof internal_seed;

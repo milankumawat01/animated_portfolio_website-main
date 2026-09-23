@@ -19,18 +19,19 @@ backend. **Only `apps/web` deploys Convex** — two projects deploying the same 
 |---|---|---|
 | `SITE_URL` | `https://milankumawat.in` | `internal/revalidate.ping` — where to POST |
 | `REVALIDATE_SECRET` | long random string, **same** as on Vercel | `internal/revalidate.ping` |
-| `ADMIN_IDENTITY` | your `tokenIdentifier` — sign in once, then read it from the `users`/auth tables or a log | `requireAdmin` — ⚠️ **unset means ANY GitHub user who signs in is admin.** It fails open; nothing warns you. Set it before sharing the admin URL. |
-| `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` | GitHub OAuth app (step 4) | Convex Auth |
-| `JWT_PRIVATE_KEY`, `JWKS`, `SITE_URL` for auth | generate with `npx @convex-dev/auth --prod` | Convex Auth |
+| `ADMIN_EMAIL` | `milankumawat01@gmail.com` | Password sign-in and `requireAdmin` — only this address can sign up or sign in. Fails closed: unset means nobody is admin. |
+| `JWT_PRIVATE_KEY`, `JWKS` | a fresh RS256 pair — `npx @convex-dev/auth --prod` generates and sets both | Convex Auth token signing |
 | `RESEND_API_KEY` | Resend dashboard | lead notification email |
 | `LEAD_NOTIFY_TO` | `hey@milankumawat.in` (or wherever) | lead notification email |
 
-> The dev deployment (`sincere-duck-662`) currently has **no** env vars set, so admin login,
-> lead emails and revalidation pings are inert in dev too. Set the same list there with
-> `npx convex env set NAME value` (no `--prod`) to test locally.
+> Dev (`sincere-duck-662`) already has `ADMIN_EMAIL`, `JWT_PRIVATE_KEY` and `JWKS`, and the
+> admin account exists there. Dev still lacks `REVALIDATE_SECRET`, `SITE_URL`, `RESEND_API_KEY`
+> and `LEAD_NOTIFY_TO`, so revalidation pings and lead emails are inert in dev.
 
-4. **GitHub OAuth app** (github.com → Settings → Developer settings → OAuth Apps):
-   callback URL `https://<prod-deployment>.convex.site/api/auth/callback/github`.
+4. **Create the prod admin account** once the admin app is live: open
+   `https://admin.milankumawat.in/login` → "First time? Create the admin account" → your
+   email and password (10+ characters). Accounts live per deployment, so the dev account
+   does not carry over. After that, only "Sign in" is needed.
 
 ## 2. Seed production
 

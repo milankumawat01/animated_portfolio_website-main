@@ -3,7 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2, Home, ChevronRight } from 'lucide-react'
-import { getProject, getProjects } from '@/lib/convex'
+import { getProject, getProjects, getSiteSettings } from '@/lib/convex'
+import { SubPageShell } from '@/components/SubPageShell'
 import { JsonLd, creativeWorkSchema } from '@/components/seo/JsonLd'
 
 interface Props {
@@ -46,30 +47,11 @@ export default async function ProjectPage({ params }: Props) {
 
   if (!project) notFound()
 
-  return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
-      <JsonLd data={creativeWorkSchema(project)} />
-      {/* Static sub-page header (P3 will wire the real Navbar) */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E4E9F1] shadow-soft py-3">
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group select-none">
-            <div className="flex items-center font-extrabold text-2xl tracking-tighter">
-              <span className="text-ink group-hover:text-blue transition-colors">M</span>
-              <span className="text-blue transition-colors group-hover:opacity-80">K</span>
-            </div>
-            <span className="font-bold text-sm tracking-tight text-ink hidden sm:inline-block">
-              Milan Kumawat
-            </span>
-          </Link>
-          <nav className="flex items-center gap-6 text-sm font-semibold text-text-secondary">
-            <Link href="/" className="hover:text-ink transition-colors">Home</Link>
-            <Link href="/projects" className="hover:text-ink transition-colors">Projects</Link>
-            <Link href="/blog" className="hover:text-ink transition-colors">Blog</Link>
-          </nav>
-        </div>
-      </header>
+  const settings = await getSiteSettings().catch(() => null)
 
-      <main className="flex-1">
+  return (
+    <SubPageShell settings={settings}>
+      <JsonLd data={creativeWorkSchema(project)} />
         {/* Breadcrumb */}
         <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pt-8 pb-0">
           <nav className="flex items-center gap-2 text-xs text-text-muted font-medium" aria-label="Breadcrumb">
@@ -101,7 +83,7 @@ export default async function ProjectPage({ params }: Props) {
         {/* Cover Image */}
         {project.imageUrl && (
           <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pb-8">
-            <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden border border-border bg-slate-950 shadow-card">
+            <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden border border-border bg-surface-feature shadow-card">
               <Image
                 src={project.imageUrl}
                 alt={project.title}
@@ -217,7 +199,7 @@ export default async function ProjectPage({ params }: Props) {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border border border-border text-text-primary font-semibold text-sm transition"
               >
                 <span>Source Repository</span>
                 <ExternalLink className="w-4 h-4" />
@@ -251,15 +233,6 @@ export default async function ProjectPage({ params }: Props) {
             </Link>
           </div>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-[#070A0F] text-white border-t border-slate-800/80 py-8">
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div>© 2026 Milan Kumawat. All rights reserved.</div>
-          <Link href="/projects" className="hover:text-white transition-colors">← All projects</Link>
-        </div>
-      </footer>
-    </div>
+    </SubPageShell>
   )
 }

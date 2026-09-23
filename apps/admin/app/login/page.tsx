@@ -2,16 +2,50 @@
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useConvexAuth } from 'convex/react'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '0.75rem 0.875rem',
+  border: '1px solid #d1d5db',
+  borderRadius: '8px',
+  fontSize: '0.95rem',
+  boxSizing: 'border-box',
+  marginBottom: '0.875rem',
+}
 
 export default function LoginPage() {
   const { signIn } = useAuthActions()
   const { isAuthenticated, isLoading } = useConvexAuth()
   const router = useRouter()
 
+  // 'signIn' normally; 'signUp' only the very first time, to create the admin account.
+  const [flow, setFlow] = useState<'signIn' | 'signUp'>('signIn')
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
   useEffect(() => {
     if (!isLoading && isAuthenticated) router.replace('/dashboard')
   }, [isAuthenticated, isLoading, router])
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    setSubmitting(true)
+    const form = new FormData(e.currentTarget)
+    form.set('flow', flow)
+    try {
+      await signIn('password', form)
+    } catch {
+      setError(
+        flow === 'signIn'
+          ? 'Invalid email or password.'
+          : 'Could not create the account. Use the admin email and a password of 10+ characters.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div
@@ -24,67 +58,80 @@ export default function LoginPage() {
         fontFamily: 'system-ui, sans-serif',
       }}
     >
-      <div
+      <form
+        onSubmit={onSubmit}
         style={{
           background: 'white',
           padding: '3rem',
           borderRadius: '12px',
           boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-          textAlign: 'center',
-          minWidth: '320px',
+          width: '100%',
+          maxWidth: '380px',
+          boxSizing: 'border-box',
         }}
       >
-        <h1
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            marginBottom: '0.5rem',
-            margin: '0 0 0.5rem',
-          }}
-        >
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 0.5rem', textAlign: 'center' }}>
           Portfolio Admin
         </h1>
-        <p
-          style={{
-            color: '#6b7280',
-            marginBottom: '2rem',
-            fontSize: '0.9rem',
-            margin: '0 0 2rem',
-          }}
-        >
-          Sign in to manage your portfolio
+        <p style={{ color: '#6b7280', fontSize: '0.9rem', margin: '0 0 2rem', textAlign: 'center' }}>
+          {flow === 'signIn' ? 'Sign in to manage your portfolio' : 'Create the admin account (one time)'}
         </p>
+
+        <input name="email" type="email" placeholder="Email" autoComplete="email" required style={inputStyle} />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          autoComplete={flow === 'signIn' ? 'current-password' : 'new-password'}
+          minLength={flow === 'signUp' ? 10 : undefined}
+          required
+          style={inputStyle}
+        />
+
+        {error && (
+          <p role="alert" style={{ color: '#b91c1c', fontSize: '0.85rem', margin: '0 0 0.875rem' }}>
+            {error}
+          </p>
+        )}
+
         <button
-          onClick={() => void signIn('github', { redirectTo: '/dashboard' })}
+          type="submit"
+          disabled={submitting}
           style={{
             width: '100%',
             padding: '0.875rem 1.5rem',
-            background: '#24292e',
+            background: '#111827',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            cursor: 'pointer',
+            cursor: submitting ? 'wait' : 'pointer',
             fontSize: '1rem',
             fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            boxSizing: 'border-box',
+            opacity: submitting ? 0.7 : 1,
           }}
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-          </svg>
-          Sign in with GitHub
+          {submitting ? 'Please wait…' : flow === 'signIn' ? 'Sign in' : 'Create account'}
         </button>
-      </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setFlow(flow === 'signIn' ? 'signUp' : 'signIn')
+            setError(null)
+          }}
+          style={{
+            width: '100%',
+            marginTop: '1rem',
+            background: 'none',
+            border: 'none',
+            color: '#6b7280',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+          }}
+        >
+          {flow === 'signIn' ? 'First time? Create the admin account' : 'Already set up? Sign in'}
+        </button>
+      </form>
     </div>
   )
 }
