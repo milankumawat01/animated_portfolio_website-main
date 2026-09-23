@@ -5,7 +5,7 @@
 > **appends** to the log — never rewrites someone else's line.
 
 **Last updated:** 2026-09-23 — **Live.** Public site on `https://milankumawat.is-a.dev`, admin on `https://milan-portfolio-admin.vercel.app`, Convex prod `polite-hornet-484` seeded. Pre-launch review fixed 5 bugs (contact form lost every lead, media covers invisible, new-post create failed, lead notes wiped, error text masked). See `docs/DEPLOY.md`.
-**Next action:** Milan — (1) fix the contact email: `hey@milankumawat.in` bounces, the domain doesn't exist; (2) Resend key + `LEAD_NOTIFY_TO` for lead emails; (3) real `liveUrl`s. Then Lighthouse + social-preview checks close P7.
+**Next action:** (1) Milan: working contact email (`hey@milankumawat.in` bounces) + Resend key/`LEAD_NOTIFY_TO`; real `liveUrl`s. (2) Perf: home is 74 on mobile — `HomeClient` makes the whole page a client tree (TBT 720ms). Move static sections to server components, keep modals/cursor as client islands. (3) Delete the two test leads (`launch-check@example.com` on prod, `reviewtest@example.com` on dev) from the admin inbox.
 
 ---
 
@@ -24,7 +24,7 @@
 | P6A | Admin: auth, shell, projects | ✅ Done | 5 | Auth reworked 2026-09-23: email + password (was GitHub OAuth, which never worked — `convex/http.ts` was missing). |
 | P6B | Admin: blog editor + media | ✅ Done | 5 | Blog editor, live Markdown preview, MediaLibrary, MediaPicker wired. |
 | P6C | Admin: leads + site content | ✅ Done | 5 | Leads inbox, Experience/Skills/Settings editors all wired. |
-| P7 | SEO, performance, QA, deploy | 🟦 In progress | 6 | Code complete. Remaining is Milan-only: env vars, Vercel, domains, live QA — see `docs/DEPLOY.md`. Analytics not added (Milan's call). |
+| P7 | SEO, performance, QA, deploy | ✅ Done | 6 | Live 2026-09-23. Lighthouse (mobile, live): project/post 98–99 perf, 95+ a11y, 100 BP/SEO; home 74 perf (see next action). Open: Resend, real contact email, social-preview debugger check. |
 | P8 | AI assistant bot | 🔒 Future | — | Do not start unless Milan asks |
 
 Status values: `⬜ Not started` · `🟦 In progress` · `✅ Done` · `⚠️ Blocked` · `🔁 Needs rework` · `🔒 Future`
@@ -266,6 +266,17 @@ Append one line per session. Never rewrite.
               functions deployed, seeded, parity clean, admin account created on prod.
               Vercel: existing project re-rooted to apps/web + 3 env vars; new project
               milan-portfolio-admin (apps/admin). Pushed main → both build from GitHub.
+            Admin build failed on Vercel: MarkdownPreview imports remark-* / unified that
+              were only hoisted from apps/web → declared in apps/admin. Both Ready.
+            Live checks (milankumawat.is-a.dev): 13 routes correct status incl. 404s;
+              content from prod Convex; canonical/og:image/JSON-LD right on all 3 page
+              types; sitemap 11 URLs; /api/revalidate 401; no secrets in client JS;
+              Convex→site revalidate ping OK; prod lead stored (email skipped: no Resend).
+              Admin: login form + noindex; scripted prod sign-in → admin queries OK,
+              anon + wrong password refused.
+            Lighthouse home perf 68 (LCP 5.1s) — Google Fonts @import was render-
+              blocking → next/font. Now 74 home / 98 project / 99 post. Also title
+              template, removed dead /favicon.ico link.
 ```
 
 ---
