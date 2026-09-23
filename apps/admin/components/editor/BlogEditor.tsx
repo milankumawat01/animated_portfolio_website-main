@@ -174,6 +174,9 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
         await update({
           id: post._id,
           ...payload,
+          // Send explicit empties so a removed or replaced cover is cleared server-side.
+          imageStorageId: imageStorageId ?? null,
+          imageUrl: imageUrl.trim(),
           slug: slug !== post.slug ? slug : undefined,
         })
       } else {
@@ -454,11 +457,11 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
           {/* Cover image */}
           <div style={groupStyle}>
             <label style={labelStyle}>Cover Image</label>
-            {imageStorageId && coverUrl && (
+            {(imageStorageId ? coverUrl : imageUrl.trim()) && (
               <div style={{ marginBottom: '0.5rem' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={coverUrl}
+                  src={(imageStorageId ? coverUrl : imageUrl.trim()) ?? ''}
                   alt="Cover"
                   style={{ maxWidth: '200px', borderRadius: '6px', border: '1px solid #e5e7eb' }}
                 />
@@ -720,9 +723,9 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
       {/* Media picker dialog */}
       {showPicker && (
         <MediaPicker
-          onSelect={(storageId, _url) => {
-            setImageStorageId(storageId)
-            setImageUrl('')
+          onSelect={(url) => {
+            setImageStorageId(undefined)
+            setImageUrl(url)
             setShowPicker(false)
           }}
           onClose={() => setShowPicker(false)}

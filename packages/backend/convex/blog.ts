@@ -121,7 +121,8 @@ export const update = mutation({
     title:           v.optional(v.string()),
     excerpt:         v.optional(v.string()),
     body:            v.optional(v.string()),
-    imageStorageId:  v.optional(v.id('_storage')),
+    // null / '' clear the cover; omitted leaves it unchanged.
+    imageStorageId:  v.optional(v.union(v.id('_storage'), v.null())),
     imageUrl:        v.optional(v.string()),
     tags:            v.optional(v.array(v.string())),
     readTimeMinutes: v.optional(v.number()),
@@ -145,7 +146,14 @@ export const update = mutation({
     if (patch.body && patch.body.length > BLOG_BODY_MAX) throw new ConvexError('Blog body too long.')
     const before = await ctx.db.get(id)
     if (!before) throw new ConvexError('Post not found.')
-    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
+    const { imageStorageId, imageUrl, ...rest } = patch
+    await ctx.db.patch(id, {
+      ...rest,
+      // Patching a field to undefined removes it.
+      ...(imageStorageId !== undefined && { imageStorageId: imageStorageId ?? undefined }),
+      ...(imageUrl !== undefined && { imageUrl: imageUrl || undefined }),
+      updatedAt: Date.now(),
+    })
     await scheduleRevalidate(ctx, [
       'blog', 'home', `post:${before.slug}`, `post:${patch.slug ?? before.slug}`,
     ])

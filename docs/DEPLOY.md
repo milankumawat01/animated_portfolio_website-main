@@ -36,6 +36,7 @@ backend. **Only `apps/web` deploys Convex** — two projects deploying the same 
 | `JWT_PRIVATE_KEY`, `JWKS` | a fresh RS256 pair — `npx @convex-dev/auth --prod` generates and sets both | Convex Auth token signing |
 | `RESEND_API_KEY` | Resend dashboard | lead notification email |
 | `LEAD_NOTIFY_TO` | `hey@milankumawat.in` (or wherever) | lead notification email |
+| `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Cloudflare R2 (same values on Vercel `apps/web`) | `media.generateUploadUrl` presigns uploads to `portfolio/media/`; `media.deleteR2Object` |
 
 > Dev (`sincere-duck-662`) already has `ADMIN_EMAIL`, `JWT_PRIVATE_KEY` and `JWKS`, and the
 > admin account exists there. Dev still lacks `REVALIDATE_SECRET`, `SITE_URL`, `RESEND_API_KEY`
@@ -65,7 +66,7 @@ Never pass `{"overwrite": true}` in production — it resets admin edits back to
 |---|---|
 | Root directory | `apps/web` |
 | Build command | `cd ../../packages/backend && npx convex deploy --cmd 'cd ../../apps/web && npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL` |
-| Env | `CONVEX_DEPLOY_KEY` (prod key from 1.2), `REVALIDATE_SECRET` (same as Convex), `NEXT_PUBLIC_SITE_URL=https://milankumawat.is-a.dev` |
+| Env | `CONVEX_DEPLOY_KEY` (prod key from 1.2), `REVALIDATE_SECRET` (same as Convex), `NEXT_PUBLIC_SITE_URL=https://milankumawat.is-a.dev`, the four `R2_*` vars (served by `app/media/[...path]`), optional `NEXT_PUBLIC_ADMIN_URL` (target of `/admin`, defaults to the admin Vercel URL) |
 | Domain | `milankumawat.is-a.dev` |
 
 `convex deploy` injects `NEXT_PUBLIC_CONVEX_URL` itself. Preview deploys: either give them a
@@ -96,3 +97,11 @@ The admin serves `robots.txt` with `Disallow: /` and a `noindex` meta on every p
 - [ ] Submit a real lead on production → appears in admin inbox **and** in email
 - [ ] Click through both themes on desktop and mobile
 - [ ] No secret in the client bundle: `grep -r "REVALIDATE_SECRET\|re_" apps/web/.next/static` is empty
+
+## R2 media
+
+Admin uploads go straight from the browser to R2 (`portfolio/media/<uuid>.<ext>`) with a
+presigned PUT, and the public site serves them from `/media/<file>` with a one-year immutable
+cache, so Convex carries no image bytes. The bucket stays private. It needs a CORS rule
+allowing `PUT` with a `Content-Type` header from the admin origins
+(`https://milan-portfolio-admin.vercel.app`, `http://localhost:3001`).

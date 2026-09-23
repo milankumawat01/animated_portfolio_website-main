@@ -1,21 +1,21 @@
 'use client'
 import { useState, useRef } from 'react'
-import { useQuery, useMutation } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { errorMessage } from '@/lib/errors'
+import { useUploadMedia } from '@/lib/uploadMedia'
 
 const MEDIA_SIZE_MAX = 10 * 1024 * 1024 // 10 MB
 
 interface MediaPickerProps {
-  onSelect: (storageId: Id<'_storage'>, url: string | null) => void
+  onSelect: (url: string) => void
   onClose: () => void
 }
 
 export function MediaPicker({ onSelect, onClose }: MediaPickerProps) {
   const mediaItems = useQuery(api.media.list) ?? []
-  const generateUploadUrl = useMutation(api.media.generateUploadUrl)
-  const createMedia = useMutation(api.media.create)
+  const uploadMedia = useUploadMedia()
 
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
@@ -24,13 +24,6 @@ export function MediaPicker({ onSelect, onClose }: MediaPickerProps) {
   const [pendingDims, setPendingDims] = useState<{ w: number; h: number } | null>(null)
   const [showUpload, setShowUpload] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
-
-  // Get URLs for all media items
-  const urlFor = useQuery(
-    api.media.list,
-    // We use the list query which returns storageId — we'll display via Convex URL
-  )
-  void urlFor // suppress lint
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -66,24 +59,7 @@ export function MediaPicker({ onSelect, onClose }: MediaPickerProps) {
     setUploading(true)
     setUploadError('')
     try {
-      const uploadUrl = await generateUploadUrl()
-      const res = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': pendingFile.type },
-        body: pendingFile,
-      })
-      if (!res.ok) throw new Error('Upload failed')
-      const { storageId } = (await res.json()) as { storageId: Id<'_storage'> }
-
-      await createMedia({
-        storageId,
-        filename: pendingFile.name,
-        contentType: pendingFile.type,
-        size: pendingFile.size,
-        alt: altText.trim(),
-        width: pendingDims?.w,
-        height: pendingDims?.h,
-      })
+      await uploadMedia(pendingFile, altText.trim(), pendingDims)
 
       setPendingFile(null)
       setPendingDims(null)
@@ -302,7 +278,7 @@ export function MediaPicker({ onSelect, onClose }: MediaPickerProps) {
 
 type MediaItem = {
   _id: Id<'media'>
-  storageId: Id<'_storage'>
+  url: string | null
   filename: string
   alt: string
   width?: number
@@ -315,13 +291,13 @@ function MediaPickerItem({
   onSelect,
 }: {
   item: MediaItem
-  onSelect: (storageId: Id<'_storage'>, url: string | null) => void
+  onSelect: (url: string) => void
 }) {
-  const url = useQuery(api.media.urlFor, { storageId: item.storageId })
+  const url = item.url
 
   return (
     <div
-      onClick={() => onSelect(item.storageId, url ?? null)}
+      onClick={() => { if (url) onSelect(url) }}
       style={{
         border: '2px solid #e5e7eb',
         borderRadius: '8px',

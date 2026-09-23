@@ -4,6 +4,7 @@ import { useQuery, useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { errorMessage } from '@/lib/errors'
+import { useUploadMedia } from '@/lib/uploadMedia'
 
 const MEDIA_SIZE_MAX = 10 * 1024 * 1024 // 10 MB
 
@@ -23,7 +24,7 @@ function formatDate(ts: number) {
 
 type MediaItem = {
   _id: Id<'media'>
-  storageId: Id<'_storage'>
+  url: string | null
   filename: string
   contentType: string
   size: number
@@ -42,11 +43,12 @@ function MediaCard({
   onDelete: (item: MediaItem) => void
   onEditAlt: (item: MediaItem) => void
 }) {
-  const url = useQuery(api.media.urlFor, { storageId: item.storageId })
+  const url = item.url
   const [copied, setCopied] = useState(false)
 
-  const copyId = () => {
-    void navigator.clipboard.writeText(item.storageId).then(() => {
+  const copyUrl = () => {
+    if (!url) return
+    void navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })
@@ -137,7 +139,7 @@ function MediaCard({
             Edit Alt
           </button>
           <button
-            onClick={copyId}
+            onClick={copyUrl}
             style={{
               padding: '0.25rem 0.5rem',
               background: '#f3f4f6',
@@ -148,7 +150,7 @@ function MediaCard({
               color: '#374151',
             }}
           >
-            {copied ? 'Copied!' : 'Copy ID'}
+            {copied ? 'Copied!' : 'Copy URL'}
           </button>
           <button
             onClick={() => onDelete(item)}
@@ -172,8 +174,7 @@ function MediaCard({
 
 export function MediaLibrary() {
   const mediaItems = (useQuery(api.media.list) ?? []) as MediaItem[]
-  const generateUploadUrl = useMutation(api.media.generateUploadUrl)
-  const createMedia = useMutation(api.media.create)
+  const uploadMedia = useUploadMedia()
   const removeMedia = useMutation(api.media.remove)
   const updateMedia = useMutation(api.media.create) // we'll use a different mutation for update — see below
   void updateMedia
@@ -226,24 +227,7 @@ export function MediaLibrary() {
     setUploading(true)
     setUploadError('')
     try {
-      const uploadUrl = await generateUploadUrl()
-      const res = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': pendingFile.type },
-        body: pendingFile,
-      })
-      if (!res.ok) throw new Error('Upload to storage failed')
-      const { storageId } = (await res.json()) as { storageId: Id<'_storage'> }
-
-      await createMedia({
-        storageId,
-        filename: pendingFile.name,
-        contentType: pendingFile.type,
-        size: pendingFile.size,
-        alt: altText.trim(),
-        width: pendingDims?.w,
-        height: pendingDims?.h,
-      })
+      await uploadMedia(pendingFile, altText.trim(), pendingDims)
 
       setPendingFile(null)
       setPendingDims(null)

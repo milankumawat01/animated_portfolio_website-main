@@ -158,7 +158,9 @@ export default defineSchema({
   }).index('by_key', ['key']),
 
   media: defineTable({
-    storageId:   v.id('_storage'),
+    // New uploads go to R2 (r2Key); storageId is kept for rows uploaded to Convex storage before.
+    storageId:   v.optional(v.id('_storage')),
+    r2Key:       v.optional(v.string()),
     filename:    v.string(),
     contentType: v.string(),
     size:        v.number(),
