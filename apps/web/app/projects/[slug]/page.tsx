@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { openGraph } from '@/lib/seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -29,6 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: project.seo?.title ?? project.title,
       description: project.seo?.description ?? project.description,
       alternates: { canonical: `/projects/${slug}` },
+      openGraph: openGraph(`/projects/${slug}`, {
+        type: 'article',
+        title: project.seo?.title ?? project.title,
+        description: project.seo?.description ?? project.description,
+        modifiedTime: new Date(project.updatedAt).toISOString(),
+        tags: project.tags,
+      }),
     }
   } catch {
     return { title: 'Project' }

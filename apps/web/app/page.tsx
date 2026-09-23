@@ -16,6 +16,14 @@ import { CustomCursor } from '@/components/ui/CustomCursor'
 import { DeferRenderGuard } from '@/components/ui/DeferRenderGuard'
 import { ModalProvider } from '@/components/modals/ModalProvider'
 import { JsonLd, personSchema } from '@/components/seo/JsonLd'
+import type { Metadata } from 'next'
+import { RSS_FEED } from '@/lib/seo'
+
+// Same site is also served on milankumawat.vercel.app and .eu.org; the
+// canonical points search engines at the primary domain (metadataBase).
+export const metadata: Metadata = {
+  alternates: { canonical: '/', types: RSS_FEED },
+}
 
 export default async function Home() {
   const [settings, projects, posts, experience, skills] = await Promise.all([

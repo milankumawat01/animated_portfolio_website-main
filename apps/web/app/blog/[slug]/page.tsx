@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { openGraph } from '@/lib/seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -40,14 +41,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: post.seo?.title ?? post.title,
       description: post.seo?.description ?? post.excerpt,
       alternates: { canonical: `/blog/${slug}` },
-      openGraph: {
+      openGraph: openGraph(`/blog/${slug}`, {
         type: 'article',
         title: post.seo?.title ?? post.title,
         description: post.seo?.description ?? post.excerpt,
         publishedTime: post.publishedAt
           ? new Date(post.publishedAt).toISOString()
           : undefined,
-      },
+        modifiedTime: new Date(post.updatedAt).toISOString(),
+        authors: ['Milan Kumawat'],
+        tags: post.tags,
+      }),
     }
   } catch {
     return { title: 'Article' }

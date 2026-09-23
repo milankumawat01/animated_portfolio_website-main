@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, Mail, Check, Copy, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { useMutation } from 'convex/react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { api as _api } from '@portfolio/backend/convex/_generated/api';
 import { errorMessage } from '@/lib/errors';
-import { ConvexClientProvider } from '@/lib/convex-client-provider';
+import { convexMutation } from '@/lib/convex-http';
 const api = _api as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 interface ContactModalProps {
@@ -17,8 +16,8 @@ interface ContactModalProps {
 
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
 
-// ContactFormInner — only rendered after hydration (see isMounted guard below),
-// so useMutation is guaranteed to run inside a live ConvexProvider context.
+// ContactFormInner — only rendered after hydration (see isMounted guard below).
+// Submits with a single HTTP request; no Convex WebSocket is opened.
 function ContactFormInner({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,7 +27,6 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const submitLead = useMutation(api.leads.submit);
 
   // Client-side validation (mirrors server for fast feedback)
   function validate(): string | null {
@@ -55,7 +53,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
     setErrorMsg('');
 
     try {
-      await submitLead({
+      await convexMutation(api.leads.submit, {
         name: name.trim(),
         email: email.trim(),
         message: message.trim(),
@@ -238,8 +236,8 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
 }
 
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
-  // isMounted prevents ContactFormInner (which calls useMutation) from rendering
-  // during SSR / static prerender — where there is no live Convex client.
+  // isMounted keeps ContactFormInner (which reads navigator/document on submit)
+  // out of SSR / static prerender.
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => { setIsMounted(true); }, []);
 
@@ -271,9 +269,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
         {/* Body — ContactFormInner mounts only after hydration */}
         <div className="p-6 sm:p-8">
           {isMounted && (
-            <ConvexClientProvider>
-              <ContactFormInner onClose={onClose} />
-            </ConvexClientProvider>
+            <ContactFormInner onClose={onClose} />
           )}
         </div>
       </div>

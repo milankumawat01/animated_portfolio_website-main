@@ -4,10 +4,17 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getProjects, getSiteSettings } from '@/lib/convex'
 import { SubPageShell } from '@/components/SubPageShell'
+import { openGraph } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'Projects',
+  description: 'AI products, backend platforms and internal tools built and shipped by Milan Kumawat.',
   alternates: { canonical: '/projects' },
+  openGraph: openGraph('/projects', {
+    type: 'website',
+    title: 'Projects | Milan Kumawat',
+    description: 'AI products, backend platforms and internal tools built and shipped by Milan Kumawat.',
+  }),
 }
 
 export default async function ProjectsPage() {

@@ -42,15 +42,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteUrl,
+    url: '/',
     title: 'Milan Kumawat | AI Engineer & Backend Developer',
     description: 'Building AI-powered products and scalable systems for a better tomorrow.',
-    siteName: 'Milan Kumawat Portfolio',
+    siteName: 'Milan Kumawat',
   },
+  // No title/description here: X falls back to each page's og:title and
+  // og:description, which would otherwise be shadowed by these site-wide ones.
   twitter: {
     card: 'summary_large_image',
-    title: 'Milan Kumawat | AI Engineer & Backend Developer',
-    description: 'Building AI-powered products and scalable systems for a better tomorrow.',
     creator: '@milankumawat',
   },
 };
@@ -64,8 +64,8 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${fontVars}`} suppressHydrationWarning>
       <body className="bg-bg-primary text-text-primary antialiased selection:bg-blue selection:text-white">
         {/* No ConvexProvider here: only the contact form and the blog view
-            counter talk to Convex, and each wraps itself so the client (and
-            its WebSocket) loads on demand instead of on every page. */}
+            counter talk to Convex, each with a one-shot HTTP call
+            (lib/convex-http.ts), so no page opens a WebSocket. */}
         <ThemeProvider>
           {children}
         </ThemeProvider>

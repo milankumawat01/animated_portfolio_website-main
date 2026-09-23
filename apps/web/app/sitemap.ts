@@ -12,22 +12,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPosts().catch(() => [] as Awaited<ReturnType<typeof getPosts>>),
   ])
 
+  // Real content dates instead of new Date(), which changed on every request
+  // and taught crawlers to ignore lastModified.
+  const latest = (docs: { updatedAt: number }[]) =>
+    docs.length ? new Date(Math.max(...docs.map((d) => d.updatedAt))) : undefined
+  const projectsModified = latest(projects)
+  const postsModified = latest(posts)
+  const siteModified = latest([...projects, ...posts])
+
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
-      lastModified: new Date(),
+      lastModified: siteModified,
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
       url: `${siteUrl}/projects`,
-      lastModified: new Date(),
+      lastModified: projectsModified,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${siteUrl}/blog`,
-      lastModified: new Date(),
+      lastModified: postsModified,
       changeFrequency: 'weekly',
       priority: 0.8,
     },

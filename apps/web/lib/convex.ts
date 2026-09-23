@@ -7,15 +7,16 @@ const api = _api as any // eslint-disable-line @typescript-eslint/no-explicit-an
 
 // ── Data helpers ─────────────────────────────────────────────────────────────
 // convex/nextjs fetchQuery is no-store internally, so we wrap each helper in
-// unstable_cache (Next.js ISR cache). Tags match what /api/revalidate (P7)
-// will purge. cacheLife('hours') comes in P7 when cacheComponents is enabled.
+// unstable_cache (Next.js ISR cache). Admin edits purge these tags through
+// /api/revalidate, so the 24h revalidate is only a safety net and Convex sees
+// about one read per query per day.
 
 export const getProjects = unstable_cache(
   async () => {
     return fetchQuery(api.projects.listPublished, {}) as Promise<ProjectDoc[]>
   },
   ['projects'],
-  { tags: ['projects'], revalidate: 3600 },
+  { tags: ['projects'], revalidate: 86400 },
 )
 
 export const getProject = (slug: string) =>
@@ -24,7 +25,7 @@ export const getProject = (slug: string) =>
       return fetchQuery(api.projects.bySlug, { slug }) as Promise<ProjectDoc | null>
     },
     [`project:${slug}`],
-    { tags: [`project:${slug}`], revalidate: 3600 },
+    { tags: [`project:${slug}`], revalidate: 86400 },
   )()
 
 export const getPosts = (opts?: { limit?: number }) =>
@@ -33,7 +34,7 @@ export const getPosts = (opts?: { limit?: number }) =>
       return fetchQuery(api.blog.listPublished, opts ?? {}) as Promise<PostDoc[]>
     },
     ['blog', JSON.stringify(opts ?? {})],
-    { tags: ['blog'], revalidate: 3600 },
+    { tags: ['blog'], revalidate: 86400 },
   )()
 
 export const getPost = (slug: string) =>
@@ -42,7 +43,7 @@ export const getPost = (slug: string) =>
       return fetchQuery(api.blog.bySlug, { slug }) as Promise<PostDoc | null>
     },
     [`post:${slug}`],
-    { tags: [`post:${slug}`], revalidate: 3600 },
+    { tags: [`post:${slug}`], revalidate: 86400 },
   )()
 
 // ── Shared document types ────────────────────────────────────────────────────
@@ -95,19 +96,19 @@ export function formatLegacyDate(epochMs: number): string {
 export const getSiteSettings = unstable_cache(
   async () => fetchQuery(api.siteSettings.get, {}) as Promise<SiteSettingsDoc | null>,
   ['siteSettings'],
-  { tags: ['home'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 86400 },
 )
 
 export const getExperience = unstable_cache(
   async () => fetchQuery(api.experience.listVisible, {}) as Promise<ExperienceDoc[]>,
   ['experience'],
-  { tags: ['home'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 86400 },
 )
 
 export const getSkillCategories = unstable_cache(
   async () => fetchQuery(api.skills.listVisible, {}) as Promise<SkillCategoryDoc[]>,
   ['skills'],
-  { tags: ['home'], revalidate: 3600 },
+  { tags: ['home'], revalidate: 86400 },
 )
 
 export type ProjectDoc = {

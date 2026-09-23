@@ -4,14 +4,17 @@ import { Suspense } from 'react'
 import { getPosts, getSiteSettings } from '@/lib/convex'
 import { SubPageShell } from '@/components/SubPageShell'
 import { BlogTagFilter } from './BlogTagFilter'
+import { openGraph, RSS_FEED } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'Blog',
-  alternates: { canonical: '/blog' },
-  other: {
-    // RSS feed discovery
-    'application-name': 'Milan Kumawat Blog',
-  },
+  description: 'Articles by Milan Kumawat on AI engineering, backend systems, FastAPI and shipping products to production.',
+  alternates: { canonical: '/blog', types: RSS_FEED },
+  openGraph: openGraph('/blog', {
+    type: 'website',
+    title: 'Blog | Milan Kumawat',
+    description: 'Articles on AI engineering, backend systems and shipping products to production.',
+  }),
 }
 
 export default async function BlogPage() {
