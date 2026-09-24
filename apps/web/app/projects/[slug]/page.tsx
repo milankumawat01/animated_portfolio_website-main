@@ -190,7 +190,9 @@ export default async function ProjectPage({ params }: Props) {
           )}
 
           {/* Action Buttons */}
+          {project.galleryUrls && project.galleryUrls.length > 0 && <section><h2 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Gallery</h2><div className="grid sm:grid-cols-2 gap-4">{project.galleryUrls.map((url, index) => <div key={`${url}-${index}`} className="relative aspect-video overflow-hidden rounded-xl border border-border"><Image src={url} alt={`${project.title} gallery image ${index + 1}`} fill className="object-cover" /></div>)}</div></section>}
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
+            {project.caseStudyUrl && <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft border border-border text-text-primary font-semibold text-sm">Case Study <ExternalLink className="w-4 h-4" /></a>}
             {project.liveUrl && (
               <a
                 href={project.liveUrl}

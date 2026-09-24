@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, Mail, Check, Copy, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { api as _api } from '@portfolio/backend/convex/_generated/api';
 import { errorMessage } from '@/lib/errors';
 import { convexMutation } from '@/lib/convex-http';
-const api = _api as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+const api = _api as any;
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -22,6 +21,9 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [subject, setSubject] = useState('');
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -57,6 +59,9 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
         name: name.trim(),
         email: email.trim(),
         message: message.trim(),
+        subject: subject.trim() || undefined,
+        phone: phone.trim() || undefined,
+        company: company.trim() || undefined,
         source: 'contact-modal',
         honeypot,
         meta: {
@@ -100,6 +105,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             setName('');
             setEmail('');
             setMessage('');
+            setSubject(''); setPhone(''); setCompany('');
             setErrorMsg('');
             onClose();
           }}
@@ -188,6 +194,17 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
           />
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label className="text-xs font-semibold text-text-secondary">Phone (optional)
+            <input type="tel" maxLength={40} value={phone} onChange={e => setPhone(e.target.value)} className="mt-1.5 w-full px-4 py-2.5 text-sm rounded-xl border border-border bg-bg-soft" />
+          </label>
+          <label className="text-xs font-semibold text-text-secondary">Company (optional)
+            <input maxLength={120} value={company} onChange={e => setCompany(e.target.value)} className="mt-1.5 w-full px-4 py-2.5 text-sm rounded-xl border border-border bg-bg-soft" />
+          </label>
+        </div>
+        <label className="block text-xs font-semibold text-text-secondary">Subject (optional)
+          <input maxLength={150} value={subject} onChange={e => setSubject(e.target.value)} className="mt-1.5 w-full px-4 py-2.5 text-sm rounded-xl border border-border bg-bg-soft" />
+        </label>
         <div>
           <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
             What would you like to discuss?
@@ -239,7 +256,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
   // isMounted keeps ContactFormInner (which reads navigator/document on submit)
   // out of SSR / static prerender.
   const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => setIsMounted(true), 0); return () => window.clearTimeout(timer); }, []);
 
   if (!isOpen) return null;
 

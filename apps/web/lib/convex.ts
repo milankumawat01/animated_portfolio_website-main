@@ -1,9 +1,9 @@
 import { fetchQuery } from 'convex/nextjs'
 import { unstable_cache } from 'next/cache'
+import { PORTFOLIO_DATA } from '@/data/portfolioData'
 // The generated api is currently a stub (pending `npx convex dev`).
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { api as _api } from '@portfolio/backend/convex/_generated/api'
-const api = _api as any // eslint-disable-line @typescript-eslint/no-explicit-any
+const api = _api as any
 
 // ── Data helpers ─────────────────────────────────────────────────────────────
 // convex/nextjs fetchQuery is no-store internally, so we wrap each helper in
@@ -75,13 +75,15 @@ export type ExperienceDoc = {
   _id: string; legacyId: string
   company: string; role: string; period: string; timeframe: string; badge: string
   logo: string; logoBg: string
+  employmentType?: string; startDate?: string; endDate?: string; current?: boolean
+  location?: string; description?: string
   points: string[]; tags: string[]
   order: number; visible: boolean; updatedAt: number
 }
 
 export type SkillCategoryDoc = {
   _id: string; title: string; subtitle: string; icon: string
-  skills: { name: string; iconKey: string }[]
+  skills: { name: string; iconKey: string; visible?: boolean }[]
   order: number; visible: boolean; updatedAt: number
 }
 
@@ -93,11 +95,21 @@ export function formatLegacyDate(epochMs: number): string {
   return `${day} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`
 }
 
-export const getSiteSettings = unstable_cache(
-  async () => fetchQuery(api.siteSettings.get, {}) as Promise<SiteSettingsDoc | null>,
-  ['siteSettings'],
-  { tags: ['home'], revalidate: 86400 },
-)
+// Infrequently changed portfolio copy is maintained in source control.
+export const STATIC_SITE_SETTINGS: SiteSettingsDoc = {
+  _id: 'static', key: 'main', updatedAt: 0,
+  personal: PORTFOLIO_DATA.personal,
+  stats: PORTFOLIO_DATA.personal.stats,
+  heroTechStack: PORTFOLIO_DATA.personal.heroTechStack,
+  aboutPillars: PORTFOLIO_DATA.personal.aboutPillars,
+  whatIWorkOn: PORTFOLIO_DATA.personal.whatIWorkOn,
+  quotes: PORTFOLIO_DATA.personal.quotes,
+  handwriting: PORTFOLIO_DATA.personal.handwriting,
+  howIBuildSteps: PORTFOLIO_DATA.howIBuildSteps,
+  howIBuildPillars: PORTFOLIO_DATA.howIBuildPillars,
+  contactCards: PORTFOLIO_DATA.contactCards,
+}
+export const getSiteSettings = async () => STATIC_SITE_SETTINGS
 
 export const getExperience = unstable_cache(
   async () => fetchQuery(api.experience.listVisible, {}) as Promise<ExperienceDoc[]>,
@@ -119,6 +131,8 @@ export type ProjectDoc = {
   description: string
   longDescription: string
   imageUrl?: string
+  galleryUrls?: string[]
+  caseStudyUrl?: string
   tags: string[]
   keyFeatures: string[]
   architecture: string[]
@@ -127,7 +141,7 @@ export type ProjectDoc = {
   githubUrl?: string
   featured: boolean
   order: number
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'archived'
   publishedAt?: number
   updatedAt: number
   seo?: { title?: string; description?: string }
@@ -140,10 +154,12 @@ export type PostDoc = {
   excerpt: string
   body: string
   imageUrl?: string
+  category?: string
   tags: string[]
   readTimeMinutes: number
   featured: boolean
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'scheduled' | 'archived'
+  scheduledAt?: number
   views: number
   publishedAt?: number
   updatedAt: number

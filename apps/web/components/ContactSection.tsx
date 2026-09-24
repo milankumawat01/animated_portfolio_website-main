@@ -37,7 +37,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
 
                 {/* Subtitle */}
                 <p className="text-base sm:text-lg max-w-xl leading-[1.6] text-text-secondary">
-                  I'm always open to discussing new opportunities, interesting projects or just tech conversations. Whether it's an AI product, backend system or a crazy idea — let's talk.
+                  I&apos;m always open to discussing new opportunities, interesting projects or just tech conversations. Whether it&apos;s an AI product, backend system or a crazy idea — let&apos;s talk.
                 </p>
               </div>
 
@@ -61,12 +61,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
               <OpenContactButton
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-blue hover:bg-blue-dark text-text-on-dark font-bold text-sm transition-all duration-200 shadow-md shadow-blue/25 active:scale-95 group shrink-0"
               >
-                <span>Let's Talk</span>
+                <span>Let&apos;s Talk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </OpenContactButton>
 
               <p className="text-xs sm:text-sm text-text-secondary">
-                Prefer a quick chat? I'm usually active on{' '}
+                Prefer a quick chat? I&apos;m usually active on{' '}
                 <a
                   href={linkedinUrl}
                   target="_blank"
@@ -92,7 +92,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
 
               {/* Floating Quote Card matching screenshot */}
               <div className="absolute top-5 right-5 sm:top-6 sm:right-6 p-4 sm:p-5 rounded-2xl bg-surface-feature/80 backdrop-blur-md border border-text-on-dark/15 text-text-on-dark shadow-2xl max-w-[190px] sm:max-w-[210px] z-10">
-                <span className="text-3xl font-serif text-blue block leading-none select-none">"</span>
+                <span className="text-3xl font-serif text-blue block leading-none select-none">&ldquo;</span>
                 <p className="text-xs sm:text-[13px] font-semibold text-text-on-dark/90 leading-snug mt-1">
                   Same Developer.<br />Bigger Things Ahead.
                 </p>

@@ -1,5 +1,6 @@
 import { ConvexError, v } from 'convex/values'
-import { query, mutation } from './_generated/server'
+import { query, mutation, internalMutation } from './_generated/server'
+import { internal } from './_generated/api'
 import { requireAdmin } from './lib/auth'
 import { scheduleRevalidate } from './lib/revalidate'
 import { withImageUrl } from './lib/images'
@@ -67,11 +68,12 @@ export const listAll = query({
   args: {},
   handler: async (ctx) => {
     await requireAdmin(ctx)
-    return await ctx.db
+    const rows = await ctx.db
       .query('blogPosts')
       .withIndex('by_status_publishedAt')
       .order('desc')
       .collect()
+    return Promise.all(rows.map(row => withImageUrl(ctx, row)))
   },
 })
 
@@ -84,6 +86,7 @@ export const create = mutation({
     excerpt:         v.string(),
     body:            v.string(),
     imageUrl:        v.optional(v.string()),
+    category:        v.optional(v.string()),
     imageStorageId:  v.optional(v.id('_storage')),
     tags:            v.array(v.string()),
     readTimeMinutes: v.number(),
@@ -124,6 +127,7 @@ export const update = mutation({
     // null / '' clear the cover; omitted leaves it unchanged.
     imageStorageId:  v.optional(v.union(v.id('_storage'), v.null())),
     imageUrl:        v.optional(v.string()),
+    category:        v.optional(v.string()),
     tags:            v.optional(v.array(v.string())),
     readTimeMinutes: v.optional(v.number()),
     featured:        v.optional(v.boolean()),
@@ -146,9 +150,14 @@ export const update = mutation({
     if (patch.body && patch.body.length > BLOG_BODY_MAX) throw new ConvexError('Blog body too long.')
     const before = await ctx.db.get(id)
     if (!before) throw new ConvexError('Post not found.')
+    if (before.status === 'scheduled' && patch.publishedAt !== undefined && patch.publishedAt !== before.scheduledAt) {
+      if (patch.publishedAt <= Date.now()) throw new ConvexError('Scheduled publish date must be in the future.')
+      await ctx.scheduler.runAt(patch.publishedAt, internal.blog.publishScheduled, { id, scheduledAt: patch.publishedAt })
+    }
     const { imageStorageId, imageUrl, ...rest } = patch
     await ctx.db.patch(id, {
       ...rest,
+      ...(before.status === 'scheduled' && patch.publishedAt !== undefined ? { scheduledAt: patch.publishedAt } : {}),
       // Patching a field to undefined removes it.
       ...(imageStorageId !== undefined && { imageStorageId: imageStorageId ?? undefined }),
       ...(imageUrl !== undefined && { imageUrl: imageUrl || undefined }),
@@ -175,7 +184,7 @@ export const remove = mutation({
 export const setStatus = mutation({
   args: {
     id:          v.id('blogPosts'),
-    status:      v.union(v.literal('draft'), v.literal('published')),
+    status:      v.union(v.literal('draft'), v.literal('published'), v.literal('scheduled'), v.literal('archived')),
     publishedAt: v.optional(v.number()),
   },
   handler: async (ctx, { id, status, publishedAt }) => {
@@ -183,16 +192,34 @@ export const setStatus = mutation({
     const post = await ctx.db.get(id)
     if (!post) throw new ConvexError('Post not found.')
     const patch: {
-      status: 'draft' | 'published'
+      status: 'draft' | 'published' | 'scheduled' | 'archived'
       publishedAt?: number
+      scheduledAt?: number
       updatedAt: number
     } = { status, updatedAt: Date.now() }
 
+    if (status === 'scheduled') {
+      if (!publishedAt || publishedAt <= Date.now()) throw new ConvexError('Choose a future publish date.')
+      patch.scheduledAt = publishedAt
+      await ctx.scheduler.runAt(publishedAt, internal.blog.publishScheduled, { id, scheduledAt: publishedAt })
+    } else {
+      patch.scheduledAt = undefined
+    }
     if (status === 'published') {
       // An explicit publishedAt overrides (backdating). Otherwise stamp now.
       patch.publishedAt = publishedAt ?? post.publishedAt ?? Date.now()
     }
     await ctx.db.patch(id, patch)
+    await scheduleRevalidate(ctx, ['blog', 'home', `post:${post.slug}`])
+  },
+})
+
+export const publishScheduled = internalMutation({
+  args: { id: v.id('blogPosts'), scheduledAt: v.number() },
+  handler: async (ctx, { id, scheduledAt }) => {
+    const post = await ctx.db.get(id)
+    if (!post || post.status !== 'scheduled' || post.scheduledAt !== scheduledAt) return
+    await ctx.db.patch(id, { status: 'published', publishedAt: scheduledAt, scheduledAt: undefined, updatedAt: Date.now() })
     await scheduleRevalidate(ctx, ['blog', 'home', `post:${post.slug}`])
   },
 })

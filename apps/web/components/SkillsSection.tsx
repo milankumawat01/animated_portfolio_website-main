@@ -126,7 +126,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, settings }
 
                 {/* Tech Icons Grid with circular/squircle containers */}
                 <div className="grid grid-cols-6 gap-2 pt-2 border-t border-border/70">
-                  {cat.skills.map((skill) => (
+                  {cat.skills.filter(skill => skill.visible !== false).map((skill) => (
                     <div
                       key={skill.name}
                       className="flex flex-col items-center gap-1 group/skill cursor-default"
@@ -154,7 +154,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, settings }
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3 max-w-2xl">
             <span className="text-4xl font-serif text-blue select-none leading-none shrink-0 -mt-1">
-              "
+              &ldquo;
             </span>
             <p className="text-sm sm:text-base font-medium italic text-text-primary leading-relaxed">
               {quoteSkills}{' '}

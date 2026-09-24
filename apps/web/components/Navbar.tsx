@@ -37,7 +37,8 @@ export const Navbar: React.FC = () => {
   const linkHref = (hash: string) => isHome ? `#${hash}` : `/#${hash}`;
 
   useEffect(() => {
-    setMounted(true);
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -142,7 +143,7 @@ export const Navbar: React.FC = () => {
                 : 'border border-white/20 bg-white/5 hover:bg-white/10 text-white hover:border-blue/50'
             }`}
           >
-            <span>Let's Talk</span>
+            <span>Let&apos;s Talk</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
@@ -185,7 +186,7 @@ export const Navbar: React.FC = () => {
               }}
               className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm"
             >
-              <span>Let's Talk</span>
+              <span>Let&apos;s Talk</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

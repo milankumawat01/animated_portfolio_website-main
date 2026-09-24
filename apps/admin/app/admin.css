@@ -1,0 +1,10 @@
+@media (max-width: 760px) {
+  .admin-shell { flex-direction: column; }
+  .admin-sidebar { width: 100% !important; min-height: 0 !important; padding: 8px 0 !important; border-right: 0 !important; border-bottom: 1px solid #e5e7eb; }
+  .admin-sidebar > div { padding: 8px 16px !important; margin: 0 !important; border: 0 !important; }
+  .admin-sidebar ul { display: flex; overflow-x: auto; white-space: nowrap; }
+  .admin-sidebar ul li:has(a) { flex: 0 0 auto; }
+  .admin-sidebar ul li:not(:has(a)) { display: none; }
+  .admin-sidebar > button { position: absolute; top: 12px; right: 8px; margin: 0 !important; }
+  .admin-main { padding: 16px !important; }
+}

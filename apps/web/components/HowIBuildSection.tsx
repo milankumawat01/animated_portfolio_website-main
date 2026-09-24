@@ -81,11 +81,11 @@ export const HowIBuildSection: React.FC<HowIBuildSectionProps> = ({ settings }) 
             <div className="p-4 sm:p-5 rounded-2xl bg-surface-elevated border border-border shadow-soft max-w-sm w-full">
               <div className="flex items-start gap-3">
                 <span className="text-3xl font-serif text-blue select-none leading-none shrink-0 mt-0.5">
-                  "
+                  &ldquo;
                 </span>
                 <div>
                   <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
-                    I don't just write code,<br />I build solutions that solve real problems.
+                    I don&apos;t just write code,<br />I build solutions that solve real problems.
                   </p>
                   <p className="text-[11px] font-bold text-text-muted mt-1.5">
                     — Milan Kumawat
@@ -126,7 +126,7 @@ export const HowIBuildSection: React.FC<HowIBuildSectionProps> = ({ settings }) 
                     <p className="text-purple-400">improve();</p>
                   </div>
                   <p>&#125;</p>
-                  <p className="text-text-on-dark/30 pt-3">// better products, brighter tomorrow</p>
+                  <p className="text-text-on-dark/30 pt-3">{'// better products, brighter tomorrow'}</p>
                 </div>
               </div>
 

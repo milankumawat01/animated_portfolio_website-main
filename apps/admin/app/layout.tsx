@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { ConvexAdminProvider } from '@/components/shell/ConvexAdminProvider'
+import './admin.css'
 
 export const metadata: Metadata = {
-  title: 'Portfolio Admin',
+  title: 'Milan Admin',
   robots: { index: false, follow: false },
 }
 

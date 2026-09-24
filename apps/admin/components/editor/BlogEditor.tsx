@@ -24,10 +24,12 @@ type PostDoc = {
   body: string
   imageStorageId?: Id<'_storage'>
   imageUrl?: string
+  category?: string
+  scheduledAt?: number
   tags: string[]
   readTimeMinutes: number
   featured: boolean
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'scheduled' | 'archived'
   views: number
   publishedAt?: number
   updatedAt: number
@@ -59,12 +61,13 @@ const groupStyle: React.CSSProperties = {
   marginBottom: '1.25rem',
 }
 
-export function BlogEditor({ post }: { post?: PostDoc }) {
+export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => void }) {
   const router = useRouter()
   const create = useMutation(api.blog.create)
   const update = useMutation(api.blog.update)
   const setStatus = useMutation(api.blog.setStatus)
   const allTags = useQuery(api.blog.listTags) ?? []
+  const categoryOptions = [...new Set((useQuery(api.blog.listAll) ?? []).map(item => item.category).filter(Boolean))]
 
   // Field state
   const [title, setTitle] = useState(post?.title ?? '')
@@ -73,10 +76,13 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? '')
   const [body, setBody] = useState(post?.body ?? '')
   const [tags, setTags] = useState((post?.tags ?? []).join(', '))
+  const [category, setCategory] = useState(post?.category ?? '')
   const [featured, setFeatured] = useState(post?.featured ?? false)
+  const [publishOnCreate, setPublishOnCreate] = useState(false)
   const [publishedAtStr, setPublishedAtStr] = useState(() => {
-    if (!post?.publishedAt) return ''
-    return new Date(post.publishedAt).toISOString().slice(0, 16)
+    if (!post?.publishedAt && !post?.scheduledAt) return ''
+    const date = new Date(post.scheduledAt ?? post.publishedAt!)
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16)
   })
   const [imageStorageId, setImageStorageId] = useState<Id<'_storage'> | undefined>(
     post?.imageStorageId,
@@ -109,20 +115,19 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
 
   // Publish dialog
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
-  const [pendingStatus, setPendingStatus] = useState<'draft' | 'published' | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<'draft' | 'published' | 'scheduled' | null>(null)
 
   // Preview pane
   const [showPreview, setShowPreview] = useState(true)
 
   // Mark dirty on any field change
   useEffect(() => {
-    setIsDirty(true)
-  }, [title, slug, excerpt, body, tags, featured, publishedAtStr, imageStorageId, imageUrl, seoTitle, seoDesc, readTimeOverride, readTimePinned])
+    const timer = window.setTimeout(() => setIsDirty(true), 0)
+    return () => window.clearTimeout(timer)
+  }, [title, slug, excerpt, body, tags, category, featured, publishedAtStr, imageStorageId, imageUrl, seoTitle, seoDesc, readTimeOverride, readTimePinned])
 
   // Auto-slug from title (only when not touched)
-  useEffect(() => {
-    if (!slugTouched && title) setSlug(slugify(title))
-  }, [title, slugTouched])
+  // The title change handler keeps untouched slugs in sync.
 
   // Unsaved-changes guard
   useEffect(() => {
@@ -153,6 +158,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
     excerpt: excerpt.trim(),
     body,
     tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+    category: category.trim() || undefined,
     readTimeMinutes: displayReadTime,
     featured,
     imageStorageId: imageStorageId ?? undefined,
@@ -184,13 +190,16 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
           slug,
           ...buildPayload(),
         })
+        if (publishOnCreate) await setStatus({ id, status: publishedAtStr && new Date(publishedAtStr).getTime() > Date.now() ? 'scheduled' : 'published', publishedAt: publishedAtStr ? new Date(publishedAtStr).getTime() : undefined })
         setIsDirty(false)
         setSaveLabel('saved')
-        router.push(`/dashboard/blog/${id}`)
+        if (onClose) onClose()
+        else router.push(`/dashboard/blog/${id}`)
         return
       }
       setIsDirty(false)
       setSaveLabel('saved')
+      onClose?.()
       setTimeout(() => setSaveLabel('save'), 2000)
     } catch (err: unknown) {
       setError(errorMessage(err, 'Save failed'))
@@ -201,7 +210,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
   }
 
   const handleStatusToggle = () => {
-    const newStatus = post?.status === 'published' ? 'draft' : 'published'
+    const newStatus = post?.status === 'published' || post?.status === 'scheduled' ? 'draft' : (publishedAtStr && new Date(publishedAtStr).getTime() > Date.now() ? 'scheduled' : 'published')
     setPendingStatus(newStatus)
     setShowPublishConfirm(true)
   }
@@ -214,7 +223,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
       await setStatus({
         id: post._id,
         status: pendingStatus,
-        publishedAt: pendingStatus === 'published'
+        publishedAt: pendingStatus === 'published' || pendingStatus === 'scheduled'
           ? (publishedAtStr ? new Date(publishedAtStr).getTime() : undefined)
           : undefined,
       })
@@ -226,8 +235,10 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
   }
 
   const isPublished = post?.status === 'published'
+  const isScheduled = post?.status === 'scheduled'
   const slugChanged = post && slug !== post.slug
-  const isFutureDate = publishedAtStr ? new Date(publishedAtStr).getTime() > Date.now() : false
+  const [openedAt] = useState(() => Date.now())
+  const isFutureDate = publishedAtStr ? new Date(publishedAtStr).getTime() > openedAt : false
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
 
@@ -256,16 +267,16 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
               disabled={saving}
               style={{
                 padding: '0.5rem 1rem',
-                background: isPublished ? '#fef3c7' : '#d1fae5',
-                color: isPublished ? '#92400e' : '#065f46',
-                border: `1px solid ${isPublished ? '#fde68a' : '#a7f3d0'}`,
+                background: isPublished || isScheduled ? '#fef3c7' : '#d1fae5',
+                color: isPublished || isScheduled ? '#92400e' : '#065f46',
+                border: `1px solid ${isPublished || isScheduled ? '#fde68a' : '#a7f3d0'}`,
                 borderRadius: '6px',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 fontSize: '0.85rem',
                 fontWeight: 600,
               }}
             >
-              {isPublished ? 'Unpublish' : 'Publish'}
+              {isScheduled ? 'Unschedule' : isPublished ? 'Unpublish' : isFutureDate ? 'Schedule' : 'Publish'}
             </button>
           )}
           <button
@@ -363,7 +374,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
             <label style={labelStyle}>Title *</label>
             <input
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => { setTitle(e.target.value); if (!slugTouched) setSlug(slugify(e.target.value)) }}
               required
               style={fieldStyle}
               placeholder="Post title"
@@ -507,6 +518,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
             </div>
           </div>
 
+          <div style={groupStyle}><label style={labelStyle}>Category</label><input list="blog-categories" value={category} onChange={e => setCategory(e.target.value)} style={fieldStyle} placeholder="Engineering" /><datalist id="blog-categories">{categoryOptions.map(option => <option key={option} value={option} />)}</datalist></div>
           {/* Tags */}
           <div style={groupStyle}>
             <label style={labelStyle}>
@@ -591,7 +603,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
               Published At (date/time)
               {isFutureDate && (
                 <span style={{ color: '#d97706', fontWeight: 400, marginLeft: '0.5rem' }}>
-                  ⚠ Future date — post publishes immediately with this date
+                  Future date — post will publish automatically at this time
                 </span>
               )}
             </label>
@@ -604,6 +616,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
           </div>
 
           {/* Flags */}
+          {!post && <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}><input type="checkbox" checked={publishOnCreate} onChange={e => setPublishOnCreate(e.target.checked)} /> Publish after saving (future date schedules automatically)</label>}
           <div style={{ ...groupStyle, display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
               <input
@@ -756,12 +769,12 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
             }}
           >
             <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.1rem', fontWeight: 700 }}>
-              {pendingStatus === 'published' ? 'Publish this post?' : 'Unpublish this post?'}
+              {pendingStatus === 'scheduled' ? 'Schedule this post?' : pendingStatus === 'published' ? 'Publish this post?' : 'Unpublish this post?'}
             </h3>
-            {pendingStatus === 'published' ? (
+            {pendingStatus === 'published' || pendingStatus === 'scheduled' ? (
               <div style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.6 }}>
                 <p style={{ margin: '0 0 0.5rem' }}>
-                  This will make the post publicly accessible at:
+                  {pendingStatus === 'scheduled' ? 'This post will become public at the selected date:' : 'This will make the post publicly accessible at:'}
                 </p>
                 <p style={{ margin: '0 0 0.75rem', fontFamily: 'monospace', color: '#4f46e5' }}>
                   {siteUrl}/blog/{post.slug}
@@ -818,7 +831,7 @@ export function BlogEditor({ post }: { post?: PostDoc }) {
                   fontWeight: 600,
                 }}
               >
-                {pendingStatus === 'published' ? 'Publish' : 'Unpublish'}
+                {pendingStatus === 'scheduled' ? 'Schedule' : pendingStatus === 'published' ? 'Publish' : 'Unpublish'}
               </button>
             </div>
           </div>

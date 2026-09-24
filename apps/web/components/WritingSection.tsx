@@ -30,7 +30,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings 
 
             {/* Exact Title from reference */}
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-black tracking-heading leading-[1.12] pt-1 pb-1 text-text-primary">
-              Things I'm building,<br />learning and <span className="text-blue">thinking about.</span>
+              Things I&apos;m building,<br />learning and <span className="text-blue">thinking about.</span>
             </h2>
 
             {/* Subtitle */}
@@ -135,7 +135,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings 
         <div className="pt-8 border-t border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-4xl font-serif text-blue select-none leading-none -mt-1">
-              "
+              &ldquo;
             </span>
             <div className="w-[1px] h-6 bg-border hidden sm:block" />
             <p className="text-sm sm:text-base font-medium italic text-text-primary">

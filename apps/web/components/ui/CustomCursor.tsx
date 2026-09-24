@@ -13,7 +13,7 @@ export const CustomCursor: React.FC = () => {
     // Check if device is touch-enabled
     if (typeof window !== 'undefined') {
       const touchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      setIsTouch(touchDevice);
+      window.setTimeout(() => setIsTouch(touchDevice), 0);
       if (touchDevice) return;
     }
 

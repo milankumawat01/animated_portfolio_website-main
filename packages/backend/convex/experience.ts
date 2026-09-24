@@ -26,6 +26,12 @@ export const create = mutation({
   args: {
     company:   v.string(),
     role:      v.string(),
+    employmentType: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    current: v.optional(v.boolean()),
+    location: v.optional(v.string()),
+    description: v.optional(v.string()),
     period:    v.string(),
     timeframe: v.string(),
     badge:     v.string(),
@@ -52,6 +58,12 @@ export const update = mutation({
     id:        v.id('experience'),
     company:   v.optional(v.string()),
     role:      v.optional(v.string()),
+    employmentType: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    current: v.optional(v.boolean()),
+    location: v.optional(v.string()),
+    description: v.optional(v.string()),
     period:    v.optional(v.string()),
     timeframe: v.optional(v.string()),
     badge:     v.optional(v.string()),
@@ -86,5 +98,27 @@ export const reorder = mutation({
       await ctx.db.patch(ids[i], { order: (i + 1) * 10, updatedAt: Date.now() })
     }
     await scheduleRevalidate(ctx, ['home'])
+  },
+})
+
+export const migrateDates = mutation({
+  args: {},
+  handler: async ctx => {
+    await requireAdmin(ctx)
+    const rows = await ctx.db.query('experience').collect()
+    const months: Record<string, string> = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' }
+    const parse = (text: string, end = false) => {
+      const match = text.trim().match(/^(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+)?(\d{4})/i)
+      return match ? `${match[2]}-${match[1] ? months[match[1].toLowerCase()] : end ? '12' : '01'}` : undefined
+    }
+    for (const row of rows) {
+      if (row.startDate) continue
+      const [start, end = ''] = row.period.split(/\s+[–—-]\s+/)
+      const current = /present|current/i.test(end)
+      const startDate = parse(start)
+      const endDate = current ? undefined : parse(end, true)
+      if (startDate) await ctx.db.patch(row._id, { startDate, endDate, current })
+    }
+    return rows.length
   },
 })

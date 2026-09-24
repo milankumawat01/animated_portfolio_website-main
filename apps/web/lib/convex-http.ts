@@ -15,3 +15,13 @@ export function convexMutation<M extends FunctionReference<'mutation'>>(
   client ??= new ConvexHttpClient(url)
   return client.mutation(mutation, args)
 }
+
+export function convexQuery<Q extends FunctionReference<'query'>>(
+  query: Q,
+  args: Q['_args'],
+): Promise<Q['_returnType']> {
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL
+  if (!url) return Promise.reject(new Error('Convex is not configured.'))
+  client ??= new ConvexHttpClient(url)
+  return client.query(query, args)
+}

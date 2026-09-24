@@ -1,11 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react'
+/* eslint-disable @next/next/no-img-element -- Editor previews the selected original asset. */
+import { useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/slugify'
 import { errorMessage } from '@/lib/errors'
+import { MediaPicker } from '@/components/editor/MediaPicker'
 
 type ProjectDoc = {
   _id: Id<'projects'>
@@ -14,6 +16,10 @@ type ProjectDoc = {
   subtitle: string
   description: string
   longDescription: string
+  imageUrl?: string
+  imageStorageId?: Id<'_storage'>
+  galleryUrls?: string[]
+  caseStudyUrl?: string
   tags: string[]
   keyFeatures: string[]
   architecture: string[]
@@ -22,7 +28,7 @@ type ProjectDoc = {
   githubUrl?: string
   featured: boolean
   order: number
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'archived'
 }
 
 const fieldStyle: React.CSSProperties = {
@@ -50,30 +56,32 @@ const groupStyle: React.CSSProperties = {
   marginBottom: '1.25rem',
 }
 
-export function ProjectEditor({ project }: { project?: ProjectDoc }) {
+export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onClose?: () => void }) {
   const router = useRouter()
   const create = useMutation(api.projects.create)
   const update = useMutation(api.projects.update)
+  const setStatus = useMutation(api.projects.setStatus)
 
   const [title, setTitle] = useState(project?.title ?? '')
   const [slug, setSlug] = useState(project?.slug ?? '')
   const [subtitle, setSubtitle] = useState(project?.subtitle ?? '')
   const [description, setDescription] = useState(project?.description ?? '')
   const [longDescription, setLongDescription] = useState(project?.longDescription ?? '')
+  const [imageUrl, setImageUrl] = useState(project?.imageUrl ?? '')
+  const [galleryUrls, setGalleryUrls] = useState(project?.galleryUrls ?? [])
+  const [caseStudyUrl, setCaseStudyUrl] = useState(project?.caseStudyUrl ?? '')
+  const [picking, setPicking] = useState<'cover' | 'gallery' | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
   const [tags, setTags] = useState((project?.tags ?? []).join(', '))
   const [keyFeatures, setKeyFeatures] = useState((project?.keyFeatures ?? []).join('\n'))
   const [architecture, setArchitecture] = useState((project?.architecture ?? []).join('\n'))
   const [liveUrl, setLiveUrl] = useState(project?.liveUrl ?? '')
   const [githubUrl, setGithubUrl] = useState(project?.githubUrl ?? '')
   const [featured, setFeatured] = useState(project?.featured ?? false)
+  const [published, setPublished] = useState(project?.status === 'published')
   const [order, setOrder] = useState(String(project?.order ?? 10))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-
-  // Auto-generate slug from title on create only
-  useEffect(() => {
-    if (!project && title) setSlug(slugify(title))
-  }, [title, project])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,6 +94,9 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         subtitle,
         description,
         longDescription,
+        imageUrl: imageUrl.trim(),
+        galleryUrls,
+        caseStudyUrl: caseStudyUrl || undefined,
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         keyFeatures: keyFeatures.split('\n').map((t) => t.trim()).filter(Boolean),
         architecture: architecture.split('\n').map((t) => t.trim()).filter(Boolean),
@@ -100,12 +111,17 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         await update({
           id: project._id,
           ...payload,
+          imageStorageId: imageUrl !== (project.imageUrl ?? '') ? null : undefined,
           // Only send slug if it changed — warns the user above
           slug: slug !== project.slug ? slug : undefined,
         })
+        if (published !== (project.status === 'published')) await setStatus({ id: project._id, status: published ? 'published' : 'draft' })
+        onClose?.()
       } else {
         const id = await create({ slug, ...payload })
-        router.push(`/dashboard/projects/${id}`)
+        if (published) await setStatus({ id, status: 'published' })
+        if (onClose) onClose()
+        else router.push(`/dashboard/projects/${id}`)
         return
       }
     } catch (err: unknown) {
@@ -121,6 +137,9 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} style={{ maxWidth: '720px', fontFamily: 'system-ui, sans-serif' }}>
+      {picking && <MediaPicker onClose={() => setPicking(null)} onSelect={url => { if (picking === 'cover') setImageUrl(url); else setGalleryUrls([...galleryUrls, url]); setPicking(null) }} />}
+      <button type="button" onClick={() => setShowPreview(!showPreview)} style={{ marginBottom: 16 }}>{showPreview ? 'Hide preview' : 'Preview project'}</button>
+      {showPreview && <article style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 18, marginBottom: 18 }}>{imageUrl && <img src={imageUrl} alt={title} style={{ width: '100%', maxHeight: 250, objectFit: 'cover' }} />}<h2>{title || 'Untitled project'}</h2><p>{description}</p><div>{tags}</div><p style={{ whiteSpace: 'pre-wrap' }}>{longDescription}</p><div>{galleryUrls.map((url, index) => <img key={index} src={url} alt={`Gallery ${index + 1}`} style={{ width: 120, marginRight: 8 }} />)}</div></article>}
       {error && (
         <div
           style={{
@@ -141,7 +160,7 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         <label style={labelStyle}>Title *</label>
         <input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); if (!project) setSlug(slugify(e.target.value)) }}
           required
           style={fieldStyle}
           placeholder="My Awesome Project"
@@ -208,6 +227,14 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         />
       </div>
 
+      <fieldset style={{ border: '1px solid #e5e7eb', borderRadius: 8, marginBottom: 20 }}><legend>Media</legend>
+        <label style={labelStyle}>Cover image</label><input value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={fieldStyle} placeholder="Image URL" />
+        <button type="button" onClick={() => setPicking('cover')}>Choose from Media</button>
+        {imageUrl && <img src={imageUrl} alt="Cover preview" style={{ display: 'block', maxWidth: 180, marginTop: 10 }} />}
+        <p>Gallery images</p>{galleryUrls.map((url, i) => <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}><input value={url} onChange={e => setGalleryUrls(galleryUrls.map((v, j) => j === i ? e.target.value : v))} style={fieldStyle} /><button type="button" onClick={() => setGalleryUrls(galleryUrls.filter((_, j) => j !== i))}>Remove</button></div>)}
+        <button type="button" onClick={() => setPicking('gallery')}>Add gallery image</button>
+      </fieldset>
+
       <div style={groupStyle}>
         <label style={labelStyle}>Key Features (one per line)</label>
         <textarea
@@ -252,6 +279,8 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
           />
         </div>
       </div>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}><input type="checkbox" checked={published} onChange={e => setPublished(e.target.checked)} /> Published on public site</label>
+      <div style={groupStyle}><label style={labelStyle}>Case Study URL</label><input value={caseStudyUrl} onChange={e => setCaseStudyUrl(e.target.value)} type="url" style={fieldStyle} /></div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div style={groupStyle}>
@@ -311,7 +340,7 @@ export function ProjectEditor({ project }: { project?: ProjectDoc }) {
         </button>
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => onClose ? onClose() : router.back()}
           style={{
             padding: '0.75rem 1.5rem',
             background: '#f3f4f6',

@@ -15,6 +15,9 @@ export const submit = mutation({
     name:     v.string(),
     email:    v.string(),
     message:  v.string(),
+    subject:  v.optional(v.string()),
+    phone:    v.optional(v.string()),
+    company:  v.optional(v.string()),
     source:   v.union(v.literal('contact-modal'), v.literal('contact-page')),
     honeypot: v.optional(v.string()),
     meta:     v.object({
@@ -32,6 +35,9 @@ export const submit = mutation({
 
     // Validation — throws a user-visible error
     const { name, email } = validateLead(args)
+    for (const [value, max] of [[args.subject, 150], [args.phone, 40], [args.company, 120]] as const) {
+      if (value && value.length > max) throw new ConvexError('An optional contact field is too long.')
+    }
 
     // Rate limiting by hashed IP (key from meta — never store raw IP)
     // We use a simple key; the actual IP hashing happens server-side
@@ -73,12 +79,16 @@ export const submit = mutation({
       name,
       email,
       message:   args.message,
+      subject: args.subject?.trim(),
+      phone: args.phone?.trim(),
+      company: args.company?.trim(),
       source:    args.source,
       status:    'new',
       meta:      args.meta,
       notified:  false,
       createdAt: Date.now(),
     })
+    await ctx.db.insert('leadEvents', { leadId, kind: 'created', text: 'Lead received', author: 'Website', createdAt: now })
 
     // Schedule the email notification — if this fails, the lead is already saved
     await ctx.scheduler.runAfter(0, internal.internal.notify.newLead, { leadId })
@@ -97,6 +107,8 @@ export const list = query({
         v.literal('read'),
         v.literal('replied'),
         v.literal('archived'),
+        v.literal('contacted'), v.literal('in_discussion'),
+        v.literal('converted'), v.literal('closed'),
       ),
     ),
   },
@@ -160,14 +172,48 @@ export const setStatus = mutation({
               v.literal('new'),
               v.literal('read'),
               v.literal('replied'),
-              v.literal('archived'),
+              v.literal('archived'), v.literal('contacted'),
+              v.literal('in_discussion'), v.literal('converted'), v.literal('closed'),
             ),
   },
   handler: async (ctx, { id, status }) => {
     await requireAdmin(ctx)
-    const patch: { status: 'new' | 'read' | 'replied' | 'archived'; repliedAt?: number } = { status }
+    const before = await ctx.db.get(id)
+    if (!before) throw new ConvexError('Lead not found.')
+    if (before.status === status) return
+    const patch: { status: typeof status; repliedAt?: number; lastContactAt?: number } = { status }
     if (status === 'replied') patch.repliedAt = Date.now()
+    if (status === 'contacted' || status === 'in_discussion') patch.lastContactAt = Date.now()
     await ctx.db.patch(id, patch)
+    const identity = await ctx.auth.getUserIdentity()
+    await ctx.db.insert('leadEvents', { leadId: id, kind: 'status', text: `Status changed to ${status.replace('_', ' ')}`, author: identity?.email ?? 'Admin', createdAt: Date.now() })
+  },
+})
+
+export const events = query({
+  args: { id: v.id('leads') },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx)
+    return ctx.db.query('leadEvents').withIndex('by_lead_createdAt', q => q.eq('leadId', id)).order('desc').collect()
+  },
+})
+
+export const recentEvents = query({
+  args: {},
+  handler: async ctx => {
+    await requireAdmin(ctx)
+    return (await ctx.db.query('leadEvents').collect()).sort((a, b) => b.createdAt - a.createdAt).slice(0, 20)
+  },
+})
+
+export const addNote = mutation({
+  args: { id: v.id('leads'), text: v.string() },
+  handler: async (ctx, { id, text }) => {
+    await requireAdmin(ctx)
+    if (!await ctx.db.get(id)) throw new ConvexError('Lead not found.')
+    if (!text.trim() || text.length > 5000) throw new ConvexError('Note must be 1–5000 characters.')
+    const identity = await ctx.auth.getUserIdentity()
+    await ctx.db.insert('leadEvents', { leadId: id, kind: 'note', text: text.trim(), author: identity?.email ?? 'Admin', createdAt: Date.now() })
   },
 })
 
@@ -183,6 +229,30 @@ export const remove = mutation({
   args: { id: v.id('leads') },
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx)
+    const events = await ctx.db.query('leadEvents').withIndex('by_lead_createdAt', q => q.eq('leadId', id)).collect()
+    for (const event of events) await ctx.db.delete(event._id)
     await ctx.db.delete(id)
+  },
+})
+
+/** Idempotent upgrade for leads saved before the portfolio CRM statuses existed. */
+export const migrateLegacy = mutation({
+  args: {},
+  handler: async ctx => {
+    await requireAdmin(ctx)
+    const rows = await ctx.db.query('leads').collect()
+    for (const lead of rows) {
+      const status = lead.status === 'read' ? 'new' : lead.status === 'replied' ? 'contacted' : lead.status === 'archived' ? 'closed' : lead.status
+      if (status !== lead.status) await ctx.db.patch(lead._id, { status, lastContactAt: lead.repliedAt })
+      const existing = await ctx.db.query('leadEvents').withIndex('by_lead_createdAt', q => q.eq('leadId', lead._id)).first()
+      if (!existing) await ctx.db.insert('leadEvents', { leadId: lead._id, kind: 'created', text: 'Lead received', author: 'Website', createdAt: lead.createdAt })
+      if (lead.status === 'replied' && lead.repliedAt && !await ctx.db.query('leadEvents').withIndex('by_lead_createdAt', q => q.eq('leadId', lead._id)).filter(q => q.eq(q.field('text'), 'Status changed to contacted')).first()) {
+        await ctx.db.insert('leadEvents', { leadId: lead._id, kind: 'status', text: 'Status changed to contacted', author: 'Imported', createdAt: lead.repliedAt })
+      }
+      if (lead.notes && !await ctx.db.query('leadEvents').withIndex('by_lead_createdAt', q => q.eq('leadId', lead._id)).filter(q => q.eq(q.field('author'), 'Imported')).first()) {
+        await ctx.db.insert('leadEvents', { leadId: lead._id, kind: 'note', text: lead.notes, author: 'Imported', createdAt: Date.now() })
+      }
+    }
+    return rows.length
   },
 })

@@ -51,7 +51,8 @@ export const listAll = query({
   args: {},
   handler: async (ctx) => {
     await requireAdmin(ctx)
-    return await ctx.db.query('projects').order('asc').collect()
+    const rows = await ctx.db.query('projects').order('asc').collect()
+    return Promise.all(rows.map(row => withImageUrl(ctx, row)))
   },
 })
 
@@ -65,6 +66,8 @@ export const create = mutation({
     description:     v.string(),
     longDescription: v.string(),
     imageUrl:        v.optional(v.string()),
+    galleryUrls:     v.optional(v.array(v.string())),
+    caseStudyUrl:    v.optional(v.string()),
     tags:            v.array(v.string()),
     keyFeatures:     v.array(v.string()),
     architecture:    v.array(v.string()),
@@ -100,8 +103,10 @@ export const update = mutation({
     subtitle:        v.optional(v.string()),
     description:     v.optional(v.string()),
     longDescription: v.optional(v.string()),
-    imageStorageId:  v.optional(v.id('_storage')),
+    imageStorageId:  v.optional(v.union(v.id('_storage'), v.null())),
     imageUrl:        v.optional(v.string()),
+    galleryUrls:     v.optional(v.array(v.string())),
+    caseStudyUrl:    v.optional(v.string()),
     tags:            v.optional(v.array(v.string())),
     keyFeatures:     v.optional(v.array(v.string())),
     architecture:    v.optional(v.array(v.string())),
@@ -127,7 +132,8 @@ export const update = mutation({
     }
     const before = await ctx.db.get(id)
     if (!before) throw new ConvexError('Project not found.')
-    await ctx.db.patch(id, { ...patch, updatedAt: Date.now() })
+    const { imageStorageId, ...rest } = patch
+    await ctx.db.patch(id, { ...rest, ...(imageStorageId !== undefined ? { imageStorageId: imageStorageId ?? undefined } : {}), updatedAt: Date.now() })
     await scheduleRevalidate(ctx, [
       'projects', 'home', `project:${before.slug}`, `project:${patch.slug ?? before.slug}`,
     ])
@@ -146,6 +152,20 @@ export const remove = mutation({
   },
 })
 
+export const duplicate = mutation({
+  args: { id: v.id('projects') },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx)
+    const source = await ctx.db.get(id)
+    if (!source) throw new ConvexError('Project not found.')
+    let slug = `${source.slug}-copy`
+    let n = 2
+    while (await ctx.db.query('projects').withIndex('by_slug', q => q.eq('slug', slug)).unique()) slug = `${source.slug}-copy-${n++}`
+    const { _id, _creationTime, legacyId, ...copy } = source
+    return ctx.db.insert('projects', { ...copy, slug, title: `${source.title} (Copy)`, status: 'draft', featured: false, publishedAt: undefined, updatedAt: Date.now() })
+  },
+})
+
 export const reorder = mutation({
   args: { ids: v.array(v.id('projects')) },
   handler: async (ctx, { ids }) => {
@@ -160,13 +180,13 @@ export const reorder = mutation({
 export const setStatus = mutation({
   args: {
     id:     v.id('projects'),
-    status: v.union(v.literal('draft'), v.literal('published')),
+    status: v.union(v.literal('draft'), v.literal('published'), v.literal('archived')),
   },
   handler: async (ctx, { id, status }) => {
     await requireAdmin(ctx)
     const project = await ctx.db.get(id)
     if (!project) throw new ConvexError('Project not found.')
-    const patch: { status: 'draft' | 'published'; publishedAt?: number; updatedAt: number } = {
+    const patch: { status: 'draft' | 'published' | 'archived'; publishedAt?: number; updatedAt: number } = {
       status,
       updatedAt: Date.now(),
     }

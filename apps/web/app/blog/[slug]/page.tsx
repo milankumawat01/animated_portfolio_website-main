@@ -95,6 +95,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Article header */}
         <article className="max-w-3xl mx-auto px-5 sm:px-7 md:px-10 pt-10 pb-16 space-y-8">
           <header className="space-y-4">
+            {post.category && <span className="text-xs font-bold uppercase tracking-wider text-blue">{post.category}</span>}
             {/* Tags */}
             {post.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">

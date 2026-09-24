@@ -95,13 +95,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
                     {/* Node Dot with timeframe */}
                     <div className="absolute -left-[31px] sm:-left-[39px] top-4 flex items-center">
                       <span className="hidden sm:block absolute right-7 text-xs font-bold text-text-muted whitespace-nowrap text-right w-20 leading-tight">
-                        {idx === 0 ? (
-                          <>2025<br /><span className="text-[11px] font-medium text-text-muted">– Present</span></>
-                        ) : idx === 1 ? (
-                          <>2024<br /><span className="text-[11px] font-medium text-text-muted">– 2025</span></>
-                        ) : (
-                          <>Earlier</>
-                        )}
+                        {item.timeframe}
                       </span>
                       <div
                         className={`w-4 h-4 rounded-full border-2 transition-transform group-hover:scale-125 ${
@@ -137,10 +131,11 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
                           </div>
                         </div>
 
-                        <span className="inline-flex items-center self-start sm:self-center px-3 py-0.5 rounded-full text-[11px] font-semibold bg-blue-light text-blue">
-                          {item.badge}
-                        </span>
+                        {(item.badge || item.current) && <span className="inline-flex items-center self-start sm:self-center px-3 py-0.5 rounded-full text-[11px] font-semibold bg-blue-light text-blue">{item.current ? 'Current' : item.badge}</span>}
                       </div>
+
+                      <p className="text-xs text-text-muted">{item.period}{item.employmentType ? ` · ${item.employmentType}` : ''}{item.location ? ` · ${item.location}` : ''}</p>
+                      {item.description && <p className="text-sm text-text-secondary leading-relaxed">{item.description}</p>}
 
                       {/* Bullet Highlights */}
                       <ul className="space-y-1.5 text-xs text-text-secondary pt-1">
@@ -186,7 +181,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
             {/* Bottom Quote matching reference image */}
             <div className="space-y-3 pt-12">
               <span className="text-4xl font-serif text-blue select-none leading-none block">
-                "
+                &ldquo;
               </span>
               <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">
                 {quoteExperience}

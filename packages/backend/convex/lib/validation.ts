@@ -26,7 +26,7 @@ export const LEAD_MESSAGE_MAX = 5000
 export const BLOG_BODY_MAX = 200_000
 
 // Media
-export const MEDIA_SIZE_MAX = 10 * 1024 * 1024 // 10 MB
+export const MEDIA_SIZE_MAX = 50 * 1024 * 1024 // video limit; images remain 10 MB
 
 export function validateLead(args: {
   name: string

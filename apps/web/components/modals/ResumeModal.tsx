@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Download, FileText, Briefcase, GraduationCap, Code2, MapPin, Mail, Globe } from 'lucide-react';
 import { PORTFOLIO_DATA } from '@/data/portfolioData';
+import { api } from '@portfolio/backend/convex/_generated/api';
+import { convexQuery } from '@/lib/convex-http';
+import type { ExperienceDoc, SkillCategoryDoc } from '@/lib/convex';
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -10,6 +13,17 @@ interface ResumeModalProps {
 }
 
 export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => {
+  const [experience, setExperience] = useState<ExperienceDoc[]>([]);
+  const [skills, setSkills] = useState<SkillCategoryDoc[]>([]);
+  const [loadError, setLoadError] = useState(false);
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    Promise.all([convexQuery(api.experience.listVisible, {}), convexQuery(api.skills.listVisible, {})])
+      .then(([entries, categories]) => { if (active) { setExperience(entries as ExperienceDoc[]); setSkills(categories as SkillCategoryDoc[]); setLoadError(false); } })
+      .catch(() => { if (active) setLoadError(true); });
+    return () => { active = false; };
+  }, [isOpen]);
   if (!isOpen) return null;
 
   const handlePrintDownload = () => {
@@ -89,17 +103,18 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
             </h3>
 
             <div className="space-y-4">
-              {PORTFOLIO_DATA.experience.map((exp) => (
-                <div key={exp.id} className="space-y-1.5">
+              {experience.map((exp) => (
+                <div key={exp._id} className="space-y-1.5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <h4 className="font-bold text-text-primary text-sm sm:text-base">
                       {exp.role}{' '}
                       <span className="font-medium text-text-muted">@ {exp.company}</span>
                     </h4>
                     <span className="text-xs font-semibold text-blue bg-blue-light px-2 py-0.5 rounded">
-                      {exp.badge}
+                      {exp.current ? 'Current' : exp.period}
                     </span>
                   </div>
+                  {exp.description && <p className="text-xs sm:text-sm text-text-secondary">{exp.description}</p>}
                   <ul className="list-disc list-outside pl-4 space-y-1 text-xs sm:text-sm text-text-secondary">
                     {exp.points.map((pt, idx) => (
                       <li key={idx}>{pt}</li>
@@ -116,24 +131,8 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
               <Code2 className="w-4 h-4 text-blue" />
               Technical Stack & Competencies
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-              <div>
-                <span className="font-bold text-text-primary">Languages & AI: </span>
-                <span className="text-text-secondary">Python, JavaScript, TypeScript, OpenAI API, LangChain, RAG, Claude, Gemini</span>
-              </div>
-              <div>
-                <span className="font-bold text-text-primary">Backend & DB: </span>
-                <span className="text-text-secondary">FastAPI, Node.js, Express, PostgreSQL, MongoDB, Redis, Supabase</span>
-              </div>
-              <div>
-                <span className="font-bold text-text-primary">Frontend: </span>
-                <span className="text-text-secondary">Next.js, React, Tailwind CSS, HTML5, CSS3</span>
-              </div>
-              <div>
-                <span className="font-bold text-text-primary">DevOps & Cloud: </span>
-                <span className="text-text-secondary">Docker, Nginx, Vercel, DigitalOcean, Cloudflare R2, Linux/Ubuntu</span>
-              </div>
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">{skills.map(category => <div key={category._id}><span className="font-bold text-text-primary">{category.title}: </span><span className="text-text-secondary">{category.skills.filter(skill => skill.visible !== false).map(skill => skill.name).join(', ')}</span></div>)}</div>
+            {loadError && <p className="text-xs text-text-muted">Experience and skills could not be loaded.</p>}
           </div>
 
           {/* Education */}

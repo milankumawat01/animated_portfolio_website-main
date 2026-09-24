@@ -1,6 +1,14 @@
 ﻿# Milan Kumawat — AI Engineer & Backend Developer Portfolio
 
-A production-ready, pixel-accurate personal portfolio for **Milan Kumawat**, engineered with Next.js 15, React 19, TypeScript, and Tailwind CSS. Built exactly to match the design specifications across all 8 core views and sections.
+A personal portfolio for **Milan Kumawat**, built with Next.js 16, React 19, TypeScript, Convex, and Tailwind CSS.
+
+## Content workflow
+
+- Use Milan Admin for Projects, Blog, Experience, Skills, Media, and Leads. Settings has been removed from the admin.
+- Edit infrequently changed biography, hero stats, quotes, handwriting, process copy, and contact cards in `apps/web/data/portfolioData.ts`. Public pages read these values from code.
+- Projects and blogs can be drafts, published, or archived. Blogs can also be scheduled for a future local date and time; Convex publishes them at that time.
+- Media is uploaded to R2 through the admin. Referenced assets cannot be deleted; Replace updates project and blog references. Images are limited to 10 MB, videos and documents to 50 MB.
+- Existing lead statuses and experience display dates are upgraded when their admin screens first open after the backend is deployed.
 
 ---
 

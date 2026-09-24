@@ -14,7 +14,7 @@ interface MediaPickerProps {
 }
 
 export function MediaPicker({ onSelect, onClose }: MediaPickerProps) {
-  const mediaItems = useQuery(api.media.list) ?? []
+  const mediaItems = (useQuery(api.media.list) ?? []).filter(item => item.contentType.startsWith('image/'))
   const uploadMedia = useUploadMedia()
 
   const [uploading, setUploading] = useState(false)

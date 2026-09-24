@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Authenticated>
-        <div
+        <div className="admin-shell"
           style={{
             display: 'flex',
             minHeight: '100vh',
@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             }}
           >
             <TopBar />
-            <main
+            <main className="admin-main"
               style={{
                 flex: 1,
                 padding: '2rem',

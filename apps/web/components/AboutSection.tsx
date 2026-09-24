@@ -178,7 +178,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
             <div className="pt-4 border-t border-border/80 space-y-4">
               <div className="flex items-start gap-3">
                 <span className="text-3xl font-serif text-blue select-none leading-none shrink-0 mt-0.5">
-                  "
+                  &ldquo;
                 </span>
                 <div>
                   <p className="text-xs sm:text-[13px] font-medium italic text-text-primary leading-relaxed">

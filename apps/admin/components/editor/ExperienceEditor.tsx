@@ -1,14 +1,21 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { errorMessage } from '@/lib/errors'
+import { AdminModal } from './AdminModal'
 
 type ExperienceDoc = {
   _id: Id<'experience'>
   company: string
   role: string
+  employmentType?: string
+  startDate?: string
+  endDate?: string
+  current?: boolean
+  location?: string
+  description?: string
   period: string
   timeframe: string
   badge: string
@@ -20,15 +27,6 @@ type ExperienceDoc = {
   visible: boolean
   updatedAt: number
 }
-
-const LOGOBG_SUGGESTIONS = [
-  'bg-slate-900 text-white',
-  'bg-blue-600 text-white',
-  'bg-purple-600 text-white',
-  'bg-green-700 text-white',
-  'bg-orange-500 text-white',
-  'bg-red-700 text-white',
-]
 
 const fieldStyle: React.CSSProperties = {
   width: '100%',
@@ -51,18 +49,23 @@ const labelStyle: React.CSSProperties = {
   fontFamily: 'system-ui, sans-serif',
 }
 
-function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => void }) {
+function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: ExperienceDoc; onSaved: () => void; onMove: (direction: -1 | 1) => void; canMoveUp: boolean; canMoveDown: boolean }) {
   const update = useMutation(api.experience.update)
   const remove = useMutation(api.experience.remove)
 
   const [expanded, setExpanded] = useState(false)
   const [company, setCompany] = useState(exp.company)
   const [role, setRole] = useState(exp.role)
-  const [period, setPeriod] = useState(exp.period)
-  const [timeframe, setTimeframe] = useState(exp.timeframe)
-  const [badge, setBadge] = useState(exp.badge)
-  const [logo, setLogo] = useState(exp.logo)
-  const [logoBg, setLogoBg] = useState(exp.logoBg)
+  const [employmentType, setEmploymentType] = useState(exp.employmentType ?? '')
+  const [startDate, setStartDate] = useState(exp.startDate ?? '')
+  const [endDate, setEndDate] = useState(exp.endDate ?? '')
+  const [current, setCurrent] = useState(exp.current ?? /present|current/i.test(exp.period))
+  const [location, setLocation] = useState(exp.location ?? '')
+  const [description, setDescription] = useState(exp.description ?? '')
+  const [period] = useState(exp.period)
+  const [timeframe] = useState(exp.timeframe)
+  const [logo] = useState(exp.logo)
+  const [logoBg] = useState(exp.logoBg)
   const [points, setPoints] = useState<string[]>(exp.points)
   const [tags, setTags] = useState(exp.tags.join(', '))
   const [visible, setVisible] = useState(exp.visible)
@@ -73,13 +76,23 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
     setSaving(true)
     setError('')
     try {
+      if (startDate && !current && endDate && endDate < startDate) throw new Error('End date must be after start date.')
+      const format = (value: string) => new Date(`${value}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+      const displayPeriod = startDate ? `${format(startDate)} – ${current ? 'Present' : endDate ? format(endDate) : 'Present'}` : period
+      const displayTimeframe = startDate ? `${startDate.slice(0,4)} – ${current ? 'Present' : endDate.slice(0,4) || 'Present'}` : timeframe
       await update({
         id: exp._id,
         company,
         role,
-        period,
-        timeframe,
-        badge,
+        employmentType,
+        startDate,
+        endDate: current ? undefined : endDate,
+        current,
+        location,
+        description,
+        period: displayPeriod,
+        timeframe: displayTimeframe,
+        badge: current ? 'Current' : '',
         logo,
         logoBg,
         points: points.filter(Boolean),
@@ -87,6 +100,7 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
         visible,
       })
       onSaved()
+      setExpanded(false)
     } catch (err: unknown) {
       setError(errorMessage(err, 'Save failed'))
     } finally {
@@ -150,7 +164,7 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#111827' }}>
             {company}
-            {badge && (
+            {current && (
               <span
                 style={{
                   marginLeft: '0.5rem',
@@ -162,7 +176,7 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
                   fontWeight: 600,
                 }}
               >
-                {badge}
+                Current
               </span>
             )}
           </div>
@@ -171,6 +185,8 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+          <button type="button" disabled={!canMoveUp} onClick={e => { e.stopPropagation(); onMove(-1) }} aria-label={`Move ${company} up`}>↑</button>
+          <button type="button" disabled={!canMoveDown} onClick={e => { e.stopPropagation(); onMove(1) }} aria-label={`Move ${company} down`}>↓</button>
           {!visible && (
             <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>hidden</span>
           )}
@@ -180,6 +196,7 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
 
       {/* Expanded editor */}
       {expanded && (
+        <AdminModal title="Edit experience" onClose={() => setExpanded(false)}>
         <div
           style={{
             padding: '1.25rem',
@@ -213,51 +230,12 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
             <label style={labelStyle}>Role *</label>
             <input value={role} onChange={(e) => setRole(e.target.value)} style={fieldStyle} />
           </div>
-          <div>
-            <label style={labelStyle}>
-              Period (display string — kept verbatim)
-            </label>
-            <input
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              style={fieldStyle}
-              placeholder="May 2025 – Present"
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>Timeframe</label>
-            <input
-              value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value)}
-              style={fieldStyle}
-              placeholder="2025 – Present"
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>Badge (short label)</label>
-            <input value={badge} onChange={(e) => setBadge(e.target.value)} style={fieldStyle} placeholder="Current" />
-          </div>
-          <div>
-            <label style={labelStyle}>Logo (initials or emoji)</label>
-            <input value={logo} onChange={(e) => setLogo(e.target.value)} style={fieldStyle} placeholder="TV" />
-          </div>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <label style={labelStyle}>
-              logoBg (Tailwind classes — wart: these won&apos;t respond to theme)
-            </label>
-            <input
-              value={logoBg}
-              onChange={(e) => setLogoBg(e.target.value)}
-              style={fieldStyle}
-              list="logobg-suggestions"
-              placeholder="bg-slate-900 text-white"
-            />
-            <datalist id="logobg-suggestions">
-              {LOGOBG_SUGGESTIONS.map((s) => (
-                <option key={s} value={s} />
-              ))}
-            </datalist>
-          </div>
+          <div><label style={labelStyle}>Employment type</label><input value={employmentType} onChange={e => setEmploymentType(e.target.value)} style={fieldStyle} placeholder="Full-time" /></div>
+          <div><label style={labelStyle}>Location</label><input value={location} onChange={e => setLocation(e.target.value)} style={fieldStyle} /></div>
+          <div><label style={labelStyle}>Start date</label><input type="month" value={startDate} onChange={e => setStartDate(e.target.value)} style={fieldStyle} /></div>
+          <div><label style={labelStyle}>End date</label><input type="month" value={endDate} onChange={e => setEndDate(e.target.value)} disabled={current} style={fieldStyle} /></div>
+          <div><label><input type="checkbox" checked={current} onChange={e => setCurrent(e.target.checked)} /> Currently working</label></div>
+          <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Description</label><textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} style={fieldStyle} /></div>
           <div style={{ gridColumn: '1 / -1' }}>
             <label style={labelStyle}>Tags (comma-separated)</label>
             <input
@@ -375,6 +353,7 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
             </button>
           </div>
         </div>
+        </AdminModal>
       )}
     </div>
   )
@@ -382,27 +361,49 @@ function ExperienceRow({ exp, onSaved }: { exp: ExperienceDoc; onSaved: () => vo
 
 export function ExperienceEditor() {
   const items = (useQuery(api.experience.listAll) ?? []) as ExperienceDoc[]
+  const migrateDates = useMutation(api.experience.migrateDates)
+  useEffect(() => { if (localStorage.getItem('milan-experience-dates-v1')) return; void migrateDates({}).then(() => localStorage.setItem('milan-experience-dates-v1','done')).catch(() => {}) }, [migrateDates])
   const create = useMutation(api.experience.create)
+  const reorder = useMutation(api.experience.reorder)
   const [creating, setCreating] = useState(false)
+  const [newOpen, setNewOpen] = useState(false)
+  useEffect(() => { if (!new URLSearchParams(window.location.search).has('new')) return; const timer = window.setTimeout(() => setNewOpen(true), 0); return () => window.clearTimeout(timer) }, [])
+  const [newItem, setNewItem] = useState({ company: '', role: '', employmentType: '', startDate: '', endDate: '', current: false, location: '', description: '', technologies: '' })
+  const [createError, setCreateError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleCreate = async () => {
     setCreating(true)
     try {
+      if (!newItem.company.trim() || !newItem.role.trim() || !newItem.startDate) throw new Error('Company, role and start date are required.')
+      if (!newItem.current && newItem.endDate && newItem.endDate < newItem.startDate) throw new Error('End date must be after start date.')
+      const format = (value: string) => new Date(`${value}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+      const period = `${format(newItem.startDate)} – ${newItem.current ? 'Present' : newItem.endDate ? format(newItem.endDate) : 'Present'}`
       await create({
-        company: 'New Company',
-        role: 'Role',
-        period: 'Month Year – Present',
-        timeframe: 'Year – Present',
-        badge: '',
-        logo: '?',
+        company: newItem.company.trim(),
+        role: newItem.role.trim(),
+        employmentType: newItem.employmentType,
+        startDate: newItem.startDate,
+        endDate: newItem.current ? undefined : newItem.endDate,
+        current: newItem.current,
+        location: newItem.location,
+        description: newItem.description,
+        period,
+        timeframe: `${newItem.startDate.slice(0,4)} – ${newItem.current ? 'Present' : newItem.endDate.slice(0,4) || 'Present'}`,
+        badge: newItem.current ? 'Current' : '',
+        logo: newItem.company.trim().slice(0, 2).toUpperCase(),
         logoBg: 'bg-slate-900 text-white',
         points: [],
-        tags: [],
+        tags: newItem.technologies.split(',').map(s => s.trim()).filter(Boolean),
         order: (items.length + 1) * 10,
-        visible: false,
+        visible: true,
       })
       setRefreshKey((k) => k + 1)
+      setNewOpen(false)
+      setNewItem({ company: '', role: '', employmentType: '', startDate: '', endDate: '', current: false, location: '', description: '', technologies: '' })
+      setCreateError('')
+    } catch (err) {
+      setCreateError(errorMessage(err, 'Create failed'))
     } finally {
       setCreating(false)
     }
@@ -422,7 +423,7 @@ export function ExperienceEditor() {
           Experience
         </h2>
         <button
-          onClick={() => void handleCreate()}
+          onClick={() => setNewOpen(true)}
           disabled={creating}
           style={{
             padding: '0.625rem 1.25rem',
@@ -439,6 +440,18 @@ export function ExperienceEditor() {
         </button>
       </div>
 
+      {newOpen && <AdminModal title="Add experience" onClose={() => setNewOpen(false)}><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 12 }}>
+        <label>Company<input required value={newItem.company} onChange={e => setNewItem({ ...newItem, company: e.target.value })} style={fieldStyle} /></label>
+        <label>Role<input required value={newItem.role} onChange={e => setNewItem({ ...newItem, role: e.target.value })} style={fieldStyle} /></label>
+        <label>Employment type<input value={newItem.employmentType} onChange={e => setNewItem({ ...newItem, employmentType: e.target.value })} style={fieldStyle} /></label>
+        <label>Location<input value={newItem.location} onChange={e => setNewItem({ ...newItem, location: e.target.value })} style={fieldStyle} /></label>
+        <label>Start date<input type="month" required value={newItem.startDate} onChange={e => setNewItem({ ...newItem, startDate: e.target.value })} style={fieldStyle} /></label>
+        <label>End date<input type="month" disabled={newItem.current} value={newItem.endDate} onChange={e => setNewItem({ ...newItem, endDate: e.target.value })} style={fieldStyle} /></label>
+        <label><input type="checkbox" checked={newItem.current} onChange={e => setNewItem({ ...newItem, current: e.target.checked })} /> Currently working</label>
+        <label style={{ gridColumn: '1 / -1' }}>Description<textarea value={newItem.description} onChange={e => setNewItem({ ...newItem, description: e.target.value })} style={fieldStyle} /></label>
+        <label style={{ gridColumn: '1 / -1' }}>Technologies (comma separated)<input value={newItem.technologies} onChange={e => setNewItem({ ...newItem, technologies: e.target.value })} style={fieldStyle} /></label>
+      </div>{createError && <p role="alert" style={{ color: '#b91c1c' }}>{createError}</p>}<div style={{ marginTop: 16, display: 'flex', gap: 10 }}><button disabled={creating} onClick={() => void handleCreate()}>Save experience</button><button onClick={() => setNewOpen(false)}>Cancel</button></div></AdminModal>}
+
       <div key={refreshKey} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {items.length === 0 ? (
           <p style={{ color: '#6b7280' }}>No experience entries yet.</p>
@@ -446,11 +459,14 @@ export function ExperienceEditor() {
           items
             .slice()
             .sort((a, b) => a.order - b.order)
-            .map((exp) => (
+            .map((exp, index, sorted) => (
               <ExperienceRow
                 key={exp._id}
                 exp={exp}
                 onSaved={() => setRefreshKey((k) => k + 1)}
+                canMoveUp={index > 0}
+                canMoveDown={index < sorted.length - 1}
+                onMove={direction => { const ids = sorted.map(item => item._id); const other = index + direction; [ids[index], ids[other]] = [ids[other], ids[index]]; void reorder({ ids }) }}
               />
             ))
         )}
