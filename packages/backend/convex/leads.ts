@@ -190,6 +190,38 @@ export const setStatus = mutation({
   },
 })
 
+export const createAdmin = mutation({
+  args: { name: v.string(), email: v.string(), message: v.string(), subject: v.optional(v.string()), phone: v.optional(v.string()), company: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx)
+    const { name, email } = validateLead(args)
+    if (args.subject && args.subject.length > 150) throw new ConvexError('Subject is too long.')
+    if (args.phone && args.phone.length > 40) throw new ConvexError('Phone is too long.')
+    if (args.company && args.company.length > 120) throw new ConvexError('Company is too long.')
+    const now = Date.now()
+    const id = await ctx.db.insert('leads', { name, email, message: args.message.trim(), subject: args.subject?.trim(), phone: args.phone?.trim(), company: args.company?.trim(), source: 'admin', status: 'new', meta: {}, notified: true, createdAt: now })
+    const identity = await ctx.auth.getUserIdentity()
+    await ctx.db.insert('leadEvents', { leadId: id, kind: 'created', text: 'Lead created in admin', author: identity?.email ?? 'Admin', createdAt: now })
+    return id
+  },
+})
+
+export const updateAdmin = mutation({
+  args: { id: v.id('leads'), name: v.string(), email: v.string(), message: v.string(), subject: v.optional(v.string()), phone: v.optional(v.string()), company: v.optional(v.string()) },
+  handler: async (ctx, { id, ...args }) => {
+    await requireAdmin(ctx)
+    const before = await ctx.db.get(id)
+    if (!before) throw new ConvexError('Lead not found.')
+    const { name, email } = validateLead(args)
+    if (args.subject && args.subject.length > 150) throw new ConvexError('Subject is too long.')
+    if (args.phone && args.phone.length > 40) throw new ConvexError('Phone is too long.')
+    if (args.company && args.company.length > 120) throw new ConvexError('Company is too long.')
+    await ctx.db.patch(id, { name, email, message: args.message.trim(), subject: args.subject?.trim(), phone: args.phone?.trim(), company: args.company?.trim() })
+    const identity = await ctx.auth.getUserIdentity()
+    await ctx.db.insert('leadEvents', { leadId: id, kind: 'note', text: 'Contact details updated', author: identity?.email ?? 'Admin', createdAt: Date.now() })
+  },
+})
+
 export const events = query({
   args: { id: v.id('leads') },
   handler: async (ctx, { id }) => {

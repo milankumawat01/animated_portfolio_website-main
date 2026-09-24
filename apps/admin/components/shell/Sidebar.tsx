@@ -1,89 +1,34 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuthActions } from '@convex-dev/auth/react'
+import { useEffect } from 'react'
+import { Icon, type IconName } from './icons'
 
-const navItems = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'CONTENT', href: '' },
-  { label: 'Projects', href: '/dashboard/projects' },
-  { label: 'Blog', href: '/dashboard/blog' },
-  { label: 'Experience', href: '/dashboard/experience' },
-  { label: 'Skills', href: '/dashboard/skills' },
-  { label: 'Media', href: '/dashboard/media' },
-  { label: 'CRM', href: '' },
-  { label: 'Leads', href: '/dashboard/leads' },
+const groups: { label?: string; items: { label: string; href: string; icon: IconName }[] }[] = [
+  { items: [{ label: 'Dashboard', href: '/dashboard', icon: 'dashboard' }] },
+  { label: 'Content', items: [
+    { label: 'Projects', href: '/dashboard/projects', icon: 'projects' },
+    { label: 'Blog', href: '/dashboard/blog', icon: 'blog' },
+    { label: 'Experience', href: '/dashboard/experience', icon: 'experience' },
+    { label: 'Skills', href: '/dashboard/skills', icon: 'skills' },
+    { label: 'Media', href: '/dashboard/media', icon: 'media' },
+  ] },
+  { label: 'CRM', items: [{ label: 'Leads', href: '/dashboard/leads', icon: 'leads' }] },
 ]
-
-const sidebarStyle: React.CSSProperties = {
-  width: '220px',
-  minHeight: '100vh',
-  borderRight: '1px solid #e5e7eb',
-  background: '#fafafa',
-  padding: '1.5rem 0',
-  display: 'flex',
-  flexDirection: 'column',
-  flexShrink: 0,
-}
-
-const logoStyle: React.CSSProperties = {
-  padding: '0 1.25rem 1.25rem',
-  fontWeight: 700,
-  fontSize: '1.1rem',
-  fontFamily: 'system-ui, sans-serif',
-  color: '#111',
-  borderBottom: '1px solid #e5e7eb',
-  marginBottom: '0.75rem',
-}
-
-const navStyle: React.CSSProperties = {
-  listStyle: 'none',
-  margin: 0,
-  padding: 0,
-}
-
-function getLinkStyle(active: boolean): React.CSSProperties {
-  return {
-    display: 'block',
-    padding: '0.5rem 1.25rem',
-    fontFamily: 'system-ui, sans-serif',
-    fontSize: '0.9rem',
-    textDecoration: 'none',
-    borderRadius: '6px',
-    margin: '0.125rem 0.5rem',
-    background: active ? '#111' : 'transparent',
-    color: active ? '#fff' : '#374151',
-    fontWeight: active ? 600 : 400,
-    transition: 'background 0.15s',
-  }
-}
-
-export function Sidebar() {
+export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname()
   const { signOut } = useAuthActions()
-
-  return (
-    <aside className="admin-sidebar" style={sidebarStyle}>
-      <div style={logoStyle}>Milan Admin</div>
-      <ul style={navStyle}>
-        {navItems.map(({ label, href }) => {
-          if (!href) return <li key={label} style={{ padding: '1rem 1.25rem 0.35rem', color: '#9ca3af', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.12em' }}>{label}</li>
-          // Exact match for /dashboard, prefix match for sub-routes
-          const active =
-            href === '/dashboard'
-              ? pathname === '/dashboard'
-              : pathname.startsWith(href)
-          return (
-            <li key={href}>
-              <Link href={href} style={getLinkStyle(active)}>
-                {label}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-      <button onClick={() => void signOut()} style={{ ...getLinkStyle(false), marginTop: 'auto', border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer' }}>Sign out</button>
+  useEffect(() => { onClose() }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+  return <>
+    {open && <button className="sidebar-scrim" aria-label="Close navigation" onClick={onClose} />}
+    <aside className={`admin-sidebar${open ? ' is-open' : ''}`} aria-label="Admin navigation">
+      <div className="sidebar-brand"><span className="brand-avatar">MK</span><span><strong>Milan Admin</strong><small>Portfolio CMS</small></span></div>
+      <nav className="sidebar-nav">{groups.map((group, index) => <div className="nav-group" key={index}>
+        {group.label && <span className="nav-heading">{group.label}</span>}
+        {group.items.map(item => { const active = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href); return <Link key={item.href} href={item.href} className={`nav-link${active ? ' active' : ''}`} aria-current={active ? 'page' : undefined}><Icon name={item.icon} /><span>{item.label}</span></Link> })}
+      </div>)}</nav>
+      <div className="sidebar-bottom"><span className="nav-heading">System</span><Link href="/dashboard/settings" className={`nav-link${pathname === '/dashboard/settings' ? ' active' : ''}`}><Icon name="settings" />Settings</Link><button className="nav-link" onClick={() => void signOut()}><Icon name="logout" />Sign out</button></div>
     </aside>
-  )
+  </>
 }

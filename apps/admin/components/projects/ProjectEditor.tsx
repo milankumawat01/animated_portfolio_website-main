@@ -1,6 +1,6 @@
 'use client'
 /* eslint-disable @next/next/no-img-element -- Editor previews the selected original asset. */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/slugify'
 import { errorMessage } from '@/lib/errors'
 import { MediaPicker } from '@/components/editor/MediaPicker'
+import { useFeedback } from '@/components/ui/Feedback'
 
 type ProjectDoc = {
   _id: Id<'projects'>
@@ -56,7 +57,8 @@ const groupStyle: React.CSSProperties = {
   marginBottom: '1.25rem',
 }
 
-export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onClose?: () => void }) {
+export function ProjectEditor({ project, onClose, onCancel, onDirtyChange }: { project?: ProjectDoc; onClose?: () => void; onCancel?: () => void; onDirtyChange?: (dirty: boolean) => void }) {
+  const { toast, confirm } = useFeedback()
   const router = useRouter()
   const create = useMutation(api.projects.create)
   const update = useMutation(api.projects.update)
@@ -82,6 +84,11 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
   const [order, setOrder] = useState(String(project?.order ?? 10))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const snapshot = JSON.stringify([title,slug,subtitle,description,longDescription,imageUrl,galleryUrls,caseStudyUrl,tags,keyFeatures,architecture,liveUrl,githubUrl,featured,published,order])
+  const [initial] = useState(snapshot)
+  const dirty = snapshot !== initial
+  useEffect(() => { onDirtyChange?.(dirty) }, [dirty, onDirtyChange])
+  useEffect(() => { const handler = (event: BeforeUnloadEvent) => { if (dirty) event.preventDefault() }; window.addEventListener('beforeunload', handler); return () => window.removeEventListener('beforeunload', handler) }, [dirty])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -116,10 +123,12 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
           slug: slug !== project.slug ? slug : undefined,
         })
         if (published !== (project.status === 'published')) await setStatus({ id: project._id, status: published ? 'published' : 'draft' })
+        if (!onClose) toast('Project saved')
         onClose?.()
       } else {
         const id = await create({ slug, ...payload })
         if (published) await setStatus({ id, status: 'published' })
+        if (!onClose) toast('Project created')
         if (onClose) onClose()
         else router.push(`/dashboard/projects/${id}`)
         return
@@ -137,7 +146,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} style={{ maxWidth: '720px', fontFamily: 'system-ui, sans-serif' }}>
-      {picking && <MediaPicker onClose={() => setPicking(null)} onSelect={url => { if (picking === 'cover') setImageUrl(url); else setGalleryUrls([...galleryUrls, url]); setPicking(null) }} />}
+      {picking && <MediaPicker multiple={picking === 'gallery'} onSelectMany={urls => setGalleryUrls(current => [...current, ...urls.filter(url => !current.includes(url))])} onClose={() => setPicking(null)} onSelect={url => { if (picking === 'cover') setImageUrl(url); else setGalleryUrls(current => [...current, url]); setPicking(null) }} />}
       <button type="button" onClick={() => setShowPreview(!showPreview)} style={{ marginBottom: 16 }}>{showPreview ? 'Hide preview' : 'Preview project'}</button>
       {showPreview && <article style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 18, marginBottom: 18 }}>{imageUrl && <img src={imageUrl} alt={title} style={{ width: '100%', maxHeight: 250, objectFit: 'cover' }} />}<h2>{title || 'Untitled project'}</h2><p>{description}</p><div>{tags}</div><p style={{ whiteSpace: 'pre-wrap' }}>{longDescription}</p><div>{galleryUrls.map((url, index) => <img key={index} src={url} alt={`Gallery ${index + 1}`} style={{ width: 120, marginRight: 8 }} />)}</div></article>}
       {error && (
@@ -159,6 +168,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Title *</label>
         <input
+          aria-label="Project title"
           value={title}
           onChange={(e) => { setTitle(e.target.value); if (!project) setSlug(slugify(e.target.value)) }}
           required
@@ -177,6 +187,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
           )}
         </label>
         <input
+          aria-label="Project slug"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
           required
@@ -188,6 +199,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Subtitle</label>
         <input
+          aria-label="Project subtitle"
           value={subtitle}
           onChange={(e) => setSubtitle(e.target.value)}
           style={fieldStyle}
@@ -198,6 +210,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Description (card blurb)</label>
         <textarea
+          aria-label="Project short description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
@@ -209,6 +222,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Long Description (detail page)</label>
         <textarea
+          aria-label="Project full description"
           value={longDescription}
           onChange={(e) => setLongDescription(e.target.value)}
           rows={5}
@@ -220,6 +234,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Tags (comma-separated)</label>
         <input
+          aria-label="Technologies"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           style={fieldStyle}
@@ -228,16 +243,17 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       </div>
 
       <fieldset style={{ border: '1px solid #e5e7eb', borderRadius: 8, marginBottom: 20 }}><legend>Media</legend>
-        <label style={labelStyle}>Cover image</label><input value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={fieldStyle} placeholder="Image URL" />
+        <label style={labelStyle}>Cover image</label><input aria-label="Cover image URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={fieldStyle} placeholder="Image URL" />
         <button type="button" onClick={() => setPicking('cover')}>Choose from Media</button>
         {imageUrl && <img src={imageUrl} alt="Cover preview" style={{ display: 'block', maxWidth: 180, marginTop: 10 }} />}
-        <p>Gallery images</p>{galleryUrls.map((url, i) => <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}><input value={url} onChange={e => setGalleryUrls(galleryUrls.map((v, j) => j === i ? e.target.value : v))} style={fieldStyle} /><button type="button" onClick={() => setGalleryUrls(galleryUrls.filter((_, j) => j !== i))}>Remove</button></div>)}
+        <p>Gallery images</p>{galleryUrls.map((url, i) => <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}><input aria-label={`Gallery image ${i+1} URL`} value={url} onChange={e => setGalleryUrls(galleryUrls.map((v, j) => j === i ? e.target.value : v))} style={fieldStyle} /><button type="button" onClick={() => setGalleryUrls(galleryUrls.filter((_, j) => j !== i))}>Remove</button></div>)}
         <button type="button" onClick={() => setPicking('gallery')}>Add gallery image</button>
       </fieldset>
 
       <div style={groupStyle}>
         <label style={labelStyle}>Key Features (one per line)</label>
         <textarea
+          aria-label="Key features"
           value={keyFeatures}
           onChange={(e) => setKeyFeatures(e.target.value)}
           rows={5}
@@ -249,6 +265,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
       <div style={groupStyle}>
         <label style={labelStyle}>Architecture (one per line)</label>
         <textarea
+          aria-label="Architecture"
           value={architecture}
           onChange={(e) => setArchitecture(e.target.value)}
           rows={5}
@@ -261,6 +278,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
         <div style={groupStyle}>
           <label style={labelStyle}>Live URL</label>
           <input
+            aria-label="Live URL"
             value={liveUrl}
             onChange={(e) => setLiveUrl(e.target.value)}
             style={fieldStyle}
@@ -271,6 +289,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
         <div style={groupStyle}>
           <label style={labelStyle}>GitHub URL</label>
           <input
+            aria-label="GitHub URL"
             value={githubUrl}
             onChange={(e) => setGithubUrl(e.target.value)}
             style={fieldStyle}
@@ -280,12 +299,13 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
         </div>
       </div>
       <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}><input type="checkbox" checked={published} onChange={e => setPublished(e.target.checked)} /> Published on public site</label>
-      <div style={groupStyle}><label style={labelStyle}>Case Study URL</label><input value={caseStudyUrl} onChange={e => setCaseStudyUrl(e.target.value)} type="url" style={fieldStyle} /></div>
+      <div style={groupStyle}><label style={labelStyle}>Case Study URL</label><input aria-label="Case study URL" value={caseStudyUrl} onChange={e => setCaseStudyUrl(e.target.value)} type="url" style={fieldStyle} /></div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div style={groupStyle}>
           <label style={labelStyle}>Order (sparse: 10, 20, …)</label>
           <input
+            aria-label="Display order"
             value={order}
             onChange={(e) => setOrder(e.target.value)}
             type="number"
@@ -340,7 +360,7 @@ export function ProjectEditor({ project, onClose }: { project?: ProjectDoc; onCl
         </button>
         <button
           type="button"
-          onClick={() => onClose ? onClose() : router.back()}
+          onClick={() => void (async () => { if (onCancel) return onCancel(); if (!dirty || await confirm({ title: 'Discard changes?', description: 'Your unsaved project changes will be lost.', confirmLabel: 'Discard changes', danger: true })) { if (onClose) onClose(); else router.back() } })()}
           style={{
             padding: '0.75rem 1.5rem',
             background: '#f3f4f6',

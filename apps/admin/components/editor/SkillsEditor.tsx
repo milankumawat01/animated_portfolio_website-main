@@ -5,6 +5,7 @@ import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { errorMessage } from '@/lib/errors'
 import { AdminModal } from './AdminModal'
+import { useFeedback } from '@/components/ui/Feedback'
 
 // Valid icon keys from apps/web/components/icons/TechIcons.tsx
 // The TechIcon component maps name.toLowerCase().replace(/[^a-z0-9]/g, '') to the switch cases
@@ -112,6 +113,7 @@ function SkillEditorModal({ category, categories, initial, onClose, onSave, onDe
   onSave: (skill: { name: string; iconKey: string; visible?: boolean }, categoryId: Id<'skillCategories'>) => Promise<void>
   onDelete?: () => Promise<void>
 }) {
+  const { confirm, toast } = useFeedback()
   const [name, setName] = useState(initial?.name ?? '')
   const [iconKey, setIconKey] = useState(initial?.iconKey ?? '')
   const [categoryId, setCategoryId] = useState<Id<'skillCategories'>>(category._id)
@@ -121,7 +123,7 @@ function SkillEditorModal({ category, categories, initial, onClose, onSave, onDe
   return <AdminModal title={initial ? 'Edit skill' : 'Add skill'} onClose={onClose}>
     <div style={{ display: 'grid', gap: 12 }}><label>Skill name<input value={name} onChange={e => setName(e.target.value)} style={fieldStyle} /></label><label>Icon<IconKeySelect value={iconKey} onChange={setIconKey} /></label><label>Category<select value={categoryId} onChange={e => setCategoryId(e.target.value as Id<'skillCategories'>)} style={fieldStyle}>{categories.map(c => <option key={c._id} value={c._id}>{c.title}</option>)}</select></label><label><input type="checkbox" checked={visible} onChange={e => setVisible(e.target.checked)} /> Visible</label></div>
     {error && <p role="alert" style={{ color: '#b91c1c' }}>{error}</p>}
-    <div style={{ display: 'flex', gap: 10, marginTop: 16 }}><button disabled={saving} onClick={() => { if (!name.trim() || !iconKey) { setError('Name and icon are required.'); return } setSaving(true); void onSave({ name: name.trim(), iconKey, visible }, categoryId).catch(err => setError(errorMessage(err, 'Save failed'))).finally(() => setSaving(false)) }}>Save</button><button onClick={onClose}>Cancel</button>{onDelete && <button style={{ color: '#b91c1c' }} onClick={() => { if (confirm(`Delete ${name}?`)) void onDelete().catch(err => setError(errorMessage(err, 'Delete failed'))) }}>Delete</button>}</div>
+    <div style={{ display: 'flex', gap: 10, marginTop: 16 }}><button disabled={saving} onClick={() => { if (!name.trim() || !iconKey) { setError('Name and icon are required.'); return } setSaving(true); void onSave({ name: name.trim(), iconKey, visible }, categoryId).then(() => toast('Skill saved')).catch(err => setError(errorMessage(err, 'Save failed'))).finally(() => setSaving(false)) }}>Save</button><button onClick={onClose}>Cancel</button>{onDelete && <button style={{ color: '#b91c1c' }} onClick={() => void (async()=>{ if(await confirm({title:'Delete skill?',description:`Permanently delete ${name}?`,confirmLabel:'Delete',danger:true})) await onDelete().then(()=>toast('Skill deleted')).catch(err=>setError(errorMessage(err,'Delete failed'))) })()}>Delete</button>}</div>
   </AdminModal>
 }
 
@@ -140,6 +142,7 @@ function SkillCategoryRow({
   canMoveUp: boolean
   canMoveDown: boolean
 }) {
+  const { confirm, toast } = useFeedback()
   const update = useMutation(api.skills.update)
   const saveSkill = useMutation(api.skills.saveSkill)
   const deleteSkill = useMutation(api.skills.deleteSkill)
@@ -179,6 +182,7 @@ function SkillCategoryRow({
         visible,
       })
       onSaved()
+      toast('Category saved')
     } catch (err: unknown) {
       setError(errorMessage(err, 'Save failed'))
     } finally {
@@ -206,7 +210,7 @@ function SkillCategoryRow({
   }
 
   return (
-    <div
+    <div className="content-entry"
       style={{
         background: 'white',
         border: '1px solid #e5e7eb',
@@ -226,6 +230,10 @@ function SkillCategoryRow({
           userSelect: 'none',
         }}
         onClick={() => setExpanded(!expanded)}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setExpanded(!expanded) } }}
       >
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#111827' }}>
@@ -381,11 +389,7 @@ function SkillCategoryRow({
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
-              onClick={() => {
-                if (window.confirm(`Delete category "${cat.title}"?`)) {
-                  void remove({ id: cat._id })
-                }
-              }}
+              onClick={() => void (async()=>{ if(await confirm({title:'Delete category?',description:`Delete “${cat.title}” and its skills?`,confirmLabel:'Delete category',danger:true})) { await remove({id:cat._id}); toast('Category deleted') } })()}
               style={{
                 padding: '0.625rem 1.5rem',
                 background: '#fff5f5',
@@ -413,7 +417,9 @@ function SkillCategoryRow({
 }
 
 export function SkillsEditor() {
-  const categories = (useQuery(api.skills.listAll) ?? []) as SkillCategoryDoc[]
+  const skillsQuery = useQuery(api.skills.listAll)
+  const categories = (skillsQuery ?? []) as SkillCategoryDoc[]
+  const { toast } = useFeedback()
   const create = useMutation(api.skills.create)
   const reorder = useMutation(api.skills.reorder)
   const saveSkill = useMutation(api.skills.saveSkill)
@@ -440,6 +446,7 @@ export function SkillsEditor() {
         order: (categories.length + 1) * 10,
         visible: newVisible,
       })
+      toast('Category added')
       setRefreshKey((k) => k + 1)
       setNewOpen(false)
       setNewTitle(''); setNewSubtitle(''); setCreateError('')
@@ -452,7 +459,7 @@ export function SkillsEditor() {
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
-      <div
+      <div className="cms-page-head"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -460,9 +467,9 @@ export function SkillsEditor() {
           marginBottom: '1.5rem',
         }}
       >
-        <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
+        <h1 style={{ margin: 0 }}>
           Skills
-        </h2>
+        </h1>
         <button
           onClick={() => setNewOpen(true)}
           disabled={creating}
@@ -477,7 +484,7 @@ export function SkillsEditor() {
             fontSize: '0.875rem',
           }}
         >
-          + New Category
+          + Add Category
         </button>
       </div>
       {quickSkillOpen && categories.length > 0 && <SkillEditorModal category={categories[0]} categories={categories} onClose={() => setQuickSkillOpen(false)} onSave={async (skill, targetId) => { await saveSkill({ categoryId: targetId, targetId, skill }); setQuickSkillOpen(false); setRefreshKey(k => k + 1) }} />}
@@ -485,8 +492,8 @@ export function SkillsEditor() {
       {newOpen && <AdminModal title="New skill category" onClose={() => setNewOpen(false)}><div style={{ display: 'grid', gap: 12 }}><label>Category name<input value={newTitle} onChange={e => setNewTitle(e.target.value)} style={fieldStyle} /></label><label>Subtitle<input value={newSubtitle} onChange={e => setNewSubtitle(e.target.value)} style={fieldStyle} /></label><label>Icon<IconKeySelect value={newIcon} onChange={setNewIcon} /></label><label><input type="checkbox" checked={newVisible} onChange={e => setNewVisible(e.target.checked)} /> Visible</label></div>{createError && <p role="alert" style={{ color: '#b91c1c' }}>{createError}</p>}<div style={{ display: 'flex', gap: 10, marginTop: 16 }}><button disabled={creating} onClick={() => void handleCreate()}>Save category</button><button onClick={() => setNewOpen(false)}>Cancel</button></div></AdminModal>}
 
       <div key={refreshKey} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {categories.length === 0 ? (
-          <p style={{ color: '#6b7280' }}>No skill categories yet.</p>
+        {skillsQuery === undefined ? <div className="skeleton" style={{height:210}}/> : categories.length === 0 ? (
+          <div className="cms-empty"><span>✦</span><strong>No skill categories yet</strong><p>Create a category to organize your skills.</p><button onClick={()=>setNewOpen(true)}>+ Add Category</button></div>
         ) : (
           categories
             .slice()

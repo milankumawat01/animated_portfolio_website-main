@@ -4,6 +4,8 @@ import { Sidebar } from '@/components/shell/Sidebar'
 import { TopBar } from '@/components/shell/TopBar'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useState } from 'react'
+import { FeedbackProvider } from '@/components/ui/Feedback'
 import type { ReactNode } from 'react'
 
 function RedirectToLogin() {
@@ -28,37 +30,19 @@ function RedirectToLogin() {
 }
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false)
   return (
     <>
       <Authenticated>
-        <div className="admin-shell"
-          style={{
-            display: 'flex',
-            minHeight: '100vh',
-            background: '#f9fafb',
-          }}
-        >
-          <Sidebar />
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              minWidth: 0,
-            }}
-          >
-            <TopBar />
-            <main className="admin-main"
-              style={{
-                flex: 1,
-                padding: '2rem',
-                overflowY: 'auto',
-              }}
-            >
-              {children}
-            </main>
+        <FeedbackProvider>
+        <div className="admin-shell">
+          <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+          <div className="admin-workspace">
+            <TopBar onMenu={() => setMenuOpen(true)} />
+            <main className="admin-main">{children}</main>
           </div>
         </div>
+        </FeedbackProvider>
       </Authenticated>
       <Unauthenticated>
         <RedirectToLogin />

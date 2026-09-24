@@ -5,6 +5,7 @@ import { api } from '@portfolio/backend/convex/_generated/api'
 import type { Id } from '@portfolio/backend/convex/_generated/dataModel'
 import { errorMessage } from '@/lib/errors'
 import { AdminModal } from './AdminModal'
+import { useFeedback } from '@/components/ui/Feedback'
 
 type ExperienceDoc = {
   _id: Id<'experience'>
@@ -50,6 +51,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: ExperienceDoc; onSaved: () => void; onMove: (direction: -1 | 1) => void; canMoveUp: boolean; canMoveDown: boolean }) {
+  const { confirm, toast } = useFeedback()
   const update = useMutation(api.experience.update)
   const remove = useMutation(api.experience.remove)
 
@@ -100,6 +102,7 @@ function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: 
         visible,
       })
       onSaved()
+      toast('Experience saved')
       setExpanded(false)
     } catch (err: unknown) {
       setError(errorMessage(err, 'Save failed'))
@@ -124,7 +127,7 @@ function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: 
   }
 
   return (
-    <div
+    <div className="content-entry"
       style={{
         background: 'white',
         border: '1px solid #e5e7eb',
@@ -144,6 +147,10 @@ function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: 
           userSelect: 'none',
         }}
         onClick={() => setExpanded(!expanded)}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setExpanded(!expanded) } }}
       >
         <div
           style={{
@@ -334,11 +341,7 @@ function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: 
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
-              onClick={() => {
-                if (window.confirm(`Delete experience at ${company}?`)) {
-                  void remove({ id: exp._id })
-                }
-              }}
+              onClick={() => void (async () => { if (await confirm({ title: 'Delete experience?', description: `Permanently delete the experience at ${company}?`, confirmLabel: 'Delete', danger: true })) { await remove({ id: exp._id }); toast('Experience deleted') } })()}
               style={{
                 padding: '0.625rem 1.5rem',
                 background: '#fff5f5',
@@ -360,7 +363,9 @@ function ExperienceRow({ exp, onSaved, onMove, canMoveUp, canMoveDown }: { exp: 
 }
 
 export function ExperienceEditor() {
-  const items = (useQuery(api.experience.listAll) ?? []) as ExperienceDoc[]
+  const experienceQuery = useQuery(api.experience.listAll)
+  const items = (experienceQuery ?? []) as ExperienceDoc[]
+  const { toast } = useFeedback()
   const migrateDates = useMutation(api.experience.migrateDates)
   useEffect(() => { if (localStorage.getItem('milan-experience-dates-v1')) return; void migrateDates({}).then(() => localStorage.setItem('milan-experience-dates-v1','done')).catch(() => {}) }, [migrateDates])
   const create = useMutation(api.experience.create)
@@ -398,6 +403,7 @@ export function ExperienceEditor() {
         order: (items.length + 1) * 10,
         visible: true,
       })
+      toast('Experience added')
       setRefreshKey((k) => k + 1)
       setNewOpen(false)
       setNewItem({ company: '', role: '', employmentType: '', startDate: '', endDate: '', current: false, location: '', description: '', technologies: '' })
@@ -411,7 +417,7 @@ export function ExperienceEditor() {
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
-      <div
+      <div className="cms-page-head"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -419,9 +425,9 @@ export function ExperienceEditor() {
           marginBottom: '1.5rem',
         }}
       >
-        <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#111827' }}>
+        <h1 style={{ margin: 0 }}>
           Experience
-        </h2>
+        </h1>
         <button
           onClick={() => setNewOpen(true)}
           disabled={creating}
@@ -436,7 +442,7 @@ export function ExperienceEditor() {
             fontSize: '0.875rem',
           }}
         >
-          + New Entry
+          + Add Experience
         </button>
       </div>
 
@@ -453,8 +459,8 @@ export function ExperienceEditor() {
       </div>{createError && <p role="alert" style={{ color: '#b91c1c' }}>{createError}</p>}<div style={{ marginTop: 16, display: 'flex', gap: 10 }}><button disabled={creating} onClick={() => void handleCreate()}>Save experience</button><button onClick={() => setNewOpen(false)}>Cancel</button></div></AdminModal>}
 
       <div key={refreshKey} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {items.length === 0 ? (
-          <p style={{ color: '#6b7280' }}>No experience entries yet.</p>
+        {experienceQuery === undefined ? <div className="skeleton" style={{height:210}}/> : items.length === 0 ? (
+          <div className="cms-empty"><span>▣</span><strong>No experience added</strong><p>Add roles and projects from your career journey.</p><button onClick={()=>setNewOpen(true)}>+ Add Experience</button></div>
         ) : (
           items
             .slice()

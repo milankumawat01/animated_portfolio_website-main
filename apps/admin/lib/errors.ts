@@ -4,5 +4,6 @@ import { ConvexError } from 'convex/values'
 // Error messages with "Server Error"; only ConvexError data reaches the client.
 export function errorMessage(err: unknown, fallback: string): string {
   if (err instanceof ConvexError && typeof err.data === 'string') return err.data
-  return err instanceof Error ? err.message : fallback
+  if (err instanceof Error && /^(Choose |Only |File |Image |Name |Category |Company |End date |Replacement |Storage upload failed|Upload to storage failed|.*: (unsupported file type|file too large))/.test(err.message)) return err.message
+  return fallback
 }

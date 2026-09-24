@@ -68,7 +68,7 @@ export default defineSchema({
     subject:   v.optional(v.string()),
     phone:     v.optional(v.string()),
     company:   v.optional(v.string()),
-    source:    v.union(v.literal('contact-modal'), v.literal('contact-page')),
+    source:    v.union(v.literal('contact-modal'), v.literal('contact-page'), v.literal('admin')),
     status:    v.union(
                  v.literal('new'), v.literal('read'),
                  v.literal('replied'), v.literal('archived'),

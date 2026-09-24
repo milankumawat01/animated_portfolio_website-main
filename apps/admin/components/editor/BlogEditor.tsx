@@ -8,6 +8,7 @@ import { slugify } from '@/lib/slugify'
 import { MarkdownPreview } from './MarkdownPreview'
 import { MediaPicker } from './MediaPicker'
 import { errorMessage } from '@/lib/errors'
+import { useFeedback } from '@/components/ui/Feedback'
 
 const BODY_MAX = 200_000
 
@@ -61,7 +62,8 @@ const groupStyle: React.CSSProperties = {
   marginBottom: '1.25rem',
 }
 
-export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => void }) {
+export function BlogEditor({ post, onClose, onCancel, onDirtyChange }: { post?: PostDoc; onClose?: () => void; onCancel?: () => void; onDirtyChange?: (dirty: boolean) => void }) {
+  const { confirm, toast } = useFeedback()
   const router = useRouter()
   const create = useMutation(api.blog.create)
   const update = useMutation(api.blog.update)
@@ -109,22 +111,21 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
 
   // Dirty state tracking
   const [isDirty, setIsDirty] = useState(false)
+  const initializedDirty = useRef(false)
   const [saving, setSaving] = useState(false)
   const [saveLabel, setSaveLabel] = useState<'save' | 'saving' | 'saved'>('save')
   const [error, setError] = useState('')
-
-  // Publish dialog
-  const [showPublishConfirm, setShowPublishConfirm] = useState(false)
-  const [pendingStatus, setPendingStatus] = useState<'draft' | 'published' | 'scheduled' | null>(null)
 
   // Preview pane
   const [showPreview, setShowPreview] = useState(true)
 
   // Mark dirty on any field change
   useEffect(() => {
+    if (!initializedDirty.current) { initializedDirty.current = true; return }
     const timer = window.setTimeout(() => setIsDirty(true), 0)
     return () => window.clearTimeout(timer)
   }, [title, slug, excerpt, body, tags, category, featured, publishedAtStr, imageStorageId, imageUrl, seoTitle, seoDesc, readTimeOverride, readTimePinned])
+  useEffect(() => { onDirtyChange?.(isDirty) }, [isDirty, onDirtyChange])
 
   // Auto-slug from title (only when not touched)
   // The title change handler keeps untouched slugs in sync.
@@ -193,12 +194,14 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
         if (publishOnCreate) await setStatus({ id, status: publishedAtStr && new Date(publishedAtStr).getTime() > Date.now() ? 'scheduled' : 'published', publishedAt: publishedAtStr ? new Date(publishedAtStr).getTime() : undefined })
         setIsDirty(false)
         setSaveLabel('saved')
+        if (!onClose) toast('Post created')
         if (onClose) onClose()
         else router.push(`/dashboard/blog/${id}`)
         return
       }
       setIsDirty(false)
       setSaveLabel('saved')
+      if (!onClose) toast('Post saved')
       onClose?.()
       setTimeout(() => setSaveLabel('save'), 2000)
     } catch (err: unknown) {
@@ -209,24 +212,22 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
     }
   }
 
-  const handleStatusToggle = () => {
+  const handleStatusToggle = async () => {
+    if (isDirty) { setError('Save your changes before changing publication status.'); return }
     const newStatus = post?.status === 'published' || post?.status === 'scheduled' ? 'draft' : (publishedAtStr && new Date(publishedAtStr).getTime() > Date.now() ? 'scheduled' : 'published')
-    setPendingStatus(newStatus)
-    setShowPublishConfirm(true)
-  }
-
-  const confirmStatusChange = async () => {
-    if (!post || !pendingStatus) return
-    setShowPublishConfirm(false)
+    if (!post) return
+    const label = newStatus === 'draft' ? 'Unpublish' : newStatus === 'scheduled' ? 'Schedule' : 'Publish'
+    if (!await confirm({ title: `${label} post?`, description: newStatus === 'draft' ? `The public URL for “${post.title}” will become unavailable.` : newStatus === 'scheduled' ? `“${post.title}” will publish at the selected date.` : `“${post.title}” will become public on your portfolio.`, confirmLabel: label })) return
     setSaving(true)
     try {
       await setStatus({
         id: post._id,
-        status: pendingStatus,
-        publishedAt: pendingStatus === 'published' || pendingStatus === 'scheduled'
+        status: newStatus,
+        publishedAt: newStatus === 'published' || newStatus === 'scheduled'
           ? (publishedAtStr ? new Date(publishedAtStr).getTime() : undefined)
           : undefined,
       })
+      toast(`Post ${newStatus === 'draft' ? 'unpublished' : newStatus}`)
     } catch (err: unknown) {
       setError(errorMessage(err, 'Status change failed'))
     } finally {
@@ -261,6 +262,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
           {post ? 'Edit Post' : 'New Post'}
         </h1>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => void (async()=>{if(!isDirty||await confirm({title:'Discard changes?',description:'Your unsaved blog changes will be lost.',confirmLabel:'Discard changes',danger:true})){if(onCancel) onCancel(); else router.back()}})()}>Cancel</button>
           {post && (
             <button
               onClick={handleStatusToggle}
@@ -360,6 +362,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
 
       {/* Two-pane layout */}
       <div
+        className="blog-editor-columns"
         style={{
           display: 'grid',
           gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr',
@@ -373,6 +376,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
           <div style={groupStyle}>
             <label style={labelStyle}>Title *</label>
             <input
+              aria-label="Post title"
               value={title}
               onChange={(e) => { setTitle(e.target.value); if (!slugTouched) setSlug(slugify(e.target.value)) }}
               required
@@ -400,6 +404,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
               )}
             </label>
             <input
+              aria-label="Post slug"
               value={slug}
               onChange={(e) => {
                 setSlugTouched(true)
@@ -420,12 +425,13 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
               </span>
             </label>
             <textarea
+              aria-label="Post excerpt"
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
               style={fieldStyle}
               placeholder="A short summary of the post…"
-              maxLength={1000}
+              maxLength={300}
             />
           </div>
 
@@ -438,6 +444,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
               </span>
             </label>
             <textarea
+              aria-label="Post body in Markdown"
               value={body}
               onChange={(e) => handleBodyChange(e.target.value)}
               rows={20}
@@ -449,19 +456,6 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
                 resize: 'vertical',
               }}
               placeholder="Write your post in Markdown…"
-              onKeyDown={(e) => {
-                if (e.key === 'Tab') {
-                  e.preventDefault()
-                  const t = e.currentTarget
-                  const start = t.selectionStart
-                  const end = t.selectionEnd
-                  const next = t.value.slice(0, start) + '  ' + t.value.slice(end)
-                  setBody(next)
-                  requestAnimationFrame(() => {
-                    t.selectionStart = t.selectionEnd = start + 2
-                  })
-                }
-              }}
             />
           </div>
 
@@ -510,6 +504,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
                 Pick from media library
               </button>
               <input
+                aria-label="Cover image URL"
                 value={imageUrl}
                 onChange={(e) => { setImageUrl(e.target.value); setImageStorageId(undefined) }}
                 placeholder="Or paste a URL"
@@ -518,7 +513,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
             </div>
           </div>
 
-          <div style={groupStyle}><label style={labelStyle}>Category</label><input list="blog-categories" value={category} onChange={e => setCategory(e.target.value)} style={fieldStyle} placeholder="Engineering" /><datalist id="blog-categories">{categoryOptions.map(option => <option key={option} value={option} />)}</datalist></div>
+          <div style={groupStyle}><label style={labelStyle}>Category</label><input aria-label="Post category" list="blog-categories" value={category} onChange={e => setCategory(e.target.value)} style={fieldStyle} placeholder="Engineering" /><datalist id="blog-categories">{categoryOptions.map(option => <option key={option} value={option} />)}</datalist></div>
           {/* Tags */}
           <div style={groupStyle}>
             <label style={labelStyle}>
@@ -530,6 +525,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
               )}
             </label>
             <input
+              aria-label="Post tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               style={fieldStyle}
@@ -542,6 +538,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
             <label style={labelStyle}>Read Time (minutes)</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <input
+                aria-label="Reading time in minutes"
                 type="number"
                 value={displayReadTime}
                 min={1}
@@ -608,6 +605,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
               )}
             </label>
             <input
+              aria-label="Publish date and time"
               type="datetime-local"
               value={publishedAtStr}
               onChange={(e) => setPublishedAtStr(e.target.value)}
@@ -654,6 +652,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
                   </span>
                 </label>
                 <input
+                  aria-label="SEO title"
                   value={seoTitle}
                   onChange={(e) => setSeoTitle(e.target.value)}
                   style={fieldStyle}
@@ -667,6 +666,7 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
                   </span>
                 </label>
                 <textarea
+                  aria-label="SEO description"
                   value={seoDesc}
                   onChange={(e) => setSeoDesc(e.target.value)}
                   rows={2}
@@ -745,98 +745,6 @@ export function BlogEditor({ post, onClose }: { post?: PostDoc; onClose?: () => 
         />
       )}
 
-      {/* Publish confirm dialog */}
-      {showPublishConfirm && pendingStatus && post && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2000,
-            fontFamily: 'system-ui, sans-serif',
-          }}
-        >
-          <div
-            style={{
-              background: 'white',
-              borderRadius: '12px',
-              padding: '2rem',
-              maxWidth: '480px',
-              width: '90vw',
-            }}
-          >
-            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.1rem', fontWeight: 700 }}>
-              {pendingStatus === 'scheduled' ? 'Schedule this post?' : pendingStatus === 'published' ? 'Publish this post?' : 'Unpublish this post?'}
-            </h3>
-            {pendingStatus === 'published' || pendingStatus === 'scheduled' ? (
-              <div style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.6 }}>
-                <p style={{ margin: '0 0 0.5rem' }}>
-                  {pendingStatus === 'scheduled' ? 'This post will become public at the selected date:' : 'This will make the post publicly accessible at:'}
-                </p>
-                <p style={{ margin: '0 0 0.75rem', fontFamily: 'monospace', color: '#4f46e5' }}>
-                  {siteUrl}/blog/{post.slug}
-                </p>
-                <p style={{ margin: '0 0 0.75rem' }}>
-                  It will be indexable by search engines.
-                </p>
-                {!publishedAtStr && (
-                  <p style={{ margin: 0, color: '#6b7280', fontSize: '0.82rem' }}>
-                    Published date will be set to now. You can change it in the editor.
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.6 }}>
-                The URL{' '}
-                <span style={{ fontFamily: 'monospace', color: '#4f46e5' }}>
-                  {siteUrl}/blog/{post.slug}
-                </span>{' '}
-                will return 404 after revalidation.
-              </p>
-            )}
-            <div
-              style={{
-                display: 'flex',
-                gap: '0.75rem',
-                marginTop: '1.5rem',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <button
-                onClick={() => setShowPublishConfirm(false)}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                }}
-              >
-                Keep editing
-              </button>
-              <button
-                onClick={() => void confirmStatusChange()}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  background: pendingStatus === 'published' ? '#4f46e5' : '#dc2626',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                }}
-              >
-                {pendingStatus === 'scheduled' ? 'Schedule' : pendingStatus === 'published' ? 'Publish' : 'Unpublish'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
