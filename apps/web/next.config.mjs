@@ -9,6 +9,7 @@ const adminUrl = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://milan-portfolio-
 
 const nextConfig = {
   reactStrictMode: true,
+  productionBrowserSourceMaps: false,
   async redirects() {
     return [
       // Matches /admin and anything below it; the admin root routes to /login or /dashboard.

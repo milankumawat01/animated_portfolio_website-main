@@ -15,7 +15,7 @@ import { Footer } from '@/components/Footer'
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { DeferRenderGuard } from '@/components/ui/DeferRenderGuard'
 import { ModalProvider } from '@/components/modals/ModalProvider'
-import { JsonLd, personSchema } from '@/components/seo/JsonLd'
+import { JsonLd, personSchema, websiteSchema } from '@/components/seo/JsonLd'
 import type { Metadata } from 'next'
 import { RSS_FEED } from '@/lib/seo'
 
@@ -37,6 +37,7 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={personSchema(settings)} />
+      <JsonLd data={websiteSchema()} />
       <ModalProvider>
         <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans selection:bg-blue selection:text-white">
           <CustomCursor />

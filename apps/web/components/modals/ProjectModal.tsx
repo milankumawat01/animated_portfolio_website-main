@@ -44,12 +44,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
         <div className="p-6 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
           {/* Banner Image Preview */}
           <div className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-border bg-surface-well shadow-inner group">
-            <Image
-              src={project.imageUrl ?? '/images/placeholder.png'}
+            {project.imageUrl && <Image
+              src={project.imageUrl}
               alt={project.title}
-              fill
+              fill sizes="(max-width: 767px) 90vw, 704px"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            />}
               <div className="absolute inset-0 bg-gradient-to-t from-surface-feature/80 via-transparent to-transparent flex items-end p-6">
               <div>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-text-on-dark tracking-tight">

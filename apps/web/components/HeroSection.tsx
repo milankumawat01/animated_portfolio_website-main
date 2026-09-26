@@ -25,7 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           <Image
             src="/images/hero-desk.png"
             alt="Milan Kumawat developer workspace"
-            fill
+            fill sizes="100vw"
             priority
             className="object-cover object-[center_right] xl:object-right"
           />

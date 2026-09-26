@@ -10,6 +10,15 @@ A personal portfolio for **Milan Kumawat**, built with Next.js 16, React 19, Typ
 - Media is uploaded to R2 through the admin. Referenced assets cannot be deleted; Replace updates project and blog references. Images are limited to 10 MB, videos and documents to 50 MB.
 - Existing lead statuses and experience display dates are upgraded when their admin screens first open after the backend is deployed.
 
+## SEO and production configuration
+
+- Set `NEXT_PUBLIC_SITE_URL` in the web deployment to the primary public origin (for example, `https://milankumawat.is-a.dev`). Local development uses `http://localhost:3000`; production must use the real domain. Canonicals, sitemap, robots, RSS, structured data and `llms.txt` share this origin. Rebuild after changing it.
+- Attach that domain to the hosting project and configure its DNS with the records provided by the host. Code alone cannot register or connect a domain. Redirect alternate domains to the primary domain in the hosting dashboard.
+- Public routes have page titles, descriptions, canonicals, social share images, an SVG favicon and a custom 404. Project and blog pages include visible breadcrumbs and matching `BreadcrumbList` structured data. The homepage describes a `Person` and `WebSite`; articles and projects use `BlogPosting` and `CreativeWork`. `LocalBusiness` is intentionally omitted because this is a personal portfolio without verified business/address information.
+- `/sitemap.xml` and `/llms.txt` read published Convex content. Drafts are excluded. `llms.txt` is a discovery aid, not a guarantee that AI systems will use it. Images use responsive sizes; dialogs and their dependencies load on demand. Browser source maps are disabled in production.
+- Maintain biography and contact information in `apps/web/data/portfolioData.ts`, and publish real projects/articles through the admin. Missing project images no longer request a nonexistent placeholder asset.
+- Before releasing, run `npm run typecheck --workspace=apps/web`, `npm run lint --workspace=apps/web` and `npm run build --workspace=apps/web`. Verify the deployed domain's canonical tags, sitemap, robots, share images and 404; check the browser console during navigation and dialog interactions.
+
 ---
 
 ## 🚀 Sections Overview

@@ -77,7 +77,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, settings }
               <Image
                 src="/images/skills-desk.png"
                 alt="Coding workspace setup with Goku and laptop"
-                fill
+                fill sizes="(max-width: 1023px) 90vw, 420px"
                 className="object-cover rounded-xl"
               />
 

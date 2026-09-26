@@ -1,15 +1,13 @@
+import { SITE_URL } from '@/lib/site'
 import type { MetadataRoute } from 'next'
 import { getProjects, getPosts } from '@/lib/convex'
 
-// Next.js 16: sitemap() may receive { id } as a Promise — we don't shard,
-// so we accept but don't use it. The function signature must NOT destructure
-// it synchronously (Next 16 trap — see docs/01-ARCHITECTURE.md §7).
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
+export const revalidate = 86400
 
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, posts] = await Promise.all([
-    getProjects().catch(() => [] as Awaited<ReturnType<typeof getProjects>>),
-    getPosts().catch(() => [] as Awaited<ReturnType<typeof getPosts>>),
+    getProjects(),
+    getPosts(),
   ])
 
   // Real content dates instead of new Date(), which changed on every request
@@ -22,19 +20,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: siteUrl,
+      url: SITE_URL,
       lastModified: siteModified,
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${siteUrl}/projects`,
+      url: `${SITE_URL}/projects`,
       lastModified: projectsModified,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${siteUrl}/blog`,
+      url: `${SITE_URL}/blog`,
       lastModified: postsModified,
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -42,14 +40,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const projectRoutes: MetadataRoute.Sitemap = projects.map((p) => ({
-    url: `${siteUrl}/projects/${p.slug}`,
+    url: `${SITE_URL}/projects/${p.slug}`,
     lastModified: new Date(p.updatedAt),
     changeFrequency: 'monthly',
     priority: 0.6,
   }))
 
   const postRoutes: MetadataRoute.Sitemap = posts.map((p) => ({
-    url: `${siteUrl}/blog/${p.slug}`,
+    url: `${SITE_URL}/blog/${p.slug}`,
     lastModified: new Date(p.updatedAt),
     changeFrequency: 'monthly',
     priority: 0.6,

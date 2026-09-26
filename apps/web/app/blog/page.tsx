@@ -1,3 +1,4 @@
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
@@ -22,12 +23,20 @@ export default async function BlogPage() {
 
   // Extract all unique tags from published posts
   const allTags = Array.from(new Set(posts.flatMap((p) => p.tags))).sort()
+  // Article bodies stay on the server instead of being serialized into the
+  // interactive filter's initial payload.
+  const cards = posts.map(({ _id, slug, title, excerpt, imageUrl, tags, publishedAt, readTimeMinutes }) => ({
+    _id, slug, title, excerpt, imageUrl, tags, publishedAt, readTimeMinutes,
+  }))
 
   return (
     <SubPageShell settings={settings}>
         {/* Page Header */}
         <section className="py-16 sm:py-20 bg-bg-soft border-b border-border">
           <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
+            <div className="mb-6">
+              <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Blog', href: '/blog' }]} />
+            </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue mb-4">
               <span className="inline-block w-6 h-[2px] bg-blue" />
               Writing
@@ -52,7 +61,7 @@ export default async function BlogPage() {
 
         {/* Tag filter + posts — client component handles filtering */}
         <Suspense fallback={<div className="py-16 text-center text-text-muted text-sm">Loading posts…</div>}>
-          <BlogTagFilter posts={posts} allTags={allTags} />
+          <BlogTagFilter posts={cards} allTags={allTags} />
         </Suspense>
     </SubPageShell>
   )

@@ -3,7 +3,7 @@ import { Caveat, Instrument_Serif, JetBrains_Mono, Manrope } from 'next/font/goo
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
+import { SITE_URL } from '@/lib/site'
 
 // Self-hosted at build time. A CSS @import of Google Fonts blocked first paint
 // for ~2.5s on mobile (Lighthouse). globals.css maps these onto --font-* tokens.
@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], display: 'swap', prel
 const fontVars = [manrope, instrumentSerif, caveat, jetbrainsMono].map((f) => f.variable).join(' ');
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Milan Kumawat | AI Engineer & Backend Developer',
     template: '%s | Milan Kumawat',

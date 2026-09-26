@@ -68,9 +68,9 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
           <div className="border-b border-border pb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">
+                <h2 className="text-3xl font-extrabold text-text-primary tracking-tight">
                   Milan Kumawat
-                </h1>
+                </h2>
                 <p className="text-blue font-semibold text-sm sm:text-base mt-0.5">
                   AI Engineer & Backend Developer
                 </p>

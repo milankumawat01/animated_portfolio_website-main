@@ -7,8 +7,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import type { PostDoc } from '@/lib/convex'
 
+export type BlogCard = Pick<PostDoc, '_id' | 'slug' | 'title' | 'excerpt' | 'imageUrl' | 'tags' | 'publishedAt' | 'readTimeMinutes'>
+
 interface Props {
-  posts: PostDoc[]
+  posts: BlogCard[]
   allTags: string[]
 }
 
@@ -34,7 +36,8 @@ export function BlogTagFilter({ posts, allTags }: Props) {
       } else {
         params.delete('tag')
       }
-      router.push(`/blog?${params.toString()}`, { scroll: false })
+      const query = params.toString()
+      router.push(query ? `/blog?${query}` : '/blog', { scroll: false })
     },
     [router, searchParams],
   )
@@ -94,7 +97,7 @@ export function BlogTagFilter({ posts, allTags }: Props) {
                     <Image
                       src={post.imageUrl}
                       alt={post.title}
-                      fill
+                      fill sizes="(max-width: 639px) 90vw, (max-width: 1023px) 45vw, 30vw"
                       className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   ) : (

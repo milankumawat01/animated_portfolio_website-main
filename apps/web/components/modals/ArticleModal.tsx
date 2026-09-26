@@ -45,7 +45,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, isOpen, onC
             <Image
               src={article.image}
               alt={article.title}
-              fill
+              fill sizes="(max-width: 767px) 90vw, 704px"
               className="object-cover"
             />
           </div>

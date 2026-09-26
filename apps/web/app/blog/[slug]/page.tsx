@@ -1,9 +1,10 @@
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import { openGraph } from '@/lib/seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Calendar, Clock, Home, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 import { getPost, getPosts, getSiteSettings } from '@/lib/convex'
 import { SubPageShell } from '@/components/SubPageShell'
 import { MarkdownRenderer } from '@/components/markdown/MarkdownRenderer'
@@ -80,16 +81,11 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Breadcrumb */}
         <div className="max-w-3xl mx-auto px-5 sm:px-7 md:px-10 pt-8 pb-0">
-          <nav className="flex items-center gap-2 text-xs text-text-muted font-medium" aria-label="Breadcrumb">
-            <Link href="/" className="flex items-center gap-1 hover:text-ink transition-colors">
-              <Home className="w-3.5 h-3.5" />
-              <span>Home</span>
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-border" />
-            <Link href="/blog" className="hover:text-ink transition-colors">Blog</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-border" />
-            <span className="text-text-primary font-semibold truncate max-w-[200px]">{post.title}</span>
-          </nav>
+          <Breadcrumbs items={[
+            { name: 'Home', href: '/' },
+            { name: 'Blog', href: '/blog' },
+            { name: post.title, href: `/blog/${post.slug}` },
+          ]} />
         </div>
 
         {/* Article header */}
@@ -139,7 +135,7 @@ export default async function BlogPostPage({ params }: Props) {
               <Image
                 src={post.imageUrl}
                 alt={post.title}
-                fill
+                fill sizes="(max-width: 767px) 90vw, 704px"
                 className="object-cover"
                 priority
               />

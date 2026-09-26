@@ -1,3 +1,4 @@
+import { SITE_URL } from '@/lib/site'
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, FolderGit2, PenLine, Mail } from 'lucide-react';
@@ -6,9 +7,10 @@ import { RequestedPath } from '@/components/RequestedPath';
 // Next.js adds robots noindex to not-found responses itself.
 export const metadata: Metadata = {
   title: 'Page not found',
+  description: 'This page could not be found. Explore Milan Kumawat’s projects, articles or contact information.',
 };
 
-const host = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev').host;
+const host = new URL(SITE_URL).host;
 
 const links = [
   { href: '/projects', label: 'Projects', hint: 'Things I have shipped', Icon: FolderGit2 },

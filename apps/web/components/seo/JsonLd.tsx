@@ -1,6 +1,6 @@
 import type { PostDoc, ProjectDoc, SiteSettingsDoc } from '@/lib/convex'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://milankumawat.is-a.dev'
+import { SITE_URL, absoluteUrl } from '@/lib/site'
 
 // Structured data as a <script> in the page, per the Next.js JSON-LD guide.
 // `<` is escaped so content from the CMS can never close the script tag.
@@ -18,6 +18,7 @@ const iso = (ms?: number) => (ms ? new Date(ms).toISOString() : undefined)
 function author(settings?: SiteSettingsDoc | null) {
   return {
     '@type': 'Person',
+    '@id': `${SITE_URL}/#person`,
     name: settings?.personal.name ?? 'Milan Kumawat',
     url: SITE_URL,
   }
@@ -28,15 +29,29 @@ export function personSchema(settings: SiteSettingsDoc | null) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': `${SITE_URL}/#person`,
     name: p?.name ?? 'Milan Kumawat',
     url: SITE_URL,
     jobTitle: 'AI Engineer & Backend Developer',
     description: p?.bio,
+    image: absoluteUrl('/images/milan-profile.jpg'),
     email: p?.email ? `mailto:${p.email}` : undefined,
     address: p?.location
       ? { '@type': 'PostalAddress', addressLocality: p.location.split(',')[0]?.trim(), addressCountry: 'IN' }
       : undefined,
     sameAs: [p?.linkedinUrl, p?.githubUrl, p?.twitterUrl].filter(Boolean),
+  }
+}
+
+export function websiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: 'Milan Kumawat',
+    url: SITE_URL,
+    inLanguage: 'en',
+    author: { '@id': `${SITE_URL}/#person` },
   }
 }
 

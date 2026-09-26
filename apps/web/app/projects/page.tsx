@@ -1,3 +1,4 @@
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,6 +26,9 @@ export default async function ProjectsPage() {
         {/* Page Header */}
         <section className="py-16 sm:py-20 bg-bg-soft border-b border-border">
           <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
+            <div className="mb-6">
+              <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Projects', href: '/projects' }]} />
+            </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue mb-4">
               <span className="inline-block w-6 h-[2px] bg-blue" />
               Portfolio
@@ -60,7 +64,7 @@ export default async function ProjectsPage() {
                         <Image
                           src={project.imageUrl}
                           alt={project.title}
-                          fill
+                          fill sizes="(max-width: 639px) 90vw, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 320px"
                           className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
                         />
                       ) : (

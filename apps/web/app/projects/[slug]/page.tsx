@@ -1,9 +1,10 @@
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import { openGraph } from '@/lib/seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2, Home, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2 } from 'lucide-react'
 import { getProject, getProjects, getSiteSettings } from '@/lib/convex'
 import { SubPageShell } from '@/components/SubPageShell'
 import { JsonLd, creativeWorkSchema } from '@/components/seo/JsonLd'
@@ -62,16 +63,11 @@ export default async function ProjectPage({ params }: Props) {
       <JsonLd data={creativeWorkSchema(project)} />
         {/* Breadcrumb */}
         <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pt-8 pb-0">
-          <nav className="flex items-center gap-2 text-xs text-text-muted font-medium" aria-label="Breadcrumb">
-            <Link href="/" className="flex items-center gap-1 hover:text-ink transition-colors">
-              <Home className="w-3.5 h-3.5" />
-              <span>Home</span>
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-border" />
-            <Link href="/projects" className="hover:text-ink transition-colors">Projects</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-border" />
-            <span className="text-text-primary font-semibold truncate max-w-[200px]">{project.title}</span>
-          </nav>
+          <Breadcrumbs items={[
+            { name: 'Home', href: '/' },
+            { name: 'Projects', href: '/projects' },
+            { name: project.title, href: `/projects/${project.slug}` },
+          ]} />
         </div>
 
         {/* Hero — title + subtitle */}
@@ -95,7 +91,7 @@ export default async function ProjectPage({ params }: Props) {
               <Image
                 src={project.imageUrl}
                 alt={project.title}
-                fill
+                fill sizes="(max-width: 1439px) 90vw, 1312px"
                 className="object-cover"
                 priority
               />
@@ -190,7 +186,7 @@ export default async function ProjectPage({ params }: Props) {
           )}
 
           {/* Action Buttons */}
-          {project.galleryUrls && project.galleryUrls.length > 0 && <section><h2 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Gallery</h2><div className="grid sm:grid-cols-2 gap-4">{project.galleryUrls.map((url, index) => <div key={`${url}-${index}`} className="relative aspect-video overflow-hidden rounded-xl border border-border"><Image src={url} alt={`${project.title} gallery image ${index + 1}`} fill className="object-cover" /></div>)}</div></section>}
+          {project.galleryUrls && project.galleryUrls.length > 0 && <section><h2 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Gallery</h2><div className="grid sm:grid-cols-2 gap-4">{project.galleryUrls.map((url, index) => <div key={`${url}-${index}`} className="relative aspect-video overflow-hidden rounded-xl border border-border"><Image src={url} alt={`${project.title} gallery image ${index + 1}`} fill sizes="(max-width: 639px) 90vw, 45vw" className="object-cover" /></div>)}</div></section>}
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
             {project.caseStudyUrl && <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft border border-border text-text-primary font-semibold text-sm">Case Study <ExternalLink className="w-4 h-4" /></a>}
             {project.liveUrl && (

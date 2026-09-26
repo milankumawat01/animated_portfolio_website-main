@@ -60,7 +60,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
                   <Image
                     src={project.imageUrl}
                     alt={project.title}
-                    fill
+                    fill sizes="(max-width: 639px) 85vw, (max-width: 1023px) 45vw, 360px"
                     className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 )}

@@ -89,7 +89,7 @@ export const WritingSection: React.FC<WritingSectionProps> = ({ posts, settings 
                   <Image
                     src={post.imageUrl}
                     alt={post.title}
-                    fill
+                    fill sizes="(max-width: 639px) 85vw, (max-width: 1023px) 45vw, 360px"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 )}
