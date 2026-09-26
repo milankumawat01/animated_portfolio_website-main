@@ -1,3 +1,4 @@
+import { ProjectContext } from '@/components/ProjectContext'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import Image from 'next/image'
@@ -31,7 +32,7 @@ export default async function ProjectsPage() {
             </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue mb-4">
               <span className="inline-block w-6 h-[2px] bg-blue" />
-              Portfolio
+              {projects.length} projects
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-text-primary tracking-heading leading-none">
               Projects that<br />
@@ -89,6 +90,7 @@ export default async function ProjectsPage() {
                       </div>
 
                       <div className="space-y-3 pt-2">
+                        <ProjectContext project={{ ...project, company: undefined, role: undefined, contribution: undefined }} />
                         {/* Tech Tags */}
                         <div className="flex flex-wrap gap-1.5">
                           {project.tags.slice(0, 4).map((tag) => (

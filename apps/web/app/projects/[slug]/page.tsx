@@ -1,10 +1,15 @@
+import Image from 'next/image'
+import { ArrowDown, ArrowLeft, ArrowRight, BarChart3, Code2, ExternalLink, Layers, MessageSquare, UsersRound } from 'lucide-react'
+import { ProjectMark } from '@/components/ProjectMark'
+import { ProjectGallery } from '@/components/ProjectGallery'
+import { ProjectArchitecture } from '@/components/ProjectArchitecture'
+import { OpenContactButton } from '@/components/modals/ModalTriggers'
+import { GithubIcon } from '@/components/icons/SocialIcons'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import type { Metadata } from 'next'
 import { openGraph } from '@/lib/seo'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2 } from 'lucide-react'
 import { getProject, getProjects, getSiteSettings } from '@/lib/convex'
 import { SubPageShell } from '@/components/SubPageShell'
 import { JsonLd, creativeWorkSchema } from '@/components/seo/JsonLd'
@@ -46,199 +51,63 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params
-
-  let project
-  try {
-    project = await getProject(slug)
-  } catch {
-    project = null
-  }
-
+  const project = await getProject(slug).catch(() => null)
   if (!project) notFound()
-
   const settings = await getSiteSettings().catch(() => null)
-
-  return (
-    <SubPageShell settings={settings}>
-      <JsonLd data={creativeWorkSchema(project)} />
-        {/* Breadcrumb */}
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pt-8 pb-0">
-          <Breadcrumbs items={[
-            { name: 'Home', href: '/' },
-            { name: 'Projects', href: '/projects' },
-            { name: project.title, href: `/projects/${project.slug}` },
-          ]} />
+  const images = [...new Set([project.imageUrl ?? '', ...(project.galleryUrls ?? [])].filter(Boolean))]
+  const featureIcons = [UsersRound, MessageSquare, BarChart3, Layers, Code2]
+  const headings: Record<string, [string, string]> = {
+    salezo: ['Automating sales across', 'every channel.'],
+    hiro: ['One hiring workspace.', 'A clearer recruitment journey.'],
+    'employee-portal': ['Everyday work,', 'in one place.'],
+    'internal-tools': ['Visitor management.', 'Built around people.'],
+    'kontent-ops': ['Creative production,', 'with a clearer workflow.'],
+    'raas-rang': ['Dance. Learn.', 'Improve.'],
+    'minaxi-marketing': ['A local business.', 'A digital storefront.'],
+    daamji: ['Traditional sweets.', 'A modern ordering experience.'],
+    'banarsi-cafe': ['From the table', 'to the kitchen.'],
+    'yolo-trips': ['Discover destinations.', 'Plan the next adventure.'],
+  }
+  const [heading, highlight] = headings[project.slug] ?? ['A considered experience.', 'Built for real people.']
+  const workLabel = project.workType === 'company' ? 'Company project' : project.workType === 'freelance' ? 'Freelance project' : 'Personal project'
+  return <SubPageShell settings={settings} appearance="dark">
+    <JsonLd data={creativeWorkSchema(project)} />
+    <div className="case-container case-breadcrumb"><Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Projects', href: '/projects' }, { name: project.title, href: `/projects/${project.slug}` }]} /></div>
+    <section className="case-hero">
+      <div className="case-container">
+        <p className="case-eyebrow"><span />Case study</p>
+        <h1>{project.title}</h1>
+        <p className="case-subtitle">{project.subtitle}</p>
+        <p className="case-intro">{project.description}</p>
+        <div className="case-tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
+        <div className="case-work-context"><span>{workLabel}</span>{project.company && <span>{project.company}</span>}{project.buildMethod && project.buildMethod !== 'unspecified' && <span>{project.buildMethod === 'manual' ? 'Manually built' : 'AI-assisted'}</span>}</div>
+        <div className="case-actions">
+          {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="case-primary">Visit Live Site <ExternalLink size={16} /></a>}
+          {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="case-secondary"><GithubIcon className="h-4 w-4" />View Code</a>}
         </div>
-
-        {/* Hero — title + subtitle */}
-        <section className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pt-10 pb-8">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue mb-4">
-            <span className="inline-block w-6 h-[2px] bg-blue" />
-            Case Study
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-text-primary tracking-heading leading-none mb-3">
-            {project.title}
-          </h1>
-          {project.subtitle && (
-            <p className="text-lg sm:text-xl text-blue font-semibold">{project.subtitle}</p>
-          )}
-        </section>
-
-        {/* Cover Image */}
-        {project.imageUrl && (
-          <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pb-8">
-            <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden border border-border bg-surface-feature shadow-card">
-              <Image
-                src={project.imageUrl}
-                alt={project.title}
-                fill sizes="(max-width: 1439px) 90vw, 1312px"
-                className="object-cover"
-                priority
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 pb-16 space-y-10">
-          {/* Tag row */}
-          {project.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-light text-blue border border-blue/20"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Overview */}
-          {project.longDescription && (
-            <div className="space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted">Overview</h2>
-              <p className="text-text-primary text-base sm:text-lg leading-relaxed max-w-3xl">
-                {project.longDescription}
-              </p>
-            </div>
-          )}
-
-          {/* Key Features */}
-          {project.keyFeatures.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-blue" />
-                Key Features &amp; Capabilities
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl">
-                {project.keyFeatures.map((feat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 p-4 rounded-xl bg-bg-soft border border-border text-sm text-text-primary"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue mt-2 shrink-0" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Architecture */}
-          {project.architecture.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-blue" />
-                Technical Architecture
-              </h2>
-              <ul className="space-y-3 max-w-2xl">
-                {project.architecture.map((arch, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary">
-                    <Cpu className="w-4 h-4 text-text-muted shrink-0 mt-0.5" />
-                    <span>{arch}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Stats */}
-          {project.stats.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                <BarChart2 className="w-4 h-4 text-blue" />
-                Impact &amp; Results
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-2xl">
-                {project.stats.map((s, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl bg-blue-light border border-blue/10 text-center"
-                  >
-                    <div className="text-2xl sm:text-3xl font-black text-blue">{s.value}</div>
-                    <div className="text-xs font-medium text-text-secondary mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          {project.galleryUrls && project.galleryUrls.length > 0 && <section><h2 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-4">Gallery</h2><div className="grid sm:grid-cols-2 gap-4">{project.galleryUrls.map((url, index) => <div key={`${url}-${index}`} className="relative aspect-video overflow-hidden rounded-xl border border-border"><Image src={url} alt={`${project.title} gallery image ${index + 1}`} fill sizes="(max-width: 639px) 90vw, 45vw" className="object-cover" /></div>)}</div></section>}
-          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
-            {project.caseStudyUrl && <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft border border-border text-text-primary font-semibold text-sm">Case Study <ExternalLink className="w-4 h-4" /></a>}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm shadow-blue/20"
-              >
-                <span>Live Preview</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border border border-border text-text-primary font-semibold text-sm transition"
-              >
-                <span>Source Repository</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
-          </div>
-
-          {/* Back link */}
-          <div>
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors group"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Back to all projects
-            </Link>
-          </div>
-
-          {/* Contact CTA */}
-          <div className="rounded-2xl bg-bg-soft border border-border p-8 sm:p-10 text-center space-y-4">
-            <h3 className="text-2xl font-black text-text-primary">Interested in working together?</h3>
-            <p className="text-text-secondary text-sm max-w-md mx-auto">
-              I&apos;m open to new projects and collaborations. Let&apos;s build something great.
-            </p>
-            <Link
-              href="/#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue hover:bg-blue-dark text-white font-semibold text-sm transition shadow-sm"
-            >
-              Get in touch
-              <ArrowLeft className="w-4 h-4 rotate-180" />
-            </Link>
-          </div>
+      </div>
+      <div className="case-device-scene">
+        <div className="case-device">
+          <div className="case-device-screen"><span className="case-device-camera" />{project.imageUrl ? <Image src={project.imageUrl} alt={`${project.title} product preview`} fill sizes="(max-width: 767px) 95vw, 1100px" className="object-contain" preload /> : <div className="case-device-placeholder"><ProjectMark slug={project.slug} /><h2>{project.title}</h2><p>{project.subtitle}</p><span>Preview images will be added soon</span></div>}</div>
+          <div className="case-device-base"><span /></div>
         </div>
-    </SubPageShell>
-  )
+        <div className="case-device-ground" />
+      </div>
+      <a href="#overview" className="case-scroll"><ArrowDown size={18} /><span>Scroll to explore</span></a>
+    </section>
+    <div className="case-container case-content">
+      <section id="overview" className="case-overview">
+        <div><p className="case-section-label"><span>01</span><i />Overview</p><h2 className="case-heading">{heading}<br /><em>{highlight}</em></h2><p className="case-body">{project.longDescription}</p>{project.contribution && <p className="case-contribution">{project.contribution}</p>}{project.role && <p className="case-contribution">Role: {project.role}</p>}</div>
+        <aside className="case-project-summary"><ProjectMark slug={project.slug} /><h3>{project.title}</h3><p>{project.subtitle}</p><dl><div><dd>{project.tags.length || '?'}</dd><dt>Technologies</dt></div><div><dd>{project.keyFeatures.length}</dd><dt>Capabilities</dt></div><div><dd>{images.length || 'Soon'}</dd><dt>Previews</dt></div></dl></aside>
+      </section>
+      {project.keyFeatures.length > 0 && <section><p className="case-section-label"><span>02</span><i />Key features &amp; capabilities<b /></p><div className="case-feature-grid">{project.keyFeatures.map((feature, index) => { const Icon = featureIcons[index % featureIcons.length]; const [title, ...detail] = feature.split(' — '); return <article key={feature}><span className="case-feature-icon"><Icon size={21} strokeWidth={1.6} /></span><h3>{title}</h3>{detail.length > 0 && <p>{detail.join(' — ')}</p>}</article> })}</div></section>}
+      {project.tags.length > 0 && <section><p className="case-section-label"><span>03</span><i />Tech stack<b /></p><div className="case-tags case-tech-tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div></section>}
+      {project.architecture.length > 0 && <section className="case-architecture"><div><p className="case-section-label"><span>04</span><i />Technical architecture</p><h2 className="case-heading case-architecture-heading">{project.slug === 'salezo' ? 'A modern frontend with a clear state layer.' : 'The technology behind the experience.'}</h2><ul>{project.architecture.map(item => <li key={item}>{item}</li>)}</ul></div><ProjectArchitecture project={project} /></section>}
+      {images.length > 1 && <section><p className="case-section-label"><span>05</span><i />Explore the product<b /></p><ProjectGallery title={project.title} urls={images} variant="showcase" /></section>}
+      {project.stats.length > 0 && <section><p className="case-section-label"><span>06</span><i />Project results<b /></p><dl className="case-results">{project.stats.map(stat => <div key={stat.label}><dd>{stat.value}</dd><dt>{stat.label}</dt></div>)}</dl></section>}
+      {project.caseStudyUrl && <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="case-external-study">Read the full external case study <ExternalLink size={16} /></a>}
+      <Link href="/projects" className="case-back"><ArrowLeft size={16} />Back to all projects</Link>
+      <section className="case-contact"><div className="case-contact-ribbon" aria-hidden="true" /><div><p className="case-eyebrow">Let?s work together</p><h2>Interested in working<br /><em>together?</em></h2><p>I?m open to new projects and collaborations.<br />Let?s build something great.</p><OpenContactButton>Get in touch<ArrowRight size={17} /></OpenContactButton></div></section>
+    </div>
+  </SubPageShell>
 }

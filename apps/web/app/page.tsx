@@ -34,6 +34,8 @@ export default async function Home() {
     getSkillCategories(),
   ])
 
+  const liveSettings = { ...settings, stats: settings.stats.map(stat => stat.label === 'Projects Built' ? { ...stat, value: String(projects.length) } : stat) }
+
   return (
     <>
       <JsonLd data={personSchema(settings)} />
@@ -44,7 +46,7 @@ export default async function Home() {
           <DeferRenderGuard />
           <Navbar />
           <main className="flex-1">
-            <HeroSection settings={settings} />
+            <HeroSection settings={liveSettings} />
             <AboutSection settings={settings} />
             <ProjectsSection projects={projects ?? []} />
             <ExperienceSection experience={experience ?? []} settings={settings} />

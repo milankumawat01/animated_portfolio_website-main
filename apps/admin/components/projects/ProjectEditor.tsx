@@ -19,6 +19,11 @@ type ProjectDoc = {
   longDescription: string
   imageUrl?: string
   imageStorageId?: Id<'_storage'>
+  workType?: 'unspecified' | 'company' | 'freelance' | 'personal'
+  company?: string
+  role?: string
+  contribution?: string
+  buildMethod?: 'unspecified' | 'ai-assisted' | 'manual'
   galleryUrls?: string[]
   caseStudyUrl?: string
   tags: string[]
@@ -72,6 +77,11 @@ export function ProjectEditor({ project, onClose, onCancel, onDirtyChange }: { p
   const [imageUrl, setImageUrl] = useState(project?.imageUrl ?? '')
   const [galleryUrls, setGalleryUrls] = useState(project?.galleryUrls ?? [])
   const [caseStudyUrl, setCaseStudyUrl] = useState(project?.caseStudyUrl ?? '')
+  const [workType, setWorkType] = useState<NonNullable<ProjectDoc['workType']>>(project?.workType ?? 'unspecified')
+  const [company, setCompany] = useState(project?.company ?? '')
+  const [role, setRole] = useState(project?.role ?? '')
+  const [contribution, setContribution] = useState(project?.contribution ?? '')
+  const [buildMethod, setBuildMethod] = useState<NonNullable<ProjectDoc['buildMethod']>>(project?.buildMethod ?? 'unspecified')
   const [picking, setPicking] = useState<'cover' | 'gallery' | null>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [tags, setTags] = useState((project?.tags ?? []).join(', '))
@@ -84,7 +94,7 @@ export function ProjectEditor({ project, onClose, onCancel, onDirtyChange }: { p
   const [order, setOrder] = useState(String(project?.order ?? 10))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-  const snapshot = JSON.stringify([title,slug,subtitle,description,longDescription,imageUrl,galleryUrls,caseStudyUrl,tags,keyFeatures,architecture,liveUrl,githubUrl,featured,published,order])
+  const snapshot = JSON.stringify([workType,company,role,contribution,buildMethod,title,slug,subtitle,description,longDescription,imageUrl,galleryUrls,caseStudyUrl,tags,keyFeatures,architecture,liveUrl,githubUrl,featured,published,order])
   const [initial] = useState(snapshot)
   const dirty = snapshot !== initial
   useEffect(() => { onDirtyChange?.(dirty) }, [dirty, onDirtyChange])
@@ -97,18 +107,19 @@ export function ProjectEditor({ project, onClose, onCancel, onDirtyChange }: { p
 
     try {
       const payload = {
+        workType, company, role, contribution, buildMethod,
         title,
         subtitle,
         description,
         longDescription,
         imageUrl: imageUrl.trim(),
         galleryUrls,
-        caseStudyUrl: caseStudyUrl || undefined,
+        caseStudyUrl: caseStudyUrl.trim(),
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         keyFeatures: keyFeatures.split('\n').map((t) => t.trim()).filter(Boolean),
         architecture: architecture.split('\n').map((t) => t.trim()).filter(Boolean),
-        liveUrl: liveUrl || undefined,
-        githubUrl: githubUrl || undefined,
+        liveUrl: liveUrl.trim(),
+        githubUrl: githubUrl.trim(),
         featured,
         order: Number(order) || 10,
         stats: project?.stats ?? [],
@@ -241,6 +252,25 @@ export function ProjectEditor({ project, onClose, onCancel, onDirtyChange }: { p
           placeholder="FastAPI, Next.js, OpenAI"
         />
       </div>
+
+      <fieldset style={{ border: '1px solid #e5e7eb', borderRadius: 8, marginBottom: 20 }}>
+        <legend>Project context</legend>
+        <label style={labelStyle} htmlFor="work-type">Work type</label>
+        <select id="work-type" value={workType} onChange={e => setWorkType(e.target.value as NonNullable<ProjectDoc['workType']>)} style={fieldStyle}>
+          <option value="unspecified">Not specified (hidden)</option><option value="company">Company</option><option value="freelance">Freelance</option><option value="personal">Personal</option>
+        </select>
+        <label style={labelStyle} htmlFor="project-company">Company / client</label>
+        <input id="project-company" value={company} onChange={e => setCompany(e.target.value)} style={fieldStyle} />
+        <label style={labelStyle} htmlFor="project-role">Your role</label>
+        <input id="project-role" value={role} onChange={e => setRole(e.target.value)} style={fieldStyle} />
+        <label style={labelStyle} htmlFor="project-contribution">Your contribution</label>
+        <textarea id="project-contribution" value={contribution} onChange={e => setContribution(e.target.value)} rows={3} style={fieldStyle} />
+        <label style={labelStyle} htmlFor="build-method">Development tag</label>
+        <select id="build-method" value={buildMethod} onChange={e => setBuildMethod(e.target.value as NonNullable<ProjectDoc['buildMethod']>)} style={fieldStyle}>
+          <option value="unspecified">Off (hidden)</option><option value="ai-assisted">AI-assisted</option><option value="manual">Manually built</option>
+        </select>
+        <p style={{ fontSize: 12, color: '#6b7280' }}>Choose this manually. AI features in a product do not mean AI was used to build it. Only publish approved screenshots and public source links.</p>
+      </fieldset>
 
       <fieldset style={{ border: '1px solid #e5e7eb', borderRadius: 8, marginBottom: 20 }}><legend>Media</legend>
         <label style={labelStyle}>Cover image</label><input aria-label="Cover image URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={fieldStyle} placeholder="Image URL" />

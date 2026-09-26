@@ -82,7 +82,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
             </div>
           </div>
 
-          {/* Center Column (4 cols): Milan's Real Photograph from IMG_8956 with Doodles */}
+          {/* Center Column (4 cols): Milan at his workspace with Doodles */}
           <div className="lg:col-span-4 flex justify-center relative pt-4 sm:pt-6">
             {/* Top-Left Doodle: "_Same Curiosity Different Problems" + curved arrow */}
             <div className="absolute -top-10 -left-8 sm:-top-14 sm:-left-12 z-20 hidden sm:block pointer-events-none">
@@ -114,7 +114,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
               {/* Photo Image Frame */}
               <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
                 <Image
-                  src="/images/milan-profile.jpg"
+                  src="https://milankumawat.is-a.dev/media/b120223f-3b9e-4405-9e9d-2f6f3de39cf0.webp"
                   alt="Milan Kumawat - AI Engineer & Backend Developer"
                   fill
                   sizes="380px"

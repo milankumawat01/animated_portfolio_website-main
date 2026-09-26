@@ -131,6 +131,11 @@ export type ProjectDoc = {
   description: string
   longDescription: string
   imageUrl?: string
+  workType?: 'unspecified' | 'company' | 'freelance' | 'personal'
+  company?: string
+  role?: string
+  contribution?: string
+  buildMethod?: 'unspecified' | 'ai-assisted' | 'manual'
   galleryUrls?: string[]
   caseStudyUrl?: string
   tags: string[]

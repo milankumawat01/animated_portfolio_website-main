@@ -8,9 +8,10 @@ interface FooterProps {
   settings: SiteSettingsDoc | null;
   // On `/` the nav links are in-page anchors; elsewhere they go back to `/`.
   isHome: boolean;
+  caseStudy?: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ settings, isHome }) => {
+export const Footer: React.FC<FooterProps> = ({ settings, isHome, caseStudy }) => {
   const navLinks = [
     { label: 'Home', href: isHome ? '#home' : '/#home' },
     { label: 'About', href: isHome ? '#about' : '/#about' },
@@ -25,7 +26,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, isHome }) => {
   const twitterUrl = settings?.personal?.twitterUrl ?? 'https://x.com/milankumawat';
 
   return (
-    <footer className="bg-surface-feature text-text-on-dark border-t border-border-dark pt-10 pb-6 relative overflow-hidden">
+    <footer className={`${caseStudy ? 'case-footer ' : ''}bg-surface-feature text-text-on-dark border-t border-border-dark pt-10 pb-6 relative overflow-hidden`}>
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16">
         {/* Top Header Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-text-on-dark/5">
@@ -41,7 +42,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, isHome }) => {
         {/* Giant Watermark Headline */}
         <div className="w-full overflow-hidden select-none py-6 sm:py-8 lg:py-10 text-center">
           <div className="text-[8.8vw] xl:text-[138px] font-black tracking-[-0.035em] leading-none uppercase whitespace-nowrap bg-gradient-to-b from-text-on-dark/[0.12] via-text-on-dark/[0.05] to-transparent bg-clip-text text-transparent">
-            MILAN KUMAWAT
+            MILAN <span>KUMAWAT</span>
           </div>
         </div>
 

@@ -46,3 +46,6 @@ Thumbs.db
 .chrome_profile/
 my_assets/
 
+
+# Local sanitized project screenshot working copies
+.project-assets/

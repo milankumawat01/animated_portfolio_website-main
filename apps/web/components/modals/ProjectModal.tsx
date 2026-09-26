@@ -1,183 +1,47 @@
-'use client';
+'use client'
+import { useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { ArrowRight, BarChart3, Boxes, Code2, Ellipsis, ExternalLink, MessageSquare, Star, UsersRound, X } from 'lucide-react'
+import { GithubIcon } from '../icons/SocialIcons'
+import type { ProjectDoc } from '@/lib/convex'
+import { ProjectGallery } from '../ProjectGallery'
+import { ProjectMark } from '../ProjectMark'
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { X, ExternalLink, CheckCircle2, Layers, Cpu, BarChart2 } from 'lucide-react';
-import { GithubIcon } from '../icons/SocialIcons';
-import type { ProjectDoc } from '@/lib/convex';
-import { TechBadge } from '../ui/TechBadge';
-
-interface ProjectModalProps {
-  project: ProjectDoc | null;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onClose }) => {
-  if (!isOpen || !project) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-surface-overlay backdrop-blur-sm animate-fadeIn overflow-y-auto">
-      <div
-        className="relative w-full max-w-3xl bg-surface-elevated rounded-2xl shadow-2xl border border-border overflow-hidden transform transition-all my-8 animate-scaleUp"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-soft/80 sticky top-0 z-10 backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue bg-blue-light px-2.5 py-1 rounded-md border border-blue/20">
-              Case Study
-            </span>
-            <span className="text-sm font-semibold text-text-secondary">{project.title}</span>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-text-muted hover:text-text-primary hover:bg-bg-soft transition-colors"
-            aria-label="Close dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+export function ProjectModal({ project, isOpen, onClose }: { project: ProjectDoc | null; isOpen: boolean; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    const node = dialog.current
+    if (!isOpen || !node) return
+    const previousOverflow = document.body.style.overflow
+    node.showModal()
+    document.body.style.overflow = 'hidden'
+    return () => { node.close(); document.body.style.overflow = previousOverflow }
+  }, [isOpen])
+  if (!isOpen || !project) return null
+  const featureIcons = [UsersRound, MessageSquare, BarChart3, Code2]
+  return <dialog ref={dialog} aria-labelledby="project-dialog-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose() }} className="project-showcase">
+    <header className="showcase-header">
+      <span className="showcase-header-icon"><Boxes size={22} /></span>
+      <div><h2>Project Showcase</h2><p>A detailed look at the project, its features, and the technology behind it.</p></div>
+      <button type="button" autoFocus onClick={onClose} aria-label="Close project" className="showcase-close"><X size={20} /></button>
+    </header>
+    <div className="showcase-grid">
+      <div className="showcase-media"><ProjectGallery key={project.slug} title={project.title} urls={[project.imageUrl ?? '', ...(project.galleryUrls ?? [])]} variant="showcase" /></div>
+      <div className="showcase-details">
+        <div className="showcase-identity"><ProjectMark slug={project.slug} /><div><h3 id="project-dialog-title">{project.title}</h3><p>{project.subtitle}</p></div>{project.featured && <span className="showcase-featured"><Star size={12} fill="currentColor" />Featured</span>}</div>
+        {project.tags.length > 0 && <div className="showcase-tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div>}
+        <div className="showcase-actions">
+          {project.liveUrl ? <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="showcase-live"><ExternalLink size={16} /> Visit Live Site</a> : <button type="button" disabled className="showcase-live" title="A public preview is not available for this project"><ExternalLink size={16} /> Visit Live Site</button>}
+          {project.githubUrl ? <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="showcase-code"><GithubIcon className="h-4 w-4" /> View Code</a> : <button type="button" disabled className="showcase-code" title="The source repository is private"><GithubIcon className="h-4 w-4" /> View Code</button>}
+          <details className="showcase-more"><summary aria-label="More project actions"><Ellipsis size={20} /></summary><div><Link href={`/projects/${project.slug}`} onClick={onClose}>Open case study</Link>{project.caseStudyUrl && <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer">External case study</a>}</div></details>
         </div>
-
-        {/* Modal Body */}
-        <div className="p-6 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
-          {/* Banner Image Preview */}
-          <div className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-border bg-surface-well shadow-inner group">
-            {project.imageUrl && <Image
-              src={project.imageUrl}
-              alt={project.title}
-              fill sizes="(max-width: 767px) 90vw, 704px"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />}
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-feature/80 via-transparent to-transparent flex items-end p-6">
-              <div>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-text-on-dark tracking-tight">
-                  {project.title}
-                </h3>
-                <p className="text-text-on-dark/80 font-medium text-sm sm:text-base">
-                  {project.subtitle}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <TechBadge key={tag} name={tag} variant="blue" />
-            ))}
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted">
-              Overview
-            </h4>
-            <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
-              {project.longDescription}
-            </p>
-          </div>
-
-          {/* Key Features */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-blue" />
-              Key Features & Capabilities
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {project.keyFeatures.map((feat, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start gap-2.5 p-3 rounded-xl bg-bg-soft border border-border text-xs sm:text-sm text-text-secondary"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue mt-2 shrink-0"></span>
-                  <span>{feat}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* System Architecture */}
-          {project.architecture && (
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-blue" />
-                Technical Architecture
-              </h4>
-              <ul className="space-y-2">
-                {project.architecture.map((arch, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2.5 text-xs sm:text-sm text-text-secondary"
-                  >
-                    <Cpu className="w-4 h-4 text-text-muted shrink-0 mt-0.5" />
-                    <span>{arch}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Metrics / Stats */}
-          {project.stats && (
-            <div className="grid grid-cols-3 gap-3 pt-2">
-              {project.stats.map((s, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-xl bg-blue-light/50 border border-blue/20 text-center"
-                >
-                  <div className="text-xl sm:text-2xl font-black text-blue">
-                    {s.value}
-                  </div>
-                  <div className="text-2xs sm:text-xs font-medium text-text-secondary mt-0.5">
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue hover:bg-blue-dark text-text-on-dark font-semibold text-sm transition shadow-sm shadow-blue/20"
-              >
-                <span>Live Preview</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-bg-soft hover:bg-border text-text-primary font-semibold text-sm transition"
-              >
-                <GithubIcon className="w-4 h-4" />
-                <span>Source Repository</span>
-              </a>
-            )}
-            <Link
-              href={`/projects/${project.slug}`}
-              className="flex items-center gap-1 px-4 py-2.5 rounded-xl border border-border hover:border-blue/40 text-text-secondary hover:text-blue font-semibold text-sm transition"
-              onClick={onClose}
-            >
-              Full case study →
-            </Link>
-            <button
-              onClick={onClose}
-              className="ml-auto px-4 py-2.5 text-sm font-medium text-text-muted hover:text-text-primary transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <section className="showcase-about"><h4>About the Project</h4><p>{project.longDescription}</p></section>
+        {project.keyFeatures.length > 0 && <section className="showcase-section"><h4>Key Features</h4><ul className="showcase-features">{project.keyFeatures.map((feature, index) => { const Icon = featureIcons[index % featureIcons.length]; return <li key={feature}><span><Icon size={18} /></span><p>{feature.split(' — ')[0]}</p></li> })}</ul></section>}
+        {project.architecture.length > 0 && <section className="showcase-section"><h4>Technical Architecture</h4><ul className="showcase-architecture">{project.architecture.map(item => <li key={item}>{item}</li>)}</ul></section>}
+        {((project.workType && project.workType !== 'unspecified') || (project.buildMethod && project.buildMethod !== 'unspecified')) && <div className="showcase-context"><span>{project.workType === 'company' ? project.company || 'Company project' : project.workType === 'freelance' ? 'Freelance project' : 'Personal project'}</span>{project.buildMethod && project.buildMethod !== 'unspecified' && <span>{project.buildMethod === 'manual' ? 'Manually built' : 'AI-assisted'}</span>}{project.role && <span>{project.role}</span>}</div>}
+        {project.contribution && <p className="showcase-contribution">{project.contribution}</p>}
+        <Link href={`/projects/${project.slug}`} onClick={onClose} className="showcase-full"><ExternalLink size={18} />View Full Project Details<ArrowRight size={18} /></Link>
       </div>
     </div>
-  );
-};
+  </dialog>
+}

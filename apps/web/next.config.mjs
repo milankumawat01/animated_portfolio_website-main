@@ -12,6 +12,7 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   async redirects() {
     return [
+      { source: '/projects/autoresumebot', destination: '/projects/hiro', permanent: true },
       // Matches /admin and anything below it; the admin root routes to /login or /dashboard.
       { source: '/admin/:path*', destination: `${adminUrl}/:path*`, permanent: false },
     ];

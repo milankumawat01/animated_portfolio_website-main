@@ -52,7 +52,7 @@ export const listAll = query({
   handler: async (ctx) => {
     await requireAdmin(ctx)
     const rows = await ctx.db.query('projects').order('asc').collect()
-    return Promise.all(rows.map(row => withImageUrl(ctx, row)))
+    return Promise.all(rows.sort((a, b) => a.order - b.order).map(row => withImageUrl(ctx, row)))
   },
 })
 
@@ -66,6 +66,11 @@ export const create = mutation({
     description:     v.string(),
     longDescription: v.string(),
     imageUrl:        v.optional(v.string()),
+    workType: v.optional(v.union(v.literal('unspecified'), v.literal('company'), v.literal('freelance'), v.literal('personal'))),
+    company: v.optional(v.string()),
+    role: v.optional(v.string()),
+    contribution: v.optional(v.string()),
+    buildMethod: v.optional(v.union(v.literal('unspecified'), v.literal('ai-assisted'), v.literal('manual'))),
     galleryUrls:     v.optional(v.array(v.string())),
     caseStudyUrl:    v.optional(v.string()),
     tags:            v.array(v.string()),
@@ -105,6 +110,11 @@ export const update = mutation({
     longDescription: v.optional(v.string()),
     imageStorageId:  v.optional(v.union(v.id('_storage'), v.null())),
     imageUrl:        v.optional(v.string()),
+    workType: v.optional(v.union(v.literal('unspecified'), v.literal('company'), v.literal('freelance'), v.literal('personal'))),
+    company: v.optional(v.string()),
+    role: v.optional(v.string()),
+    contribution: v.optional(v.string()),
+    buildMethod: v.optional(v.union(v.literal('unspecified'), v.literal('ai-assisted'), v.literal('manual'))),
     galleryUrls:     v.optional(v.array(v.string())),
     caseStudyUrl:    v.optional(v.string()),
     tags:            v.optional(v.array(v.string())),
@@ -170,8 +180,14 @@ export const reorder = mutation({
   args: { ids: v.array(v.id('projects')) },
   handler: async (ctx, { ids }) => {
     await requireAdmin(ctx)
+    const projects = await ctx.db.query('projects').collect()
+    const unique = new Set(ids)
+    if (unique.size !== ids.length || projects.length !== ids.length || projects.some(project => !unique.has(project._id))) {
+      throw new ConvexError('The project list changed. Close Arrange projects, reopen it and try again.')
+    }
+    const now = Date.now()
     for (let i = 0; i < ids.length; i++) {
-      await ctx.db.patch(ids[i], { order: (i + 1) * 10, updatedAt: Date.now() })
+      await ctx.db.patch(ids[i], { order: (i + 1) * 10, updatedAt: now })
     }
     await scheduleRevalidate(ctx, ['projects', 'home'])
   },

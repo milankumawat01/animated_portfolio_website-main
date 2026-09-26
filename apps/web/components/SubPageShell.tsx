@@ -9,17 +9,19 @@ import type { SiteSettingsDoc } from '@/lib/convex'
 export function SubPageShell({
   settings,
   children,
+  appearance,
 }: {
   settings: SiteSettingsDoc | null
   children: React.ReactNode
+  appearance?: 'dark'
 }) {
   return (
     <ModalProvider>
-      <div className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans selection:bg-blue selection:text-white">
+      <div className={`${appearance === 'dark' ? 'case-study-theme ' : ''}min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans selection:bg-blue selection:text-white`}>
         <Navbar />
         {/* The navbar is fixed; this offsets content by its solid height. */}
         <main className="flex-1 pt-[65px]">{children}</main>
-        <Footer settings={settings} isHome={false} />
+        <Footer settings={settings} isHome={false} caseStudy={appearance === 'dark'} />
       </div>
     </ModalProvider>
   )
