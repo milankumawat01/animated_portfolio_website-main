@@ -114,11 +114,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ settings }) => {
               {/* Photo Image Frame */}
               <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-md">
                 <Image
-                  src="https://milankumawat.is-a.dev/media/b120223f-3b9e-4405-9e9d-2f6f3de39cf0.webp"
+                  src="https://milankumawat.is-a.dev/media/78c4c7f5-5381-4293-8053-7c8e30e9e4cb.webp"
                   alt="Milan Kumawat - AI Engineer & Backend Developer"
                   fill
                   sizes="380px"
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                 />
 
                 {/* Location Badge (bottom-left) */}
