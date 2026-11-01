@@ -84,7 +84,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
   };
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('hey@milankumawat.in');
+    navigator.clipboard.writeText('milankumawat01@gmail.com');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -131,7 +131,7 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
         <div className="mt-3 flex items-center justify-between p-2.5 bg-bg-soft rounded-xl border border-border text-xs sm:text-sm">
           <div className="flex items-center gap-2 text-text-secondary font-medium truncate">
             <Mail className="w-4 h-4 text-blue shrink-0" />
-            <span className="truncate">hey@milankumawat.in</span>
+            <span className="truncate">milankumawat01@gmail.com</span>
           </div>
           <button
             type="button"

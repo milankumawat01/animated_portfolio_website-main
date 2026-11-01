@@ -12,7 +12,7 @@ interface ContactSectionProps {
 
 export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
   const contactCards = settings?.contactCards ?? [];
-  const email = settings?.personal?.email ?? 'hey@milankumawat.in';
+  const email = settings?.personal?.email ?? 'milankumawat01@gmail.com';
   const linkedinUrl = settings?.personal?.linkedinUrl ?? 'https://linkedin.com/in/milankumawat';
 
   return (

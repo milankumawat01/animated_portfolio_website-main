@@ -51,7 +51,7 @@ export const PORTFOLIO_DATA = {
     location: 'Jaipur, India',
     headline: 'Milan Kumawat',
     subheadline: 'Building AI-powered products and scalable systems for a better tomorrow.',
-    email: 'hey@milankumawat.in',
+    email: 'milankumawat01@gmail.com',
     linkedin: 'linkedin.com/in/milankumawat',
     linkedinUrl: 'https://linkedin.com/in/milankumawat',
     github: 'github.com/milankumawat',
@@ -503,10 +503,10 @@ export const PORTFOLIO_DATA = {
     {
       id: 'email',
       title: 'Email',
-      value: 'hey@milankumawat.in',
+      value: 'milankumawat01@gmail.com',
       hint: 'Drop a message anytime.',
       icon: 'mail',
-      action: 'mailto:hey@milankumawat.in',
+      action: 'mailto:milankumawat01@gmail.com',
       copyable: true
     },
     {

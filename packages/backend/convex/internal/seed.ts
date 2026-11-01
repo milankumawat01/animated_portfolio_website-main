@@ -45,7 +45,7 @@ export const importLegacy = internalMutation({
         location: 'Jaipur, India',
         headline: 'Milan Kumawat',
         subheadline: 'Building AI-powered products and scalable systems for a better tomorrow.',
-        email: 'hey@milankumawat.in',
+        email: 'milankumawat01@gmail.com',
         bio: "I'm Milan Kumawat, an AI Engineer and Backend Developer from India. I build scalable backend systems, AI-powered applications, and modern web products that solve real-world problems. I enjoy working at the intersection of AI, automation, and clean product development.",
         linkedin: 'linkedin.com/in/milankumawat',
         linkedinUrl: 'https://linkedin.com/in/milankumawat',
@@ -137,9 +137,9 @@ export const importLegacy = internalMutation({
       ],
       contactCards: [
         {
-          id: 'email', title: 'Email', value: 'hey@milankumawat.in',
+          id: 'email', title: 'Email', value: 'milankumawat01@gmail.com',
           hint: 'Drop a message anytime.', icon: 'mail',
-          action: 'mailto:hey@milankumawat.in', copyable: true,
+          action: 'mailto:milankumawat01@gmail.com', copyable: true,
         },
         {
           id: 'linkedin', title: 'LinkedIn', value: 'linkedin.com/in/milankumawat',

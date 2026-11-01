@@ -96,7 +96,7 @@ A personal portfolio for **Milan Kumawat**, built with Next.js 16, React 19, Typ
 8. **08 Get In Touch & Footer (`#contact`)**
    - Section header: `— 08 GET IN TOUCH` & heading: *"Have an idea worth building?"*
    - 4 interactive contact cards:
-     - **Email**: `hey@milankumawat.in` (one-click copy to clipboard with feedback)
+     - **Email**: `milankumawat01@gmail.com` (one-click copy to clipboard with feedback)
      - **LinkedIn**: `linkedin.com/in/milankumawat`
      - **GitHub**: `github.com/milankumawat`
      - **Resume**: Interactive CV modal & printable PDF view
