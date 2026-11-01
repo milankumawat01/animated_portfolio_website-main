@@ -122,6 +122,35 @@ body {
   }
 }
 
+/* Light-mode hero sits on a bright photograph, so its feature surface turns light and its text dark */
+:root:not(.dark) .hero-theme {
+  --surface-feature: #F7F9FC;
+  --surface-well: #F7F9FC;
+  --text-on-dark: #0B1220;
+}
+
+/* Theme switch: circular reveal from the toggle button (driven by lib/themeSwitch.ts) */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+:root[data-theme-switch="expand"]::view-transition-old(root) { z-index: 1; }
+/* Start the new snapshot fully clipped, or it paints full-size for one frame before the animation attaches */
+:root[data-theme-switch="expand"]::view-transition-new(root) { z-index: 2; clip-path: circle(0px at 50% 50%); }
+:root[data-theme-switch="collapse"]::view-transition-old(root) { z-index: 2; }
+:root[data-theme-switch="collapse"]::view-transition-new(root) { z-index: 1; }
+
+/* Turn off the site's own colour transitions while switching, so the snapshots are clean */
+:root[data-theme-switch] *,
+:root[data-theme-switch] *::before,
+:root[data-theme-switch] *::after { transition: none !important; }
+
+/* Sun/moon icon swap */
+.theme-toggle { position: relative; display: inline-grid; place-items: center; overflow: hidden; }
+.theme-toggle svg { position: absolute; transition: transform 450ms cubic-bezier(.4,0,.2,1), opacity 250ms ease; }
+.theme-toggle[data-theme-icon="light"] .theme-toggle-sun { opacity: 0; transform: rotate(-90deg) scale(.4); }
+.theme-toggle[data-theme-icon="dark"] .theme-toggle-moon { opacity: 0; transform: rotate(90deg) scale(.4); }
+@media (prefers-reduced-motion: reduce) { .theme-toggle svg { transition: none; } }
+
 /* Typography classes */
 .font-handwriting {
   font-family: var(--font-caveat);

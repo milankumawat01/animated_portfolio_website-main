@@ -16,22 +16,36 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
   return (
     <section
       id="home"
-      className="relative min-h-screen bg-surface-feature text-text-on-dark pt-24 sm:pt-28 pb-16 flex flex-col justify-between overflow-hidden"
+      className="hero-theme relative min-h-screen bg-surface-feature text-text-on-dark pt-24 sm:pt-28 pb-16 flex flex-col justify-between overflow-hidden"
     >
       {/* Background Ambience & Desk Image */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Full-width desk photograph with left gradient */}
         <div className="absolute inset-0 w-full h-full opacity-70 lg:opacity-100">
+          {/* Both photos stay laid out (the light one fades over the dark one) so each is loaded and
+              decoded before the theme reveal snapshots it; lib/themeSwitch.ts also decodes data-theme-image. */}
           <Image
             src="/images/hero-desk.png"
+            data-theme-image
             alt="Milan Kumawat developer workspace"
             fill sizes="100vw"
-            priority
+            preload
             className="object-cover object-[center_right] xl:object-right"
           />
+          <Image
+            src="/images/Bright Modern Coding Workspace.png"
+            data-theme-image
+            alt=""
+            fill sizes="100vw"
+            preload
+            className="dark:opacity-0 object-cover object-[center_right] xl:object-right"
+          />
           {/* Gradients for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-feature via-surface-feature/80 to-transparent lg:w-[60%]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-feature via-transparent to-surface-feature/40" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-surface-feature via-surface-feature/80 to-transparent lg:w-[60%]" />
+          <div className="hidden dark:block absolute inset-0 bg-gradient-to-t from-surface-feature via-transparent to-surface-feature/40" />
+          {/* The bright photo is busy behind the copy, so light mode washes it out further */}
+          <div className="dark:hidden absolute inset-0 bg-surface-feature/85 lg:bg-transparent lg:bg-gradient-to-r lg:from-surface-feature lg:from-35% lg:via-surface-feature/85 lg:via-55% lg:to-transparent lg:w-[75%]" />
+          <div className="dark:hidden absolute inset-0 bg-gradient-to-t from-surface-feature via-transparent via-40% to-surface-feature/50" />
         </div>
 
         {/* Ambient glow */}

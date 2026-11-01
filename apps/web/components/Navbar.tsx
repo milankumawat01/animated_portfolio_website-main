@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight, Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useModals } from './modals/ModalProvider';
+import { switchThemeFrom } from '@/lib/themeSwitch';
 
 export const Navbar: React.FC = () => {
   const { openContact } = useModals();
@@ -14,6 +15,7 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  const themeButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const isHome = pathname === '/';
 
@@ -78,21 +80,21 @@ export const Navbar: React.FC = () => {
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
           ? 'bg-surface-elevated/90 backdrop-blur-md border-b border-border shadow-soft py-3 text-text-primary'
-          : 'bg-transparent py-5 text-white'
+          : 'bg-transparent py-5 text-text-primary dark:text-white'
       }`}
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-7 md:px-10 lg:px-12 xl:px-16 flex items-center justify-between">
         {/* Logo */}
         <Link href={isHome ? '#home' : '/'} className="flex items-center gap-2.5 group select-none">
           <div className="flex items-center font-extrabold text-2xl tracking-tighter">
-            <span className={`transition-colors ${scrolled ? 'text-text-primary group-hover:text-blue' : 'text-white group-hover:text-blue-300'}`}>
+            <span className={`transition-colors ${scrolled ? 'text-text-primary group-hover:text-blue' : 'text-text-primary group-hover:text-blue dark:text-white dark:group-hover:text-blue-300'}`}>
               M
             </span>
             <span className="text-blue transition-colors group-hover:opacity-80">
               K
             </span>
           </div>
-          <span className={`font-bold text-sm tracking-tight hidden sm:inline-block ${scrolled ? 'text-text-primary' : 'text-white'}`}>
+          <span className={`font-bold text-sm tracking-tight hidden sm:inline-block ${scrolled ? 'text-text-primary' : 'text-text-primary dark:text-white'}`}>
             Milan Kumawat
           </span>
         </Link>
@@ -108,7 +110,7 @@ export const Navbar: React.FC = () => {
                 className={`relative flex flex-col items-center text-[13px] font-semibold transition-colors py-1 ${
                   scrolled
                     ? isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
-                    : isActive ? 'text-white' : 'text-slate-300 hover:text-white'
+                    : isActive ? 'text-text-primary dark:text-white' : 'text-ink-soft/80 hover:text-text-primary dark:text-slate-300 dark:hover:text-white'
                 }`}
               >
                 <span>{link.label}</span>
@@ -125,13 +127,20 @@ export const Navbar: React.FC = () => {
           {/* Theme Toggle */}
           {mounted && (
             <button
-              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 rounded-lg transition-colors ${
-                scrolled ? 'text-text-secondary hover:text-text-primary hover:bg-bg-soft' : 'text-slate-300 hover:text-white hover:bg-white/10'
+              ref={themeButtonRef}
+              type="button"
+              onClick={() => {
+                const next = resolvedTheme === 'dark' ? 'light' : 'dark';
+                switchThemeFrom(themeButtonRef.current, next, () => setTheme(next));
+              }}
+              data-theme-icon={resolvedTheme === 'dark' ? 'dark' : 'light'}
+              className={`theme-toggle w-8 h-8 rounded-lg transition-colors ${
+                scrolled ? 'text-text-secondary hover:text-text-primary hover:bg-bg-soft' : 'text-text-secondary hover:text-text-primary hover:bg-ink/5 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10'
               }`}
-              aria-label="Toggle theme"
+              aria-label={resolvedTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
-              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <Sun className="theme-toggle-sun w-4 h-4" aria-hidden="true" />
+              <Moon className="theme-toggle-moon w-4 h-4" aria-hidden="true" />
             </button>
           )}
 
@@ -140,7 +149,7 @@ export const Navbar: React.FC = () => {
             className={`hidden sm:inline-flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 group ${
               scrolled
                 ? 'bg-ink text-bg-primary hover:bg-blue hover:text-white shadow-xs'
-                : 'border border-white/20 bg-white/5 hover:bg-white/10 text-white hover:border-blue/50'
+                : 'border border-ink/15 bg-white/50 hover:bg-white/80 text-text-primary dark:border-white/20 dark:bg-white/5 dark:hover:bg-white/10 dark:text-white hover:border-blue/50'
             }`}
           >
             <span>Let&apos;s Talk</span>
@@ -151,7 +160,7 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`md:hidden p-2 rounded-lg transition-colors ${
-              scrolled ? 'text-text-primary hover:bg-bg-soft' : 'text-white hover:bg-white/10'
+              scrolled ? 'text-text-primary hover:bg-bg-soft' : 'text-text-primary hover:bg-ink/5 dark:text-white dark:hover:bg-white/10'
             }`}
             aria-label="Toggle menu"
           >

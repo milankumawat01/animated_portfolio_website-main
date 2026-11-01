@@ -18,6 +18,9 @@ const nextConfig = {
     ];
   },
   images: {
+    // In dev, NEXT_PUBLIC_SITE_URL is localhost, so /media/* images resolve to a loopback IP,
+    // which the optimizer refuses unless allowed. Production keeps the SSRF guard on.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
     remotePatterns: [
       {
         protocol: 'https',
@@ -27,6 +30,12 @@ const nextConfig = {
         protocol: siteUrl.protocol.replace(':', ''),
         hostname: siteUrl.hostname,
         port: siteUrl.port,
+        pathname: '/media/**',
+      },
+      // Stored media URLs point at production even when NEXT_PUBLIC_SITE_URL is localhost in dev.
+      {
+        protocol: 'https',
+        hostname: 'milankumawat.is-a.dev',
         pathname: '/media/**',
       },
     ],
