@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as blog from "../blog.js";
 import type * as experience from "../experience.js";
 import type * as http from "../http.js";
+import type * as internal_contactEmail from "../internal/contactEmail.js";
 import type * as internal_importProjects from "../internal/importProjects.js";
 import type * as internal_notify from "../internal/notify.js";
 import type * as internal_projectCatalog from "../internal/projectCatalog.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   blog: typeof blog;
   experience: typeof experience;
   http: typeof http;
+  "internal/contactEmail": typeof internal_contactEmail;
   "internal/importProjects": typeof internal_importProjects;
   "internal/notify": typeof internal_notify;
   "internal/projectCatalog": typeof internal_projectCatalog;
