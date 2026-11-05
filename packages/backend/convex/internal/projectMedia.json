@@ -8,6 +8,126 @@
     "height": 1448
   },
   {
+    "filename": "adiveda-1.webp",
+    "r2Key": "portfolio/media/64264d00-2abc-4e24-a3a7-7be790e36f5f.webp",
+    "size": 71242,
+    "hash": "81e953a436cbd4c8311576219a24e6fe2f0cefd4f232d5422c5990b3f963d727",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-10.webp",
+    "r2Key": "portfolio/media/6ac48542-dae7-4fd7-a29c-61fa953e2cdc.webp",
+    "size": 54666,
+    "hash": "3b52ad9baca4aeedfcb80f8c10256476c547bf35d15a761d9a7267eeef6db178",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-11.webp",
+    "r2Key": "portfolio/media/0c691d3f-3f6f-49cb-b9ff-3dce896ae9f7.webp",
+    "size": 51450,
+    "hash": "b60d1f2922a49f059ca76e6245155c929c0737e5a285bbd7b4b82b066d5d4c64",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-12.webp",
+    "r2Key": "portfolio/media/cf582c68-da8c-4fcc-bc4c-462be1b6579e.webp",
+    "size": 66108,
+    "hash": "9409c2a26a72e5a38aa2006174111fd92a41da3f32408c48286ed553aa9ff575",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-13.webp",
+    "r2Key": "portfolio/media/c8076da5-93b3-4418-bee1-45016e108dd5.webp",
+    "size": 74662,
+    "hash": "ff17bbdbcb3df3349539f7b596eeefeae5a858c89ba8f7c57f07502fbc8b58e5",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-14.webp",
+    "r2Key": "portfolio/media/f915859c-6973-484d-8a9b-78d6dcfac30c.webp",
+    "size": 71152,
+    "hash": "b618eea49270b694f230126978040d5be4ff92528f60150bc1ce435df07e6f41",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-15.webp",
+    "r2Key": "portfolio/media/11099a30-fabe-430c-8d00-d223d6713582.webp",
+    "size": 49152,
+    "hash": "c0a3ebbc2248d0cb9f64492deea198e441e714994cd1cb0655d53689a9a2004c",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-2.webp",
+    "r2Key": "portfolio/media/fea23104-e52b-4440-9b47-c9cb38d02f11.webp",
+    "size": 45410,
+    "hash": "c1e4dc6331764d86785ec2478ef2739b57412d71efbbf93a99523d8609045b39",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-3.webp",
+    "r2Key": "portfolio/media/101f6b94-8cc4-46e1-907c-63be5d34e8f8.webp",
+    "size": 46876,
+    "hash": "af6a967242029647d706781abfc73a9707a692e364072432f8eacb5e1fed67b0",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-4.webp",
+    "r2Key": "portfolio/media/471340f8-062f-4818-a2f1-c6ac3aff4702.webp",
+    "size": 38192,
+    "hash": "6c10a71414f381301db72a1e6a0970a5a5129a597b2af9497b7192824942d0d5",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-5.webp",
+    "r2Key": "portfolio/media/4017c0f9-746c-4ce3-bbf6-52a07d29418d.webp",
+    "size": 54770,
+    "hash": "e76d81dd02f46dd04ec9775311ca7f51aab8a137c94190b50c0f227263c93b56",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-6.webp",
+    "r2Key": "portfolio/media/ef219317-29a9-459a-8004-56d7b0dac65e.webp",
+    "size": 55930,
+    "hash": "efa9674dc0a107a36bab06f74e1befdb0ce2b9f4995d6d5b44be14e6f84d45bd",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-7.webp",
+    "r2Key": "portfolio/media/1752d379-c250-4705-a2f0-606badeeb569.webp",
+    "size": 71838,
+    "hash": "8e1910181bb4d33bcd439363eeb19fa8eadc955c660eaf82fa41134155f29040",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-8.webp",
+    "r2Key": "portfolio/media/9e2c2e12-f1d5-4b03-8a55-31cd802fd9e1.webp",
+    "size": 90092,
+    "hash": "97f9be76d05cd2f16ed78daa6c5e9cfeb2edd2c4f9832a62bb64d80f02d09026",
+    "width": 1440,
+    "height": 900
+  },
+  {
+    "filename": "adiveda-9.webp",
+    "r2Key": "portfolio/media/32586830-7460-43bd-b66b-0b85fc12a390.webp",
+    "size": 53026,
+    "hash": "691d3dd271c497ebaa9fcab583b3185ab7f5d61bd8d7bb3972c4465084ea2281",
+    "width": 1440,
+    "height": 900
+  },
+  {
     "filename": "aep-engineering-1.webp",
     "r2Key": "portfolio/media/79989c8b-cdb8-4340-892b-037808e0cf55.webp",
     "size": 157486,

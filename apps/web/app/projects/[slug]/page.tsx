@@ -66,6 +66,7 @@ export default async function ProjectPage({ params }: Props) {
     'minaxi-marketing': ['A local business.', 'A digital storefront.'],
     daamji: ['Traditional sweets.', 'A modern ordering experience.'],
     'banarsi-cafe': ['From the table', 'to the kitchen.'],
+    adiveda: ['A living tradition.', 'A platform the team can run.'],
     'yolo-trips': ['Discover destinations.', 'Plan the next adventure.'],
   }
   const [heading, highlight] = headings[project.slug] ?? ['A considered experience.', 'Built for real people.']

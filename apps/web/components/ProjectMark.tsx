@@ -1,4 +1,4 @@
-import { Bot, Building2, ClipboardList, Code2, Compass, Flame, Leaf, Music2, Send, ShoppingBag, UsersRound, UtensilsCrossed } from 'lucide-react'
+import { Bot, Building2, ClipboardList, Code2, Compass, Flame, Leaf, Music2, Send, ShoppingBag, Sun, UsersRound, UtensilsCrossed } from 'lucide-react'
 
 export function ProjectMark({ slug, className = '' }: { slug: string; className?: string }) {
   const marks: Record<string, { icon: typeof Send; color: string }> = {
@@ -12,6 +12,7 @@ export function ProjectMark({ slug, className = '' }: { slug: string; className?
     'aep-engineering': { icon: Leaf, color: '#43c5aa' },
     daamji: { icon: ShoppingBag, color: '#f2a542' },
     'banarsi-cafe': { icon: UtensilsCrossed, color: '#f5c247' },
+    adiveda: { icon: Sun, color: '#f0883e' },
     'yolo-trips': { icon: Compass, color: '#58c1e9' },
     'sanatan-vishwa': { icon: Flame, color: '#fb9943' },
     'internal-tools': { icon: UsersRound, color: '#4d9dff' },

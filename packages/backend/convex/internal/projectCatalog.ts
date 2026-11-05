@@ -1,6 +1,80 @@
 // Public-facing project copy with work context confirmed by the portfolio owner.
 export const projectCatalog = [
   {
+    "slug": "adiveda",
+    "title": "Adiveda",
+    "subtitle": "Website, member platform and owner admin",
+    "description": "A full-stack platform for a spiritual foundation: public website, offerings, donations, a member dashboard and a complete owner admin.",
+    "longDescription": "Adiveda Sadhana Foundation needed one home for its sadhanas, retreats, stotrams, rituals, films and seva work, and a team that could run that home without a developer. I built the whole product: a public website on one shared offering template, Razorpay donations confirmed by server-side verification, TagMango checkout with enrolment sync, a member dashboard, and an owner admin where every page, photo, menu and offering can be edited and published. A new course or event goes live from admin and appears on its own page, in the catalogue, on the home tabs and in the header menu with no code change.",
+    "tags": [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "PostgreSQL",
+      "Drizzle ORM",
+      "Better Auth",
+      "Razorpay",
+      "Tailwind CSS",
+      "Docker",
+      "Coolify"
+    ],
+    "keyFeatures": [
+      "One offering template for sadhanas, retreats, stotrams, rituals and events",
+      "Owner admin for pages, media, menus, offerings and publishing",
+      "Razorpay donations confirmed by server-side verification",
+      "TagMango checkout with enrolment sync",
+      "Member dashboard for courses, sessions, purchases and donations",
+      "Queued transactional email with an owner outbox"
+    ],
+    "architecture": [
+      "Next.js App Router with server components in a production Docker build",
+      "PostgreSQL through Drizzle ORM, with typed validation for every content and offering section",
+      "Better Auth sessions with separate owner and member access",
+      "Background workers for email, TagMango sync and analytics sync",
+      "Self-hosted on a VPS with Coolify, deploying from every push to main"
+    ],
+    "stats": [
+      {
+        "label": "Offerings published",
+        "value": "15"
+      },
+      {
+        "label": "Offering formats on one template",
+        "value": "5"
+      },
+      {
+        "label": "Public pages tested at desktop and phone width",
+        "value": "28"
+      }
+    ],
+    "liveUrl": "https://adiveda.com/milan.kumawat",
+    "githubUrl": "",
+    "company": "Adiveda Sadhana Foundation",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/adiveda-1.webp",
+    "galleryUrls": [
+      "/images/projects/adiveda-2.webp",
+      "/images/projects/adiveda-3.webp",
+      "/images/projects/adiveda-4.webp",
+      "/images/projects/adiveda-5.webp",
+      "/images/projects/adiveda-6.webp",
+      "/images/projects/adiveda-7.webp",
+      "/images/projects/adiveda-8.webp",
+      "/images/projects/adiveda-9.webp",
+      "/images/projects/adiveda-10.webp",
+      "/images/projects/adiveda-11.webp",
+      "/images/projects/adiveda-12.webp",
+      "/images/projects/adiveda-13.webp",
+      "/images/projects/adiveda-14.webp",
+      "/images/projects/adiveda-15.webp"
+    ],
+    "featured": true,
+    "order": 15
+  },
+  {
     "slug": "hiro",
     "title": "Hiro",
     "subtitle": "AI hiring and resume management",
