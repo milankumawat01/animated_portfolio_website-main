@@ -1,3 +1,4 @@
+import { v } from 'convex/values'
 import { internalMutation } from '../_generated/server'
 import { projectCatalog } from './projectCatalog'
 import projectMedia from './projectMedia.json'
@@ -15,7 +16,7 @@ export const importCatalog = internalMutation({
       if (!media.some(row => row.r2Key === asset.r2Key)) await ctx.db.insert('media', {
         r2Key: asset.r2Key, filename: asset.filename, contentType: 'image/webp', size: asset.size,
         alt: asset.filename === 'about-milan.webp' ? 'Milan Kumawat at his workspace' : `${asset.filename.replace(/-\d+\.webp$/, '').replace(/-/g, ' ')} project preview`,
-        caption: asset.filename === 'about-milan.webp' ? 'Portrait supplied by Milan Kumawat' : asset.filename.startsWith('aep-') ? 'Company brand imagery' : 'Project screenshot; private data blurred where present',
+        caption: asset.filename === 'about-milan.webp' ? 'Portrait supplied by Milan Kumawat' : asset.filename.startsWith('aep-') ? 'Company brand imagery' : asset.filename.includes('-gen-') ? 'Illustrative product mockup' : 'Project screenshot; private data blurred where present',
         collection: asset.filename === 'about-milan.webp' ? 'Portraits' : 'Project portfolio', width: asset.width, height: asset.height, uploadedAt: Date.now(),
       })
     }
@@ -61,5 +62,26 @@ export const importCatalog = internalMutation({
     }
     await scheduleRevalidate(ctx, ['projects', 'home', ...projectCatalog.map(p => `project:${p.slug}`)])
     return { inserted, updated, skipped, published: (await ctx.db.query('projects').withIndex('by_status_order', q => q.eq('status', 'published')).collect()).length }
+  },
+})
+
+// Re-points existing projects at the catalog's images (importCatalog never touches existing rows).
+// Run importCatalog first so new media rows exist, then: internal/importProjects:syncCatalogImages '{"slugs":[...]}'
+export const syncCatalogImages = internalMutation({
+  args: { slugs: v.array(v.string()) },
+  handler: async (ctx, { slugs }) => {
+    const mediaUrl = (path: string) => {
+      const asset = projectMedia.find(a => a.filename === path.split('/').pop())
+      if (!asset) throw new Error(`Project media not uploaded: ${path}`)
+      return r2PublicUrl(asset.r2Key)
+    }
+    for (const slug of slugs) {
+      const item = projectCatalog.find(p => p.slug === slug)
+      const project = await ctx.db.query('projects').withIndex('by_slug', q => q.eq('slug', slug)).unique()
+      if (!item || !project) throw new Error(`Unknown project: ${slug}`)
+      await ctx.db.patch(project._id, { imageUrl: item.imageUrl ? mediaUrl(item.imageUrl) : '', galleryUrls: item.galleryUrls.map(mediaUrl), updatedAt: Date.now() })
+    }
+    await scheduleRevalidate(ctx, ['projects', 'home', ...slugs.map(s => `project:${s}`)])
+    return slugs.length
   },
 })

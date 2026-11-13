@@ -563,11 +563,7 @@ export const projectCatalog = [
     "role": "",
     "contribution": "Built as a freelance project.",
     "imageUrl": "/images/projects/infumarket-1.webp",
-    "galleryUrls": [
-      "/images/projects/infumarket-2.webp",
-      "/images/projects/infumarket-3.webp",
-      "/images/projects/infumarket-4.webp"
-    ],
+    "galleryUrls": ["/images/projects/infumarket-2.webp","/images/projects/infumarket-3.webp","/images/projects/infumarket-4.webp","/images/projects/infumarket-gen-1.webp","/images/projects/infumarket-gen-2.webp"],
     "featured": true,
     "order": 12
   },
@@ -614,10 +610,7 @@ export const projectCatalog = [
     "role": "",
     "contribution": "My own product, from the Onorian beta to Zeni.",
     "imageUrl": "/images/projects/zeni-1.webp",
-    "galleryUrls": [
-      "/images/projects/zeni-2.webp",
-      "/images/projects/zeni-3.webp"
-    ],
+    "galleryUrls": ["/images/projects/zeni-2.webp","/images/projects/zeni-3.webp","/images/projects/zeni-gen-1.webp","/images/projects/zeni-gen-2.webp","/images/projects/zeni-gen-4.webp"],
     "featured": true,
     "order": 25
   },
@@ -662,10 +655,7 @@ export const projectCatalog = [
     "role": "",
     "contribution": "Built as a freelance project.",
     "imageUrl": "/images/projects/agrivia-1.webp",
-    "galleryUrls": [
-      "/images/projects/agrivia-2.webp",
-      "/images/projects/agrivia-3.webp"
-    ],
+    "galleryUrls": ["/images/projects/agrivia-2.webp","/images/projects/agrivia-3.webp","/images/projects/agrivia-gen-1.webp","/images/projects/agrivia-gen-2.webp"],
     "featured": true,
     "order": 35
   },
@@ -752,8 +742,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built at True Value Infosoft.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/sj-visitor-gen-1.webp",
+    "galleryUrls": ["/images/projects/sj-visitor-gen-4.webp","/images/projects/sj-visitor-gen-5.webp"],
     "featured": true,
     "order": 55
   },
@@ -795,8 +785,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built at True Value Infosoft for Amity University.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/amity-compliance-gen-1.webp",
+    "galleryUrls": ["/images/projects/amity-compliance-gen-4.webp","/images/projects/amity-compliance-gen-5.webp"],
     "featured": true,
     "order": 65
   },
@@ -839,8 +829,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built at True Value Infosoft for Yamato Logistics India.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/yamato-docs-gen-1.webp",
+    "galleryUrls": ["/images/projects/yamato-docs-gen-3.webp","/images/projects/yamato-docs-gen-5.webp"],
     "featured": true,
     "order": 75
   },
@@ -882,7 +872,7 @@ export const projectCatalog = [
     "role": "",
     "contribution": "My own product.",
     "imageUrl": "/images/projects/hisaab-1.webp",
-    "galleryUrls": [],
+    "galleryUrls": ["/images/projects/hisaab-gen-1.webp","/images/projects/hisaab-gen-2.webp","/images/projects/hisaab-gen-3.webp","/images/projects/hisaab-gen-4.webp"],
     "featured": true,
     "order": 85
   },
@@ -926,8 +916,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built as a freelance project.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/bhoomi-rakshak-gen-1.webp",
+    "galleryUrls": ["/images/projects/bhoomi-rakshak-gen-2.webp","/images/projects/bhoomi-rakshak-gen-3.webp","/images/projects/bhoomi-rakshak-gen-4.webp","/images/projects/bhoomi-rakshak-gen-5.webp"],
     "featured": true,
     "order": 95
   },
@@ -968,8 +958,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built for a client as a freelance project.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/kairos-gen-1.webp",
+    "galleryUrls": ["/images/projects/kairos-gen-2.webp","/images/projects/kairos-gen-3.webp","/images/projects/kairos-gen-4.webp"],
     "featured": true,
     "order": 105
   },
@@ -1011,8 +1001,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built as a freelance project.",
-    "imageUrl": "/images/projects/shiv-hotel-1.webp",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/shiv-hotel-gen-1.webp",
+    "galleryUrls": ["/images/projects/shiv-hotel-gen-2.webp","/images/projects/shiv-hotel-gen-4.webp","/images/projects/shiv-hotel-1.webp"],
     "featured": true,
     "order": 115
   },
@@ -1180,8 +1170,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "My own product.",
-    "imageUrl": "/images/projects/dekko-1.webp",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/dekko-gen-1.webp",
+    "galleryUrls": ["/images/projects/dekko-1.webp","/images/projects/dekko-gen-2.webp","/images/projects/dekko-gen-3.webp"],
     "featured": true,
     "order": 140
   },
@@ -1220,8 +1210,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Rebranded and deployed as a freelance project.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/starting-core-mailer-gen-1.webp",
+    "galleryUrls": ["/images/projects/starting-core-mailer-gen-2.webp","/images/projects/starting-core-mailer-gen-3.webp","/images/projects/starting-core-mailer-gen-4.webp"],
     "featured": true,
     "order": 145
   },
@@ -1256,8 +1246,8 @@ export const projectCatalog = [
     "buildMethod": "unspecified",
     "role": "",
     "contribution": "Built as a freelance project.",
-    "imageUrl": "",
-    "galleryUrls": [],
+    "imageUrl": "/images/projects/sc-media-discord-gen-1.webp",
+    "galleryUrls": ["/images/projects/sc-media-discord-gen-2.webp","/images/projects/sc-media-discord-gen-3.webp"],
     "featured": true,
     "order": 150
   }
