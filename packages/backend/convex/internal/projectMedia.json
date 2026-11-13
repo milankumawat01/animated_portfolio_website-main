@@ -136,6 +136,24 @@
     "height": 695
   },
   {
+    "filename": "agrivia-1.webp",
+    "r2Key": "portfolio/media/5f62ce85-f127-4b22-a869-34de7c74661f.webp",
+    "size": 100594,
+    "hash": "6eba1726aae71bc0c512ab28abb6a487155bf61678c2057e46c1b2cbfb3cebbb"
+  },
+  {
+    "filename": "agrivia-2.webp",
+    "r2Key": "portfolio/media/16d5500c-2508-4988-b6fa-6858d23af64c.webp",
+    "size": 51506,
+    "hash": "7566ed8b63709c966fc12704881ca04b7459c5d836e2dbeda4fd9f8334ef18fb"
+  },
+  {
+    "filename": "agrivia-3.webp",
+    "r2Key": "portfolio/media/15852a45-90cc-4c7f-8fde-acebafe92bfb.webp",
+    "size": 49760,
+    "hash": "b0169d90b4893eb75faba4840aa48eaba0d9f6d8267bf38bd6a1bf691af33f70"
+  },
+  {
     "filename": "aspire-1.webp",
     "r2Key": "portfolio/media/591c89e0-e664-48c1-9cd3-fc2a505dbffc.webp",
     "size": 91556,
@@ -168,6 +186,12 @@
     "height": 1132
   },
   {
+    "filename": "dekko-1.webp",
+    "r2Key": "portfolio/media/e18902c1-dded-425d-86fc-7ce19c6b657b.webp",
+    "size": 15548,
+    "hash": "10bab8c54de31e425f97b2758c9f31ada6781337cd8352336c9e38e0f705190c"
+  },
+  {
     "filename": "employee-portal-1.webp",
     "r2Key": "portfolio/media/4c1b136f-6310-4002-b478-51dc158f6a0d.webp",
     "size": 82576,
@@ -182,6 +206,54 @@
     "hash": "9912940da2acb7435fae81aa35511728bdb9f01b0869efbd1bd7da654e7d6dec",
     "width": 1699,
     "height": 1132
+  },
+  {
+    "filename": "hisaab-1.webp",
+    "r2Key": "portfolio/media/ea9d4eda-1d20-40b0-b6fc-0dceddc7550b.webp",
+    "size": 32668,
+    "hash": "89d3149d6f14852b4b30e678189bab3919b58b4d4b67398b68e476dcb6ffe077"
+  },
+  {
+    "filename": "infumarket-1.webp",
+    "r2Key": "portfolio/media/0b0f314c-ded4-4a24-9361-5a222a34f4ca.webp",
+    "size": 35810,
+    "hash": "aa8fbc83210b8579a321e6636ee4748bdd1b827c55ebb41c559fda0f75b81184"
+  },
+  {
+    "filename": "infumarket-2.webp",
+    "r2Key": "portfolio/media/b9c87456-d175-4580-80c8-dc43873f79ff.webp",
+    "size": 81922,
+    "hash": "4b4e6c67a7f08e9b84911e10e7ff1d688a214ddc3553d0a7645aee8535c68afe"
+  },
+  {
+    "filename": "infumarket-3.webp",
+    "r2Key": "portfolio/media/e9511ad3-377f-4bf6-8e83-e71a34bb5421.webp",
+    "size": 94028,
+    "hash": "7b91a872203864180d5caa450bac1c35b23b9254c447da6893cb855c25b68315"
+  },
+  {
+    "filename": "infumarket-4.webp",
+    "r2Key": "portfolio/media/59839fd4-07df-4076-b608-eeb372166f34.webp",
+    "size": 67786,
+    "hash": "35014c8c1133d53dc320c27c7def38758441999961f62d4048b879b6ad1e92c4"
+  },
+  {
+    "filename": "khatu-cab-service-1.webp",
+    "r2Key": "portfolio/media/f6acb291-18f1-40e2-b35c-bdd4311c5e91.webp",
+    "size": 170410,
+    "hash": "56beea01d52ec688cd837dd8501f4387eebc12f25af592a5ccb3d316f1fa9f35"
+  },
+  {
+    "filename": "khatu-cab-service-2.webp",
+    "r2Key": "portfolio/media/f996ed05-9234-4eea-b75b-3657648fe4b3.webp",
+    "size": 122328,
+    "hash": "a69b75ea408fc6e315728a9a5eda0f734b799e8ac30f5fd5d3a755b6f1fbe74e"
+  },
+  {
+    "filename": "khatu-cab-service-3.webp",
+    "r2Key": "portfolio/media/93a5c67a-56e5-46bd-a036-c32aa9558390.webp",
+    "size": 118498,
+    "hash": "0375b06f39a76c56136769231786d1bac6168cea02270553bc655e8ef9b98d82"
   },
   {
     "filename": "kontent-ops-1.webp",
@@ -224,6 +296,24 @@
     "height": 1132
   },
   {
+    "filename": "rajasthan-tours-1.webp",
+    "r2Key": "portfolio/media/8cfa1000-8588-4277-8675-a638e87a3fe4.webp",
+    "size": 166326,
+    "hash": "13c2543e32bbc2b90a3dff4192b63467fe95838de45931894dc6123d67d6d865"
+  },
+  {
+    "filename": "rajasthan-tours-2.webp",
+    "r2Key": "portfolio/media/48eda6e6-a69a-445f-9453-8b584f930f41.webp",
+    "size": 144048,
+    "hash": "115dbd2d7734e5c938f8e78644b181051647e3a169676838507f91bf5baf3ea4"
+  },
+  {
+    "filename": "rajasthan-tours-3.webp",
+    "r2Key": "portfolio/media/9add39f0-fc55-47a9-80f8-9655a0a508f3.webp",
+    "size": 110738,
+    "hash": "079b6792485a572da965b660257ff5f346a8727c503558d2be9ba3144dc372ab"
+  },
+  {
     "filename": "salezo-1.webp",
     "r2Key": "portfolio/media/0f90ab09-96d0-4c8a-baa2-2f1c2bb20bad.webp",
     "size": 62274,
@@ -240,11 +330,65 @@
     "height": 1132
   },
   {
+    "filename": "shiv-hotel-1.webp",
+    "r2Key": "portfolio/media/39b9e973-2c1b-4a1e-9761-c01495f7d38e.webp",
+    "size": 14894,
+    "hash": "3dd8d268115164753e62b1ffb937e5eec4446b236b1af256698e14ac0ebe1ab2"
+  },
+  {
+    "filename": "the-soul-root-1.webp",
+    "r2Key": "portfolio/media/e26e37d2-255b-4ec2-af68-f5942b948434.webp",
+    "size": 100380,
+    "hash": "500d4b1f6f6be9553feb449434bae46d281f997fb169dbd918b5caf74d38b931"
+  },
+  {
+    "filename": "the-soul-root-2.webp",
+    "r2Key": "portfolio/media/09f9a561-891f-4253-bb74-3f7d85424117.webp",
+    "size": 143148,
+    "hash": "7e49c547cf0afad27b280376fc874236a7c2265dfe403c03b2010f3a690432a8"
+  },
+  {
+    "filename": "the-soul-root-3.webp",
+    "r2Key": "portfolio/media/98f136f8-be0c-437d-bcb1-44cadb9886e1.webp",
+    "size": 34742,
+    "hash": "ec8503b9ade2ec0af2031c2897a87b54f6baac20709884fcf9fb194761cab842"
+  },
+  {
+    "filename": "tooljar-1.webp",
+    "r2Key": "portfolio/media/4a49c76c-359a-40b1-b2b9-6c624d593791.webp",
+    "size": 38918,
+    "hash": "989b6946fc72ba8bfad08f6c3ca0d452a24b34510a856d9800cc747bfce9c6e7"
+  },
+  {
+    "filename": "tooljar-2.webp",
+    "r2Key": "portfolio/media/ac3e561e-e116-47bc-baab-f429bb908559.webp",
+    "size": 56314,
+    "hash": "cbe1ce72a5ac50bd6c4615823f0bb49d18a5aa94d1feb8b4b861e3aba5cf2388"
+  },
+  {
     "filename": "yolo-trips-1.webp",
     "r2Key": "portfolio/media/7642b198-5077-47f8-bb45-47918e8b0af9.webp",
     "size": 306424,
     "hash": "c12f2ccb6e744e0888d0bc53b1cd402515153ee5bac775ef3d7c6344fcafff1c",
     "width": 1699,
     "height": 1132
+  },
+  {
+    "filename": "zeni-1.webp",
+    "r2Key": "portfolio/media/6f725a5f-251f-4c78-bbe7-8810b06150ff.webp",
+    "size": 51684,
+    "hash": "901bf2ab982aef4d6c97545556a52b0287a37c47298951ceecd2e2e45d757424"
+  },
+  {
+    "filename": "zeni-2.webp",
+    "r2Key": "portfolio/media/6d6819a0-a021-4e88-b388-72f517c1852f.webp",
+    "size": 48746,
+    "hash": "ec7f8391166f39327edc31c1a98d9e4494fd1584e39016518d019cd03ca8bc58"
+  },
+  {
+    "filename": "zeni-3.webp",
+    "r2Key": "portfolio/media/2647aa18-0c2d-4131-8000-c6b605099632.webp",
+    "size": 34382,
+    "hash": "69cdb0ebb6908bfc09a3dfc803898f0ecc53d092525b23cac25a1c902dcbab2c"
   }
 ]

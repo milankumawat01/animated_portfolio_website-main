@@ -462,10 +462,10 @@ export const projectCatalog = [
   },
   {
     "slug": "sanatan-vishwa",
-    "title": "Sanatan Vishwa Foundation",
-    "subtitle": "Community foundation website",
-    "description": "A bilingual foundation website presenting its mission, initiatives and participation.",
-    "longDescription": "The Sanatan Vishwa Foundation website presents the organisation's mission, history and community initiatives. English and Hindi interfaces, image-led storytelling and participation calls to action help visitors understand the foundation and find ways to connect. The repository verifies a Next.js frontend with Supabase; participation and donation-related integrations are present in the implementation, without asserting fundraising or membership results.",
+    "title": "Sanatan Trust",
+    "subtitle": "Community trust website",
+    "description": "A bilingual trust website presenting its mission, initiatives and participation.",
+    "longDescription": "The Sanatan Trust website presents the trust's mission, history and community initiatives. English and Hindi interfaces, image-led storytelling and participation calls to action help visitors understand the trust and find ways to connect. The repository verifies a Next.js frontend with Supabase; participation and donation-related integrations are present in the implementation, without asserting fundraising or membership results.",
     "tags": [
       "Next.js",
       "TypeScript",
@@ -484,7 +484,7 @@ export const projectCatalog = [
     "stats": [],
     "liveUrl": "",
     "githubUrl": "",
-    "company": "Sanatan Vishwa Foundation",
+    "company": "Sanatan Trust",
     "workType": "freelance",
     "buildMethod": "unspecified",
     "role": "",
@@ -519,5 +519,746 @@ export const projectCatalog = [
     "contribution": "Built as a freelance visitor management project.",
     "featured": true,
     "order": 40
+  },
+  {
+    "slug": "infumarket",
+    "title": "InfuMarket",
+    "subtitle": "Creator-economy marketplace with crypto escrow",
+    "description": "A marketplace for buying and selling YouTube, Instagram and TikTok channels, Play Buttons, brand deals and creator services, with escrow paid in cryptocurrency.",
+    "longDescription": "InfuMarket brings five creator businesses under one account, one verified identity and one escrow-protected wallet: buying and selling monetised channels, brand deals and sponsorships, a growth services panel, courses and digital products, and a store for Silver and Gold Play Button plaques. The highlight is the payment layer. Buyers pay in the cryptocurrency and network of their choice through Heleket, the platform settles in USDT, and sellers withdraw USDT on Tron, Ethereum or BNB Smart Chain after admin approval, with a signature-verified webhook crediting every top-up. A WhatsApp bot built directly on Meta's Cloud API handles phone OTP, deal updates and transfer reminders, and a full admin panel covers KYC review, disputes, chat moderation and an audit log on every change.",
+    "tags": [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "PostgreSQL",
+      "Drizzle ORM",
+      "Better Auth",
+      "Heleket Crypto",
+      "WhatsApp Cloud API",
+      "Tailwind CSS",
+      "Docker",
+      "Coolify"
+    ],
+    "keyFeatures": [
+      "Crypto pay-ins in any coin, settled in USDT, with USDT payouts on Tron, Ethereum and BNB Smart Chain",
+      "Escrow deals with a transfer window and admin dispute mediation",
+      "WhatsApp bot for OTP login, deal updates and transfer reminders",
+      "Automatic channel listing once ownership is verified, with scheduled re-checks",
+      "Free channel valuation tool on its own subdomain",
+      "Admin panel with KYC review, role-based access, chat moderation and audit log"
+    ],
+    "architecture": [
+      "Next.js App Router with domain logic in framework-free service modules",
+      "PostgreSQL through Drizzle ORM, with money stored as integer cents",
+      "Signature-checked webhooks for crypto payments and WhatsApp",
+      "Cron-driven outbox for WhatsApp messages and listing re-checks",
+      "Self-hosted with Docker and Coolify behind Cloudflare"
+    ],
+    "stats": [],
+    "liveUrl": "https://infumarket.com",
+    "githubUrl": "",
+    "company": "InfuMarket",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/infumarket-1.webp",
+    "galleryUrls": [
+      "/images/projects/infumarket-2.webp",
+      "/images/projects/infumarket-3.webp",
+      "/images/projects/infumarket-4.webp"
+    ],
+    "featured": true,
+    "order": 12
+  },
+  {
+    "slug": "zeni",
+    "title": "Zeni",
+    "subtitle": "Personal finance workspace, with Onorian Finance OS as its beta",
+    "description": "A private money workspace that keeps accounts, cards, bills, people and statements in one ledger. Onorian Finance OS was the beta that became Zeni.",
+    "longDescription": "Zeni is a finance product from my studio, Rovezi. It started as Onorian Finance OS, a private beta I used to run my own money: statement imports with OCR, bank-alert email sweeps, reconciliation per account and an AI assistant that acts through permissioned tools. Zeni rebuilds that beta for many users. Statements are imported and reviewed line by line, card-payment and statement emails land in an inbox as drafts, and accounts, bills, splits with people, projects, vehicles, share holdings and IPO allotments all live in one ledger. It ships as a web app, an installable PWA and an iPhone app, and an MCP connection lets an AI assistant read and log entries with the user's consent.",
+    "tags": [
+      "React",
+      "Vite",
+      "Astro",
+      "Hono",
+      "Cloudflare Workers",
+      "Neon Postgres",
+      "Better Auth",
+      "Expo",
+      "MCP",
+      "Next.js",
+      "Turso"
+    ],
+    "keyFeatures": [
+      "Statement import and line-by-line review with undo",
+      "Email inbox that unlocks statement PDFs and drafts card payments",
+      "Accounts, bills, people, splits, projects and vehicles in one ledger",
+      "Share holdings with cost basis, plus IPO allotments",
+      "MCP assistant connection with an OAuth consent screen",
+      "Passkey sign-in and an iPhone app alongside the web app"
+    ],
+    "architecture": [
+      "Astro public site, React PWA and Hono API on Cloudflare Workers",
+      "Neon Postgres with checksum-checked migrations and ledger rules enforced by triggers",
+      "Shared contracts and UI packages in a pnpm monorepo",
+      "Expo mobile app with feature parity and an offline demo mode",
+      "Beta (Onorian): Next.js PWA on Vercel with Turso, R2 and QStash"
+    ],
+    "stats": [],
+    "liveUrl": "https://rovezi.tech/zeni",
+    "githubUrl": "",
+    "company": "Rovezi",
+    "workType": "personal",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "My own product, from the Onorian beta to Zeni.",
+    "imageUrl": "/images/projects/zeni-1.webp",
+    "galleryUrls": [
+      "/images/projects/zeni-2.webp",
+      "/images/projects/zeni-3.webp"
+    ],
+    "featured": true,
+    "order": 25
+  },
+  {
+    "slug": "agrivia",
+    "title": "Agrivia",
+    "subtitle": "AI billing and credit ledger for rural agri shops",
+    "description": "A Hindi-first app for fertiliser, seed and pesticide shops: bills, farmer credit, stock and an AI scanner that reads supplier invoices.",
+    "longDescription": "Agrivia replaces the paper credit notebook and hand-written bills of rural agriculture shops. Shop owners make Hindi bills that look like the ones their customers already know and share them on WhatsApp, keep a credit ledger for every farmer by village, and track stock with GST, purchase prices and expiry dates. The AI scanner reads a batch of supplier invoice photos, compresses them on the phone for slow networks, and shows a review screen before anything is saved. Every bill is saved in one atomic step that writes the bill, updates the farmer's balance and deducts stock together.",
+    "tags": [
+      "React",
+      "Vite",
+      "Supabase",
+      "PostgreSQL",
+      "Edge Functions",
+      "OpenRouter",
+      "Gemini",
+      "PWA",
+      "i18next",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "Hindi bills exported as PDF and shared on WhatsApp",
+      "AI invoice scanner with a review step before saving",
+      "Farmer credit ledger with village filters, payments and returns",
+      "Inventory with GST, purchase price, loss warnings and expiry alerts",
+      "Phone OTP login and push notifications",
+      "Separate admin app for data imports"
+    ],
+    "architecture": [
+      "Installable React PWA built for low-end phones and slow networks",
+      "Supabase Postgres with row-level security and atomic RPCs for billing",
+      "Edge functions for OTP, AI proxying, WhatsApp and push",
+      "Soft deletes that reverse the money side first"
+    ],
+    "stats": [],
+    "liveUrl": "https://www.agrivia.in",
+    "githubUrl": "",
+    "company": "Agrivia",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/agrivia-1.webp",
+    "galleryUrls": [
+      "/images/projects/agrivia-2.webp",
+      "/images/projects/agrivia-3.webp"
+    ],
+    "featured": true,
+    "order": 35
+  },
+  {
+    "slug": "the-soul-root",
+    "title": "The Soul Root",
+    "subtitle": "Live satellite plot viewer for a farmhouse estate",
+    "description": "An interactive satellite map where buyers explore every farmhouse plot, see availability and price, and enquire on WhatsApp, plus the estate's website.",
+    "longDescription": "The Soul Root is a luxury farmhouse estate near Jaipur. I built its website and a live plot viewer at plots.thesoulroot.in. Visitors fly over the estate on satellite imagery in a tilted 3D view, hover or click any plot to see its area, side lengths, price, status and photos, and send an enquiry that opens WhatsApp with the plot already filled in. Inside the boundary the map shows the architect's masterplan instead of bare land. Behind it is a Map Studio where the owner draws plots that snap together, measures sides automatically, and publishes changes that reach visitors at once.",
+    "tags": [
+      "Next.js",
+      "React",
+      "MapLibre GL",
+      "Hono",
+      "Cloudflare Workers",
+      "Cloudflare D1",
+      "Cloudflare R2",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "Satellite map with a tilted 3D view of every plot",
+      "Plot details with area, sides, price, status and photos",
+      "WhatsApp enquiry with the plot pre-filled, saved as a lead",
+      "Map Studio to draw, snap and measure plots",
+      "Enquiry inbox with CSV export",
+      "Brochure viewer and showcase videos on the estate website"
+    ],
+    "architecture": [
+      "Static Next.js viewer with a Hono API on a Cloudflare Worker",
+      "D1 for plots and leads, R2 for photos and the brochure",
+      "Public map data cached at the edge and purged on every admin save",
+      "Whole stack on Cloudflare's free tier"
+    ],
+    "stats": [],
+    "liveUrl": "https://plots.thesoulroot.in",
+    "githubUrl": "",
+    "company": "The Soul Root",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/the-soul-root-1.webp",
+    "galleryUrls": [
+      "/images/projects/the-soul-root-2.webp",
+      "/images/projects/the-soul-root-3.webp"
+    ],
+    "featured": true,
+    "order": 45
+  },
+  {
+    "slug": "sj-visitor",
+    "title": "SJ Visitor",
+    "subtitle": "Visitor and student-pickup system for a school",
+    "description": "A gate tablet app and admin console for S.J. Public School, Jaipur, that records every visitor, verifies student pickups and issues gate passes.",
+    "longDescription": "Everyone who enters S.J. Public School is now on record. Security staff check visitors in on a tablet: phone OTP, identity, a live photo and the reason for the visit, whether that is a half-day pickup, a meeting with a teacher or the principal, an admission enquiry or a fee payment. The app issues a gate pass that can be printed or shared. Student pickups are verified by OTP or a parent pickup card, so a child only leaves with an authorised adult. The admin console shows live counters and an activity feed, and manages students, parents, cards, staff and devices, while teachers see only their own class.",
+    "tags": [
+      "Expo",
+      "React Native",
+      "React",
+      "Vite",
+      "TypeScript",
+      "Supabase",
+      "PostgreSQL",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "Tablet check-in with OTP, identity, photo and visit reason",
+      "Printable and shareable gate passes",
+      "Student pickup verified by OTP or parent pickup card",
+      "Admin console with live counters, activity feed, reports and CSV export",
+      "Separate admin, security and teacher roles"
+    ],
+    "architecture": [
+      "Expo tablet app and React admin on one Supabase backend",
+      "Row-level security on every table and an activity log written by triggers",
+      "Private storage with signed URLs; photos compressed before upload",
+      "Scheduled job that deletes old visitor photos automatically"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "True Value Infosoft",
+    "workType": "company",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built at True Value Infosoft.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 55
+  },
+  {
+    "slug": "amity-compliance",
+    "title": "Amity Facility & Compliance",
+    "subtitle": "Complaint ticketing and compliance checklists for Amity University",
+    "description": "A facility management system for Amity University: maintenance complaints, staff assignment and routine compliance checks with photo proof.",
+    "longDescription": "Built for Amity University to run campus maintenance and compliance in one place. Residents raise complaints for carpentry, civil, plumbing or electrical work through a public form, admins assign them to staff by trade, and a job closes only with an OTP and a rating from the resident. On the compliance side, admins set up locations, time slots and task templates such as water tank cleaning, design custom checklists with a drag-and-drop builder, and staff upload before and after photos as proof. WhatsApp messages and push notifications keep everyone informed, and reports export to Excel. A later rewrite fixed connection and schema problems found in a written root-cause analysis.",
+    "tags": [
+      "Next.js",
+      "Prisma",
+      "MySQL",
+      "PostgreSQL",
+      "Firebase Cloud Messaging",
+      "WhatsApp",
+      "Docker",
+      "Expo"
+    ],
+    "keyFeatures": [
+      "Public complaint form with running complaint numbers",
+      "Assignment by trade, OTP closure and resident rating",
+      "Compliance checklists with a drag-and-drop form builder",
+      "Before and after photo proof for every task",
+      "WhatsApp and push notifications on assignment",
+      "Filters, search and Excel reports per employee"
+    ],
+    "architecture": [
+      "Next.js app with Prisma, first on MySQL and rewritten on Postgres",
+      "Rewrite driven by a root-cause analysis of connection-pool and schema drift issues",
+      "Containerised stack with Postgres, Redis and object storage",
+      "Expo staff app for field work"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "True Value Infosoft",
+    "workType": "company",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built at True Value Infosoft for Amity University.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 65
+  },
+  {
+    "slug": "yamato-docs",
+    "title": "DocuQuery & ETMS",
+    "subtitle": "AI document search and an operations suite for Yamato Logistics India",
+    "description": "Two prototypes for Yamato Logistics India: DocuQuery, an offline AI that reads scanned records and answers questions, followed by ETMS, an expense and operations suite.",
+    "longDescription": "Yamato Logistics India, part of a Japanese logistics group, wanted to digitise years of scanned paperwork and then run its internal operations on one system. The first prototype, DocuQuery, reads scanned PDFs with OCR, sorts them into categories such as accounts, HR, leasing and legal, and lets staff search by meaning or chat with the documents, with every answer citing its page. It runs fully on-premise with a local language model, so no document leaves the office. The second prototype, ETMS, grew from that work into an operations suite: business trips and claims, mileage, advances, departmental requisitions, purchase orders, vendor onboarding, asset checks, a SaaS risk register and approval and finance consoles, demonstrated to the client behind Microsoft sign-in.",
+    "tags": [
+      "FastAPI",
+      "Python",
+      "Tesseract OCR",
+      "Sentence Transformers",
+      "Ollama",
+      "SQLite",
+      "React",
+      "TypeScript",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "OCR for scanned PDFs with background processing",
+      "Automatic document categories and per-document summaries",
+      "Semantic search and chat with page-cited answers",
+      "Fully offline: local embeddings and local LLM",
+      "ETMS: trips, claims, mileage, advances and requisitions",
+      "ETMS: purchase orders, vendor onboarding, asset checks and approvals"
+    ],
+    "architecture": [
+      "DocuQuery: single FastAPI service with OCR, chunked embeddings and cosine search",
+      "Streaming answers with source lists",
+      "On-premise by design so records never leave the network",
+      "ETMS: clickable React prototype planned for Azure AD, HRMS and Tally integration"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "True Value Infosoft",
+    "workType": "company",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built at True Value Infosoft for Yamato Logistics India.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 75
+  },
+  {
+    "slug": "hisaab",
+    "title": "Hisaab",
+    "subtitle": "Invoices, reconciliation and GST for small businesses",
+    "description": "Upload a bill or a bank statement and Hisaab reads it, books the invoice and matches the payment, with GST tracking and Tally and Zoho sync.",
+    "longDescription": "Hisaab takes the month-end chores off small Indian businesses. Upload a PDF or a phone photo of a bill and it extracts the vendor, GSTIN, invoice number, line items, tax and totals, then books the invoice for review. Import a bank statement from any bank and each payment is matched to the right invoice, with part-payments, duplicates and unknown debits sent to an exceptions queue. Categorise a transaction once and Hisaab learns the rule. Input and output GST is tracked by period and split into CGST, SGST and IGST, TDS and party ledgers sit alongside, verified invoices sync to Tally or Zoho Books, and bills that arrive by email are pulled in automatically.",
+    "tags": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "AI Extraction",
+      "GST",
+      "Tally",
+      "Zoho Books",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "AI bill extraction from PDFs and phone photos",
+      "Bank statement matching with an exceptions queue",
+      "Reconciliation rules learned from one categorisation",
+      "GST by period with CGST, SGST and IGST split, plus TDS",
+      "Tally and Zoho Books sync with logged runs",
+      "Mailbox import, multiple companies and team access"
+    ],
+    "architecture": [
+      "Review-first flow: nothing is booked without the user's approval",
+      "Rules per bank account or across accounts",
+      "Every change recorded for an audit trail"
+    ],
+    "stats": [],
+    "liveUrl": "https://hisaab.truevalueinfosoft.co.in",
+    "githubUrl": "",
+    "company": "",
+    "workType": "personal",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "My own product.",
+    "imageUrl": "/images/projects/hisaab-1.webp",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 85
+  },
+  {
+    "slug": "bhoomi-rakshak",
+    "title": "Bhoomi Rakshak",
+    "subtitle": "Doctor and patient portals with AI voice prescriptions",
+    "description": "A health platform where patients book doctors online and doctors dictate prescriptions by voice, turned into a structured prescription by AI.",
+    "longDescription": "Bhoomi Rakshak connects patients and doctors through two portals on one API. Patients sign in with OTP, book appointments and keep their prescriptions, lab results, vitals and medicine reminders in one place. Doctors run their day from a live OPD queue and a consultation workspace where they simply speak: the recording is transcribed, AI extracts the medicines, diagnosis and notes, checks for drug interactions and produces a prescription PDF in moments. The interface works in six languages, including regional tribal languages, and an assistant helps patients find their way.",
+    "tags": [
+      "FastAPI",
+      "PostgreSQL",
+      "SQLAlchemy",
+      "Socket.IO",
+      "React",
+      "Vite",
+      "TypeScript",
+      "Whisper",
+      "Gemini",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "Online booking with OTP sign-in",
+      "Voice dictation turned into a structured prescription",
+      "Drug-interaction check before the prescription is issued",
+      "Prescription PDFs and patient health records",
+      "Live OPD queue for doctors",
+      "Six interface languages and an AI patient assistant"
+    ],
+    "architecture": [
+      "FastAPI with async SQLAlchemy on PostgreSQL",
+      "Socket.IO for the live queue",
+      "Speech-to-text with Whisper, structured extraction with Gemini",
+      "Two React portals served as static builds behind Nginx"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 95
+  },
+  {
+    "slug": "kairos",
+    "title": "KairOS",
+    "subtitle": "AI agents that deliver a daily market briefing",
+    "description": "A multi-agent system built for a client that collects launches and discussions from Reddit, Hacker News and Product Hunt and delivers a morning report.",
+    "longDescription": "The client wanted to start every day knowing what had happened in their market without reading a dozen sites. KairOS runs a team of agents overnight: they collect new launches and discussions from Reddit, Hacker News, Product Hunt and Indie Hackers, store them in vector memory, link them in a knowledge graph and score each opportunity on demand, competition and effort. Each morning a report agent writes a daily briefing with the top opportunity, market discoveries, competitor launches and keyword ideas, and sends it to Slack or Discord, with a dashboard to explore everything behind it.",
+    "tags": [
+      "Python",
+      "FastAPI",
+      "Qdrant",
+      "Google Gemini",
+      "APScheduler",
+      "Next.js",
+      "React",
+      "Docker"
+    ],
+    "keyFeatures": [
+      "Research agents for Reddit, Hacker News, Product Hunt and Indie Hackers",
+      "Vector memory and a knowledge graph of everything collected",
+      "Opportunity scoring on demand, competition and effort",
+      "Daily morning report delivered to Slack or Discord",
+      "Dashboard with live agent logs"
+    ],
+    "architecture": [
+      "Separate agents for research, memory, decisions, reports and notifications",
+      "FastAPI service with async SQLAlchemy and a Qdrant vector store",
+      "Scheduled daily run with webhook delivery and a local fallback",
+      "Docker Compose for the full stack"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built for a client as a freelance project.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 105
+  },
+  {
+    "slug": "shiv-hotel",
+    "title": "Shiv Hotel & Dining",
+    "subtitle": "QR table ordering for a hotel restaurant",
+    "description": "Guests scan the QR on their table and order from their phone; the order reaches the kitchen, cashier and waiter screens at once.",
+    "longDescription": "Built on the same foundation as the Banarsi Lassi & Cafe system, Shiv Hotel lets guests scan the QR on their table, browse the menu, order and track it live from their own phone, and call a waiter or ask for the bill with a tap. Each order moves through placed, confirmed, preparing, ready and served across separate screens for the kitchen, cashier, waiter and admin. Table sessions, walk-ins, counter sales, inventory with recipes, a customer credit ledger and a daily day book complete the restaurant's back office.",
+    "tags": [
+      "Next.js 16",
+      "TypeScript",
+      "Drizzle ORM",
+      "Supabase",
+      "PostgreSQL",
+      "Server-Sent Events",
+      "shadcn/ui",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "QR menu, cart and live order tracking for guests",
+      "Waiter call and bill request from the table",
+      "Kitchen, cashier, waiter and admin screens",
+      "Table sessions, walk-ins and counter quick sale",
+      "Inventory with recipes and stock movements",
+      "Customer credit ledger and daily day book"
+    ],
+    "architecture": [
+      "Real-time updates over Server-Sent Events with a polling fallback",
+      "Server-side price checks and role-based access",
+      "Idempotent orders keyed by a client request ID",
+      "Hosted on Vercel in Mumbai with Supabase Postgres"
+    ],
+    "stats": [],
+    "liveUrl": "https://shivhotel.vercel.app",
+    "githubUrl": "",
+    "company": "Shiv Hotel",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/shiv-hotel-1.webp",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 115
+  },
+  {
+    "slug": "khatu-cab-service",
+    "title": "Khatu Cab Service",
+    "subtitle": "Taxi and pilgrimage booking website",
+    "description": "A booking website for a Khatu Shyam taxi service: darshan trips, Rajasthan tour packages, vehicles and hotel help, with WhatsApp enquiries.",
+    "longDescription": "Khatu Cab Service takes pilgrims to Khatu Shyam Ji and travellers across Rajasthan. The site presents darshan yatras, tour packages, the vehicle fleet and hotel booking help, and its enquiry form validates the trip details and opens WhatsApp with everything pre-filled, so the owner gets bookings without a backend. It was rebuilt from a written plan and checked for accessibility and layout across phone and desktop widths before launch.",
+    "tags": [
+      "Next.js 16",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Playwright",
+      "axe-core"
+    ],
+    "keyFeatures": [
+      "WhatsApp enquiry form with validation",
+      "Darshan yatra and Rajasthan tour packages",
+      "Vehicle fleet and hotel booking help",
+      "Swipeable carousels on mobile",
+      "Accessible mobile menu with focus trap"
+    ],
+    "architecture": [
+      "Static Next.js site with no backend to maintain",
+      "Automated accessibility and layout checks across screen widths",
+      "Deployed to Vercel through a signed webhook on every push"
+    ],
+    "stats": [],
+    "liveUrl": "https://www.khatucabservice.com",
+    "githubUrl": "",
+    "company": "Khatu Cab Service",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/khatu-cab-service-1.webp",
+    "galleryUrls": [
+      "/images/projects/khatu-cab-service-2.webp",
+      "/images/projects/khatu-cab-service-3.webp"
+    ],
+    "featured": true,
+    "order": 125
+  },
+  {
+    "slug": "rajasthan-tours",
+    "title": "Rajasthan Tours & Travels",
+    "subtitle": "Taxi, tour package and hotel booking website",
+    "description": "A website for a Rajasthan taxi and tour operator with vehicles, tour packages, hotels and WhatsApp booking.",
+    "longDescription": "Rajasthan Tours & Travels sells taxis, tour packages and hotel stays across Rajasthan. The site shows the fleet from sedans to Urbania, tour packages with detailed itineraries in dialogs, hotels and reviews, and a booking form that opens a pre-filled WhatsApp enquiry. Every heading and price is real text rather than baked into images, which keeps it fast and searchable, and structured data, a sitemap and an llms.txt help search engines and AI assistants understand the business.",
+    "tags": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Playwright",
+      "SEO",
+      "Vercel"
+    ],
+    "keyFeatures": [
+      "Fleet and tour packages with detail dialogs",
+      "WhatsApp booking form and QR code",
+      "Structured data, sitemap, robots and llms.txt",
+      "Lazy-loaded WebP imagery and self-hosted fonts",
+      "End-to-end tests for navigation, dialogs and links"
+    ],
+    "architecture": [
+      "Statically exported Next.js site",
+      "No customer data stored; enquiries go straight to WhatsApp",
+      "Deployed to Vercel through a signed webhook"
+    ],
+    "stats": [],
+    "liveUrl": "https://www.rajasthantaxitourshotels.com",
+    "githubUrl": "",
+    "company": "Rajasthan Tours & Travels",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "/images/projects/rajasthan-tours-1.webp",
+    "galleryUrls": [
+      "/images/projects/rajasthan-tours-2.webp",
+      "/images/projects/rajasthan-tours-3.webp"
+    ],
+    "featured": true,
+    "order": 130
+  },
+  {
+    "slug": "tooljar",
+    "title": "ToolJar",
+    "subtitle": "Free image tools that run entirely in the browser",
+    "description": "An open, free suite of image tools (compress, resize, crop, convert, image to PDF and more) where files never leave the user's device.",
+    "longDescription": "ToolJar is a free image toolkit I built and run: compress, resize, crop, convert, rotate and flip, image to PDF, watermark, colour palette and image to Base64. Every tool runs in the browser with the Canvas API, so nothing is uploaded and it works offline once loaded. The site is built for search: each tool has its own page with FAQ structured data, and programmatic landing pages answer specific needs such as compressing a photo for an exam form or resizing for WhatsApp, with a scheduled job adding new pages automatically. It draws steady international traffic at zero hosting cost.",
+    "tags": [
+      "Astro",
+      "TypeScript",
+      "Canvas API",
+      "Cloudflare Pages",
+      "SEO",
+      "JSON-LD",
+      "GitHub Actions"
+    ],
+    "keyFeatures": [
+      "Image tools that never upload files",
+      "Image to PDF, watermark, palette and Base64 tools",
+      "Programmatic SEO landing pages for common tasks",
+      "FAQ and WebApplication structured data",
+      "One data file drives navigation, footer and tool grid"
+    ],
+    "architecture": [
+      "Static Astro site on Cloudflare Pages",
+      "Scheduled GitHub Action generates and publishes new SEO pages",
+      "Sitemap generated at build with clean URLs"
+    ],
+    "stats": [],
+    "liveUrl": "https://tooljar.pages.dev",
+    "githubUrl": "",
+    "company": "",
+    "workType": "personal",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "My own product.",
+    "imageUrl": "/images/projects/tooljar-1.webp",
+    "galleryUrls": [
+      "/images/projects/tooljar-2.webp"
+    ],
+    "featured": true,
+    "order": 135
+  },
+  {
+    "slug": "dekko",
+    "title": "Dekko",
+    "subtitle": "Automatic Trakt tracking for everything you watch",
+    "description": "A PWA and browser extension that marks shows and movies as watched on Trakt automatically while you watch them in the browser.",
+    "longDescription": "Dekko removes the chore of logging what you watch on Trakt. A browser extension notices playback and the app scrobbles it to Trakt on its own; when a match is uncertain it waits in an inbox for one confirmation and learns the site for next time. The PWA brings Trakt's Up Next, calendar, discover, library, history and reports into one fast app with push notifications. It runs entirely on Cloudflare's free tier at dekko.rovezi.tech, with Trakt tokens encrypted at rest and refreshed before they expire.",
+    "tags": [
+      "React",
+      "Vite",
+      "TypeScript",
+      "Hono",
+      "Cloudflare Workers",
+      "Cloudflare D1",
+      "Chrome Extension",
+      "PWA",
+      "Tailwind CSS"
+    ],
+    "keyFeatures": [
+      "Automatic scrobbling from a browser extension",
+      "Inbox for uncertain matches that learns site rules",
+      "Up Next, calendar, discover, library and reports",
+      "Web push notifications",
+      "Trakt sign-in with an invite allowlist"
+    ],
+    "architecture": [
+      "One Cloudflare Worker serves the PWA and the API",
+      "Trakt tokens encrypted with AES-GCM in D1 and refreshed by cron",
+      "Image proxy with caching for Trakt artwork",
+      "Tests run against a fake Trakt server"
+    ],
+    "stats": [],
+    "liveUrl": "https://dekko.rovezi.tech",
+    "githubUrl": "",
+    "company": "Rovezi",
+    "workType": "personal",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "My own product.",
+    "imageUrl": "/images/projects/dekko-1.webp",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 140
+  },
+  {
+    "slug": "starting-core-mailer",
+    "title": "Starting Core Mailer",
+    "subtitle": "Self-hosted email marketing for an agency",
+    "description": "A rebranded, self-hosted listmonk deployment that lets an agency run newsletters, campaigns and transactional email on its own server.",
+    "longDescription": "Starting Core needed to send campaigns and newsletters without paying per subscriber to a SaaS. I rebranded the open-source listmonk as Starting Core Mailer and set it up on their own infrastructure: subscriber lists and segments, campaigns built in Markdown or a visual email builder, transactional email, bounce processing, analytics and a public subscription page with captcha. It ships as a single Go binary or a Docker image on PostgreSQL, with systemd units for running it on a server.",
+    "tags": [
+      "Go",
+      "Vue",
+      "PostgreSQL",
+      "Docker",
+      "listmonk",
+      "SMTP"
+    ],
+    "keyFeatures": [
+      "Campaigns, newsletters and transactional email",
+      "Subscriber lists, segments and import",
+      "Markdown and visual email builder templates",
+      "Bounce processing and campaign analytics",
+      "Public subscription page with captcha"
+    ],
+    "architecture": [
+      "Rebranded fork of the open-source listmonk",
+      "Single Go binary serving the API and the bundled frontend",
+      "PostgreSQL with SQL queries kept in files",
+      "Docker Compose and systemd deployment"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "Starting Core",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Rebranded and deployed as a freelance project.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 145
+  },
+  {
+    "slug": "sc-media-discord",
+    "title": "SC Media Discord",
+    "subtitle": "Discord server and bots for a video-editor agency",
+    "description": "A scripted Discord server and moderation bot that run recruitment and onboarding for a clipping agency's community of video editors.",
+    "longDescription": "SC Media recruits video editors at scale through Discord. I designed the whole server and automated it: scripts build every role, colour, permission and channel category from scratch, and a bot runs the recruitment funnel. Applicants read the rules, watch training, open a ticket, receive test footage and submit their edit. Reviewers accept or reject with one command; accepted editors are promoted, announced and assigned a page, rejected ones get feedback by DM, and every decision is logged.",
+    "tags": [
+      "Python",
+      "discord.py",
+      "Discord",
+      "Automation"
+    ],
+    "keyFeatures": [
+      "Server built automatically: roles, permissions and categories",
+      "Applicant to verified-editor recruitment funnel",
+      "Accept and reject commands with announcements and DMs",
+      "Ticket closing and review logs"
+    ],
+    "architecture": [
+      "Python scripts with discord.py for setup and cleanup",
+      "Bot commands restricted to reviewer roles",
+      "Works alongside Ticket Tool and Carl-bot"
+    ],
+    "stats": [],
+    "liveUrl": "",
+    "githubUrl": "",
+    "company": "SC Media",
+    "workType": "freelance",
+    "buildMethod": "unspecified",
+    "role": "",
+    "contribution": "Built as a freelance project.",
+    "imageUrl": "",
+    "galleryUrls": [],
+    "featured": true,
+    "order": 150
   }
 ] as const

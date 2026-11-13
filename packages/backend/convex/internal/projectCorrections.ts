@@ -44,3 +44,19 @@ export const applyConfirmedDetails = internalMutation({
     return { published: (await ctx.db.query('projects').withIndex('by_status_order', q => q.eq('status', 'published')).collect()).length, merged: 'autoresumebot -> hiro', employer: 'True Value Infosoft' }
   },
 })
+
+// Owner-confirmed rename: the client is Sanatan Trust. Slug stays so existing links keep working.
+export const renameSanatanTrust = internalMutation({
+  args: {},
+  handler: async ctx => {
+    const project = await ctx.db.query('projects').withIndex('by_slug', q => q.eq('slug', 'sanatan-vishwa')).unique()
+    const copy = projectCatalog.find(item => item.slug === 'sanatan-vishwa')
+    if (!project || !copy) throw new Error('sanatan-vishwa not found')
+    await ctx.db.patch(project._id, {
+      title: copy.title, subtitle: copy.subtitle, description: copy.description, longDescription: copy.longDescription,
+      company: copy.company, seo: { title: copy.title, description: copy.description }, updatedAt: Date.now(),
+    })
+    await scheduleRevalidate(ctx, ['home', 'projects', 'project:sanatan-vishwa'])
+    return copy.title
+  },
+})
