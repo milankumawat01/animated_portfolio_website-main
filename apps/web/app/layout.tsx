@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: 'Milan Kumawat | AI Engineer & Backend Developer',
     description: 'Building AI-powered products and scalable systems for a better tomorrow.',
     siteName: 'Milan Kumawat',
-    images: [{ url: '/images/og-milan.jpg', width: 1200, height: 630, alt: 'Milan Kumawat' }],
+    images: [{ url: '/images/og-milan-desk.jpg', width: 1200, height: 630, alt: 'Milan Kumawat' }],
   },
   // No title/description here: X falls back to each page's og:title and
   // og:description, which would otherwise be shadowed by these site-wide ones.
