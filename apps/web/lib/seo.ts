@@ -10,8 +10,8 @@ export function openGraph(path: string, fields: OpenGraph): OpenGraph {
     locale: 'en_US',
     url: path,
     images: [{
-      url: '/opengraph-image', width: 1200, height: 630,
-      alt: 'Milan Kumawat — AI Engineer & Backend Developer',
+      url: '/images/og-milan.jpg', width: 1200, height: 630,
+      alt: 'Milan Kumawat',
     }],
     ...fields,
   }
