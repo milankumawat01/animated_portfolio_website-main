@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import { Handwriting } from './ui/Handwriting';
 import { ContactCards } from './ContactCards';
-import { OpenContactButton } from './modals/ModalTriggers';
+import { OpenBookingButton, OpenContactButton } from './modals/ModalTriggers';
 import type { SiteSettingsDoc } from '@/lib/convex';
 
 interface ContactSectionProps {
@@ -64,6 +64,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings }) => {
                 <span>Let&apos;s Talk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </OpenContactButton>
+
+              <OpenBookingButton
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border-2 border-blue text-blue hover:bg-blue hover:text-text-on-dark font-bold text-sm transition-all duration-200 active:scale-95 shrink-0"
+              >
+                <CalendarDays className="w-4 h-4" />
+                <span>Book a meeting</span>
+              </OpenBookingButton>
 
               <p className="text-xs sm:text-sm text-text-secondary">
                 Prefer a quick chat? I&apos;m usually active on{' '}

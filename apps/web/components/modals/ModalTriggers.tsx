@@ -12,6 +12,11 @@ export function OpenContactButton(props: ButtonProps) {
   return <button type="button" {...props} onClick={openContact} />
 }
 
+export function OpenBookingButton(props: ButtonProps) {
+  const { openBooking } = useModals()
+  return <button type="button" {...props} onClick={openBooking} />
+}
+
 export function OpenResumeButton(props: ButtonProps) {
   const { openResume } = useModals()
   return <button type="button" {...props} onClick={openResume} />

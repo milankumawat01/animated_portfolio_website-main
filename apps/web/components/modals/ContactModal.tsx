@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Send, Mail, Check, Copy, AlertCircle } from 'lucide-react';
+import { X, Send, Mail, Check, Copy, AlertCircle, CalendarDays } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api as _api } from '@portfolio/backend/convex/_generated/api';
 import { errorMessage } from '@/lib/errors';
 import { convexMutation } from '@/lib/convex-http';
+import { OpenBookingButton } from './ModalTriggers';
 const api = _api as any;
 
 interface ContactModalProps {
@@ -247,6 +248,11 @@ function ContactFormInner({ onClose }: { onClose: () => void }) {
             </>
           )}
         </button>
+
+        <OpenBookingButton className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl border border-blue/40 text-blue hover:bg-blue/5 font-semibold text-sm transition-colors">
+          <CalendarDays className="w-4 h-4" />
+          <span>Book a meeting instead</span>
+        </OpenBookingButton>
       </form>
     </div>
   );
